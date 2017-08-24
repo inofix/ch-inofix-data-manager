@@ -1,0 +1,4 @@
+Bundle-Name: data-manager-web
+Bundle-SymbolicName: ch.inofix.data
+Bundle-Version: 1.0.0
+Export-Package: ch.inofix.data.constants
