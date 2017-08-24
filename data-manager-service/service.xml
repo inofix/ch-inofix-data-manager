@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.0.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_0_0.dtd">
+<!-- 
+    service.xml: model and service configuration of the data manager. 
+
+    Created:    2017-03-08 19:28 by Christian Berndt 
+    Modified:   2017-08-24 11:58 by Christian Berndt 
+    Version:    1.0.4
+-->
+<service-builder package-path="ch.inofix.data">
+    <author>Christian Berndt</author>    
+    <namespace>inofix_dm</namespace>
+    <entity name="Measurement" uuid="true" local-service="true"
+        remote-service="true">
+
+		<!-- PK fields -->
+
+        <column name="measurementId" type="long" primary="true" />
+        
+		<!-- Group instance -->
+
+        <column name="groupId" type="long" />
+        
+		<!-- Audit fields -->
+        
+        <column name="companyId" type="long" />
+        <column name="userId" type="long" />
+        <column name="userName" type="String" />
+        <column name="createDate" type="Date" />
+        <column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+        <column name="data" type="String" />
+
+		<!-- Order -->
+        
+        <order>
+            <order-column name="measurementId" order-by="desc" />
+        </order>
+
+		<!-- Finder methods -->
+
+        <finder return-type="Collection" name="GroupId">
+            <finder-column name="groupId" />
+        </finder>
+
+		<!-- References -->
+        
+        <reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />
+        <reference entity="AssetLink" package-path="com.liferay.portlet.asset" />
+		<reference entity="AssetTag" package-path="com.liferay.portlet.asset" />
+        
+        <reference entity="SocialActivity" package-path="com.liferay.portlet.social" />
+        
+	</entity>
+    
+    <!-- Exceptions -->
+
+    <exceptions>
+        <exception>FileFormat</exception>
+        <exception>MeasurementXLS</exception>
+        <exception>MeasurementXML</exception>
+    </exceptions>
+    
+</service-builder>
