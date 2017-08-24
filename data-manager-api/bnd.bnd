@@ -1,0 +1,9 @@
+Bundle-Name: data-manager-api
+Bundle-SymbolicName: ch.inofix.data.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	ch.inofix.data.exception,\
+	ch.inofix.data.model,\
+	ch.inofix.data.service,\
+	ch.inofix.data.service.persistence
+-includeresource: META-INF/service.xml=../data-manager-service/service.xml
