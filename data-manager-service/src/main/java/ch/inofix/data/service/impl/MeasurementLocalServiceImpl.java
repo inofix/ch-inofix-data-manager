@@ -57,8 +57,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-09-01 20:03
- * @version 1.1.0
+ * @modified 2017-09-02 07:26
+ * @version 1.1.1
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -381,7 +381,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
             searchContext.setFacets(facets);
             searchContext.setSorts(sort);
 
-            Indexer indexer = IndexerRegistryUtil
+            Indexer<Measurement> indexer = IndexerRegistryUtil
                     .nullSafeGetIndexer(Measurement.class);
 
             return indexer.search(searchContext);
@@ -393,6 +393,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
+    @Indexable(type = IndexableType.REINDEX)
     public Measurement updateMeasurement(long measurementId, long userId,
             String data, ServiceContext serviceContext) throws PortalException {
 
@@ -415,12 +416,6 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         measurement.setData(data);
 
         measurementPersistence.update(measurement);
-
-        // Indexing
-
-        Indexer indexer = IndexerRegistryUtil
-                .nullSafeGetIndexer(Measurement.class);
-        indexer.reindex(measurement);
 
         return measurement;
 
