@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-09-10 16:39 by Christian Berndt
-    Version:     1.0.0
+    Modified:    2017-09-12 10.46 by Christian Berndt
+    Version:     1.0.1
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -19,14 +19,17 @@
 
 <%@page import="ch.inofix.data.web.configuration.DataManagerConfiguration"%>
 
+<%@page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil"%>
 <%@page import="com.liferay.portal.kernel.portlet.PortalPreferences"%>
 <%@page import="com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.security.auth.PrincipalException"%>
+<%@page import="com.liferay.portal.kernel.util.Constants"%>
 <%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
 
 <%@page import="javax.portlet.PortletURL"%>
+<%@page import="javax.portlet.ResourceURL"%>
 
 <liferay-frontend:defineObjects />
 
