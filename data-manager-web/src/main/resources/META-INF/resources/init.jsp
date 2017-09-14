@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-09-12 10.46 by Christian Berndt
-    Version:     1.0.1
+    Modified:    2017-09-14 18:12 by Christian Berndt
+    Version:     1.0.2
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -28,6 +28,8 @@
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
 
+<%@page import="java.util.Date"%>
+
 <%@page import="javax.portlet.PortletURL"%>
 <%@page import="javax.portlet.ResourceURL"%>
 
@@ -40,11 +42,24 @@
 <%
     PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
 
+    String dataURL = portletPreferences.getValue("dataURL", "");
+
     String markupView = "lexicon";
+    
+    Date now = new Date(); 
+    
+    String password = portletPreferences.getValue("password", "");
+    
     boolean showSearchSpeed = false;
     
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
     String tabs2 = ParamUtil.getString(request, "tabs2", "export");
+    
+    long until = ParamUtil.getLong(request, "until", now.getTime());
+    
+    long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0"));
+    
+    String userName = portletPreferences.getValue("userName", "");
     
     DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) request
             .getAttribute(DataManagerConfiguration.class.getName());
