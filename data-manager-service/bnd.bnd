@@ -1,5 +1,10 @@
 Bundle-Name: Inofix Data Manager Service
 Bundle-SymbolicName: ch.inofix.data.service
 Bundle-Version: 1.0.0
+Export-Package:\
+    ch.inofix.data.model.impl,\
+    ch.inofix.data.search,\
+    ch.inofix.data.service.permission,\
+    ch.inofix.data.service.util
 Liferay-Require-SchemaVersion: 1.0.0
 Liferay-Service: true

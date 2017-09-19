@@ -28,5 +28,8 @@
                                 
             </div>
         </div>
+        
+        <liferay-util:include page="/add_button.jsp" servletContext="<%= application %>" />    
+        
     </c:otherwise>
 </c:choose>

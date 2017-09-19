@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE resource-action-mapping PUBLIC "-//Liferay//DTD Resource Action Mapping 7.0.0//EN" 
+    "http://www.liferay.com/dtd/liferay-resource-action-mapping_7_0_0.dtd">
+<!--  
+    default.xml: The data-manager portlet's permission configuration.
+    
+    Created:    2017-09-18 11:02 by Christian Berndt
+    Modified:   2017-09-18 11:02 by Christian Berndt
+    Version:    1.0.0
+-->
+<resource-action-mapping>
+    <model-resource>
+        <model-name>ch.inofix.data</model-name>
+        <portlet-ref>
+            <portlet-name>ch_inofix_data_web_internal_portlet_DataManagerPortlet</portlet-name>
+        </portlet-ref>
+        <root>true</root>
+        <weight>1</weight>
+        <permissions>
+            <supports>
+                <action-key>ADD_MEASUREMENT</action-key>
+                <action-key>DELETE_GROUP_MEASUREMENTS</action-key>
+                <action-key>EXPORT_MEASUREMENTS</action-key>
+                <action-key>EXPORT_IMPORT_MEASUREMENTS</action-key>
+                <action-key>IMPORT_MEASUREMENTS</action-key>
+                <action-key>PERMISSIONS</action-key>
+                <action-key>VIEW</action-key>
+            </supports>
+            <site-member-defaults>
+<!--                 <action-key>ADD_MEASUREMENT</action-key> -->
+                <action-key>VIEW</action-key>
+            </site-member-defaults>
+            <guest-defaults/>
+            <guest-unsupported>
+                <action-key>ADD_MEASUREMENT</action-key>
+                <action-key>DELETE_GROUP_MEASUREMENTS</action-key>
+                <action-key>EXPORT_MEASUREMENTS</action-key>
+                <action-key>EXPORT_IMPORT_MEASUREMENTS</action-key>
+                <action-key>IMPORT_MEASUREMENTS</action-key>
+                <action-key>PERMISSIONS</action-key>
+            </guest-unsupported>
+        </permissions>
+    </model-resource>
+    <model-resource>
+        <model-name>ch.inofix.data.model.Measurement</model-name>
+        <portlet-ref>
+            <portlet-name>ch_inofix_data_web_internal_portlet_DataManagerPortlet</portlet-name>
+        </portlet-ref>
+        <weight>3</weight>
+        <permissions>
+            <supports>
+                <action-key>DELETE</action-key>
+                <action-key>PERMISSIONS</action-key>
+                <action-key>UPDATE</action-key>
+                <action-key>VIEW</action-key>
+            </supports>
+            <site-member-defaults>
+                <action-key>VIEW</action-key>
+            </site-member-defaults>
+            <guest-defaults/>
+            <guest-unsupported>
+                <action-key>DELETE</action-key>
+                <action-key>PERMISSIONS</action-key>
+                <action-key>UPDATE</action-key>
+            </guest-unsupported>
+        </permissions>
+    </model-resource>
+</resource-action-mapping>
