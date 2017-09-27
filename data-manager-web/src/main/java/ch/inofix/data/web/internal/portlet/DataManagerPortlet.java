@@ -1,10 +1,13 @@
 package ch.inofix.data.web.internal.portlet;
 
+import com.liferay.portal.kernel.exception.NoSuchResourceException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -18,9 +21,15 @@ import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementService;
 import ch.inofix.data.web.internal.constants.DataManagerWebKeys;
 
+import java.io.IOException;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.PortletRequest;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -30,8 +39,8 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:32
- * @modified 2017-09-27 00:19
- * @version 1.0.2
+ * @modified 2017-09-27 14:20
+ * @version 1.0.3
  */
 @Component(
     immediate = true,
@@ -56,9 +65,15 @@ public class DataManagerPortlet extends MVCPortlet {
         String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
         try {
-            if (cmd.equals(Constants.UPDATE)) {
+            if (cmd.equals(Constants.DELETE)) {
 
-            } else if (cmd.equals(Constants.DELETE)) {
+                deleteMeasurements(actionRequest, actionResponse);
+                addSuccessMessage(actionRequest, actionResponse);
+                
+            } else if (cmd.equals(Constants.UPDATE)) {
+                
+                updateMeasurement(actionRequest, actionResponse);
+                addSuccessMessage(actionRequest, actionResponse);
 
             }
 
@@ -68,6 +83,23 @@ public class DataManagerPortlet extends MVCPortlet {
             _log.error(e);
 
         }
+    }
+    
+    @Override
+    public void render(RenderRequest renderRequest, RenderResponse renderResponse)
+            throws IOException, PortletException {
+
+        try {
+            getMeasurement(renderRequest);
+        } catch (Exception e) {
+            if (e instanceof NoSuchResourceException || e instanceof PrincipalException) {
+                SessionErrors.add(renderRequest, e.getClass());
+            } else {
+                throw new PortletException(e);
+            }
+        }
+
+        super.render(renderRequest, renderResponse);
     }
 
     protected String getEditMeasurementURL(ActionRequest actionRequest, ActionResponse actionResponse,
@@ -112,6 +144,19 @@ public class DataManagerPortlet extends MVCPortlet {
             _measurementService.deleteMeasurement(id);
         }
 
+    }
+    
+    protected void getMeasurement(PortletRequest portletRequest) throws Exception {
+
+        long measurementId = ParamUtil.getLong(portletRequest, "measurementId");
+
+        if (measurementId <= 0) {
+            return;
+        }
+
+        Measurement measurement = _measurementService.getMeasurement(measurementId);
+
+        portletRequest.setAttribute(DataManagerWebKeys.MEASUREMENT, measurement);
     }
 
     @Reference(unbind = "-")

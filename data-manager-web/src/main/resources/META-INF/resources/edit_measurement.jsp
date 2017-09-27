@@ -2,8 +2,8 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-09-27 00:45 by Christian Berndt
-    Version:     1.0.0
+    Modified:    2017-09-27 14:20 by Christian Berndt
+    Version:     1.0.1
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -13,7 +13,7 @@
 
     String namespace = portletDisplay.getNamespace();
 
-    String title = LanguageUtil.get(request, "new-task-record");
+    String title = LanguageUtil.get(request, "new-measurement");
 
     boolean hasUpdatePermission = false;
     boolean hasViewPermission = false;
@@ -21,6 +21,19 @@
     boolean hasPermissionsPermission = false;
 
     if (measurement != null) {
+
+        title = LanguageUtil.format(request, "edit-measurement-x",
+                String.valueOf(measurement.getMeasurementId()));
+
+        hasUpdatePermission = MeasurementPermission.contains(permissionChecker, measurement,
+                MeasurementActionKeys.UPDATE);
+        hasViewPermission = MeasurementPermission.contains(permissionChecker, measurement,
+                MeasurementActionKeys.VIEW);
+        hasDeletePermission = MeasurementPermission.contains(permissionChecker, measurement,
+                MeasurementActionKeys.DELETE);
+        hasPermissionsPermission = MeasurementPermission.contains(permissionChecker, measurement,
+                MeasurementActionKeys.PERMISSIONS);
+        
 
     } else {
 
