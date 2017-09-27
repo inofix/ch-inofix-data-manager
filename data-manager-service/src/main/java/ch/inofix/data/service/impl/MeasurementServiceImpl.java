@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Inofix GmbH. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,26 +14,77 @@
 
 package ch.inofix.data.service.impl;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ServiceContext;
+
 import ch.inofix.data.service.base.MeasurementServiceBaseImpl;
+import ch.inofix.data.constants.MeasurementActionKeys;
+import ch.inofix.data.model.Measurement;
+import ch.inofix.data.service.permission.MeasurementPermission;
+import ch.inofix.data.service.permission.DataManagerPortletPermission;
 
 /**
  * The implementation of the measurement remote service.
  *
  * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link ch.inofix.data.service.MeasurementService} interface.
+ * All custom service methods should be put in this class. Whenever methods are
+ * added, rerun ServiceBuilder to copy their definitions into the
+ * {@link ch.inofix.data.service.MeasurementService} interface.
  *
  * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
+ * This is a remote service. Methods of this service are expected to have
+ * security checks based on the propagated JAAS credentials because this service
+ * can be accessed remotely.
  * </p>
  *
  * @author Christian Berndt
+ * @created 2017-09-27 00:32
+ * @modified 2017-09-27 10:43
+ * @version 1.0.1
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
 public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link ch.inofix.data.service.MeasurementServiceUtil} to access the measurement remote service.
-	 */
+    /*
+     * NOTE FOR DEVELOPERS:
+     *
+     * Never reference this class directly. Always use {@link
+     * ch.inofix.data.service.MeasurementServiceUtil} to access the measurement
+     * remote service.
+     */
+    @Override
+    public Measurement addMeasurement(String data, ServiceContext serviceContext) throws PortalException {
+
+        DataManagerPortletPermission.check(getPermissionChecker(), serviceContext.getScopeGroupId(),
+                MeasurementActionKeys.ADD_MEASUREMENT);
+
+        return measurementLocalService.addMeasurement(getUserId(), data, serviceContext);
+
+    }
+
+    @Override
+    public Measurement createMeasurement() throws PortalException {
+
+        // Create an empty measurement - no permission check required
+        return measurementLocalService.createMeasurement(0);
+    }
+
+    @Override
+    public Measurement deleteMeasurement(long measurementId) throws PortalException {
+
+        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.DELETE);
+
+        return measurementLocalService.deleteMeasurement(measurementId);
+
+    }
+
+    @Override
+    public Measurement updateMeasurement(long measurementId, String data, ServiceContext serviceContext)
+            throws PortalException {
+
+        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.UPDATE);
+
+        return measurementLocalService.updateMeasurement(measurementId, getUserId(), data, serviceContext);
+
+    }
 }
