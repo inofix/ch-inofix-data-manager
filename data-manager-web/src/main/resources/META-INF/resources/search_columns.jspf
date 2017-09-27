@@ -1,0 +1,50 @@
+<%--
+    search_columns.jspf: Configurable search columns
+    for the default view of the data manager portlet.
+
+    Created:     2017-09-27 13:17 by Christian Berndt
+    Modified:    2017-09-27 13:17 by Christian Berndt
+    Version:     1.0.0
+--%>
+
+<%
+    String[] columns = (String[])request.getAttribute("view.jsp-columns");
+
+    for (String column : columns) {
+%>
+
+<c:if test='<%="create-date".equals(column)%>'>
+    <liferay-ui:search-container-column-date property="createDate"
+        name="create-date" orderable="true" href="<%=detailURL%>" />
+</c:if>
+<c:if test='<%="data".equals(column)%>'>
+    <liferay-ui:search-container-column-text property="data" name="data"
+        orderable="true" href="<%=detailURL%>" />
+</c:if>
+<c:if test='<%="from".equals(column)%>'>
+    <liferay-ui:search-container-column-text name="from"
+        orderable="true" href="<%=detailURL%>" />
+</c:if>
+<c:if test='<%="modified-date".equals(column)%>'>
+    <liferay-ui:search-container-column-date property="modifiedDate"
+        name="modified-date" orderable="true" href="<%=detailURL%>" />
+</c:if>
+<c:if test='<%="status".equals(column)%>'>
+    <liferay-ui:search-container-column-status property="status"
+        orderable="true" />
+</c:if>
+<c:if test='<%="measurement-id".equals(column)%>'>
+    <liferay-ui:search-container-column-text property="measurementId"
+        name="measurement-id" orderable="true" href="<%=detailURL%>" />
+</c:if>
+<c:if test='<%="until".equals(column)%>'>
+    <liferay-ui:search-container-column-text name="until"
+        orderable="true" href="<%=detailURL%>" />
+</c:if>
+<c:if test='<%="user-name".equals(column)%>'>
+    <liferay-ui:search-container-column-text property="userName"
+        name="user-name" orderable="true" href="<%=detailURL%>" />
+</c:if>
+<%
+    }
+%>

@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-09-27 11:38 by Christian Berndt
-    Version:     1.0.4
+    Modified:    2017-09-27 12:06 by Christian Berndt
+    Version:     1.0.5
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -21,20 +21,29 @@
 <%@page import="ch.inofix.data.service.MeasurementServiceUtil"%>
 <%@page import="ch.inofix.data.service.permission.DataManagerPortletPermission"%>
 <%@page import="ch.inofix.data.service.permission.MeasurementPermission"%>
+<%@page import="ch.inofix.data.service.util.MeasurementUtil"%>
 <%@page import="ch.inofix.data.web.configuration.DataManagerConfiguration"%>
 <%@page import="ch.inofix.data.web.internal.constants.DataManagerWebKeys"%>
+<%@page import="ch.inofix.data.web.internal.search.MeasurementSearch"%>
+<%@page import="ch.inofix.data.web.internal.search.MeasurementSearchTerms"%>
 
 <%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
 <%@page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil"%>
 <%@page import="com.liferay.portal.kernel.portlet.PortalPreferences"%>
 <%@page import="com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil"%>
+<%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
+<%@page import="com.liferay.portal.kernel.search.Hits"%>
+<%@page import="com.liferay.portal.kernel.search.Sort"%>
 <%@page import="com.liferay.portal.kernel.security.auth.PrincipalException"%>
 <%@page import="com.liferay.portal.kernel.util.Constants"%>
 <%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
+<%@page import="com.liferay.portal.kernel.util.HttpUtil"%>
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
+<%@page import="com.liferay.portal.kernel.util.WebKeys"%>
 
 <%@page import="java.util.Date"%>
+<%@page import="java.util.List"%>
 
 <%@page import="javax.portlet.PortletURL"%>
 <%@page import="javax.portlet.ResourceURL"%>
