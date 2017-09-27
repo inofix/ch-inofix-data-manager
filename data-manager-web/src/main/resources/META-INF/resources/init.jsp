@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-09-17 23:59 by Christian Berndt
-    Version:     1.0.3
+    Modified:    2017-09-27 11:38 by Christian Berndt
+    Version:     1.0.4
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -17,8 +17,12 @@
 <%@taglib uri="http://liferay.com/tld/util" prefix="liferay-util"%>
 
 <%@page import="ch.inofix.data.constants.MeasurementActionKeys"%>
-<%@page import="ch.inofix.data.service.permission.DataManagerPermission"%>
+<%@page import="ch.inofix.data.model.Measurement"%>
+<%@page import="ch.inofix.data.service.MeasurementServiceUtil"%>
+<%@page import="ch.inofix.data.service.permission.DataManagerPortletPermission"%>
+<%@page import="ch.inofix.data.service.permission.MeasurementPermission"%>
 <%@page import="ch.inofix.data.web.configuration.DataManagerConfiguration"%>
+<%@page import="ch.inofix.data.web.internal.constants.DataManagerWebKeys"%>
 
 <%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
 <%@page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil"%>
