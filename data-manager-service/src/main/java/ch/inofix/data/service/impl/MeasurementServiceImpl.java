@@ -15,6 +15,8 @@
 package ch.inofix.data.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import ch.inofix.data.service.base.MeasurementServiceBaseImpl;
@@ -39,8 +41,8 @@ import ch.inofix.data.service.permission.DataManagerPortletPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 00:32
- * @modified 2017-09-27 10:43
- * @version 1.0.1
+ * @modified 2017-09-27 12:22
+ * @version 1.0.2
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
@@ -67,6 +69,20 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
 
         // Create an empty measurement - no permission check required
         return measurementLocalService.createMeasurement(0);
+    }
+    
+    @Override
+    public Measurement getMeasurement(long measurementId) throws PortalException {
+
+        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.VIEW);
+        return measurementLocalService.getMeasurement(measurementId);
+    }
+    
+    @Override
+    public Hits search(long userId, long groupId, String keywords, int start, int end, Sort sort)
+            throws PortalException {
+
+        return measurementLocalService.search(userId, groupId, keywords, start, end, sort);
     }
 
     @Override

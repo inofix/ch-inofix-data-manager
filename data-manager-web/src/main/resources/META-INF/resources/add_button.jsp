@@ -2,16 +2,14 @@
     add_button.jsp: add a measurement 
     
     Created:    2017-09-17 23:58 by Christian Berndt
-    Modified:   2017-09-17 23:58 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-09-27 14:16 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
 
-<%-- 
-<c:if test="<%=DataManagerPermission.contains(permissionChecker, scopeGroupId,
+<c:if test="<%=DataManagerPortletPermission.contains(permissionChecker, scopeGroupId,
                         MeasurementActionKeys.ADD_MEASUREMENT)%>">
---%>
     <liferay-frontend:add-menu>
 
         <portlet:renderURL var="addMeasurementURL">
@@ -25,4 +23,4 @@
 
     </liferay-frontend:add-menu>
 
-<%-- </c:if> --%>
+</c:if>
