@@ -15,7 +15,7 @@ import ch.inofix.data.constants.PortletKeys;
 * @version 1.0.0
 *
 */
-public class DataManagerPermission extends BaseResourcePermissionChecker {
+public class DataManagerPortletPermission extends BaseResourcePermissionChecker {
 
     public static final String RESOURCE_NAME = "ch.inofix.data";
 
