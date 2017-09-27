@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,21 +21,25 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.facet.Facet;
-import com.liferay.portal.kernel.search.facet.MultiValueFacet;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import ch.inofix.data.background.task.MeasurementExportBackgroundTaskExecutor;
 import ch.inofix.data.background.task.MeasurementImportBackgroundTaskExecutor;
@@ -57,8 +62,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-09-02 07:26
- * @version 1.1.1
+ * @modified 2017-09-27 14:13
+ * @version 1.1.2
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -94,6 +99,10 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         measurement.setData(data);
 
         measurementPersistence.update(measurement);
+        
+        // Resources
+
+        resourceLocalService.addModelResources(measurement, serviceContext);
 
         return measurement;
 
@@ -120,6 +129,11 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         // Measurement
 
         measurementPersistence.remove(measurement);
+        
+        // Resources
+
+        resourceLocalService.deleteResource(measurement.getCompanyId(), Measurement.class.getName(),
+                ResourceConstants.SCOPE_INDIVIDUAL, measurement.getMeasurementId());
 
         return measurement;
     }
@@ -262,133 +276,45 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         }
     }
     
-    /**
-     * Returns an ordered range of all the measurements whose channelId, or
-     * timestamp fields match the keywords specified for them, using the
-     * indexer.
-     *
-     * <p>
-     * Useful when paginating results. Returns a maximum of <code>end -
-     * start</code> instances. <code>start</code> and <code>end</code> are not
-     * primary keys, they are indexes in the result set. Thus, <code>0</code>
-     * refers to the first result in the set. Setting both <code>start</code>
-     * and <code>end</code> to
-     * {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return
-     * the full result set.
-     * </p>
-     *
-     *
-     * @param companyId
-     * @param channelId
-     * @param timestamp
-     * @param andSearch
-     * @param start
-     * @param end
-     * @param sort
-     * @return
-     * @throws SystemException
-     */
     @Override
-    public Hits search(long companyId, long groupId, String channelId,
-            String channelName, String timestamp, boolean andSearch, int start,
-            int end, Sort sort) throws PortalException {
-
-        return search(companyId, groupId, channelId, channelName, timestamp, 0,
-                0, andSearch, start, end, sort);
-
-    }
-
-    /**
-     *
-     * @param companyId
-     * @param groupId
-     * @param channelId
-     * @param channelName
-     * @param from
-     * @param until
-     * @param andSearch
-     * @param start
-     * @param end
-     * @param sort
-     * @return
-     * @throws SystemException
-     */
-    @Override
-    public Hits search(long companyId, long groupId, String channelId,
-            String channelName, long from, long until, boolean andSearch,
-            int start, int end, Sort sort) throws PortalException {
-
-        return search(companyId, groupId, channelId, channelName, null, from,
-                until, andSearch, start, end, sort);
-    }
-
-    @Override
-    public Hits search(long companyId, long groupId, String channelId,
-            String channelName, String timestamp, long from, long until,
-            boolean andSearch, int start, int end, Sort sort)
+    public Hits search(long userId, long groupId, String keywords, int start, int end, Sort sort)
             throws PortalException {
 
-        if (Validator.isNull(sort)) {
+        if (sort == null) {
+            sort = new Sort(Field.MODIFIED_DATE, true);
+        }
+
+        String data = null;
+        boolean andOperator = false;
+
+        if (Validator.isNotNull(keywords)) {
+
+            data = keywords;
+
+        } else {
+            andOperator = true;
+        }
+
+        return search(userId, groupId, data, WorkflowConstants.STATUS_ANY, null, null, null, andOperator, start, end,
+                sort);
+
+    }
+
+    @Override
+    public Hits search(long userId, long groupId, String data, int status, Date from, Date until,
+            LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
+            throws PortalException {
+
+        if (sort == null) {
             sort = new Sort("timestamp", true);
         }
 
-        try {
+        Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class.getName());
 
-            SearchContext searchContext = new SearchContext();
+        SearchContext searchContext = buildSearchContext(userId, groupId, data, status, from, until, params, andSearch,
+                start, end, sort);
 
-            searchContext.setCompanyId(companyId);
-            searchContext.setGroupIds(new long[] { groupId });
-
-            searchContext.setAttribute("paginationType", "more");
-            searchContext.setStart(start);
-            searchContext.setEnd(end);
-
-            searchContext.setAndSearch(andSearch);
-
-            Map<String, Serializable> attributes = new HashMap<String, Serializable>();
-
-            attributes.put("channelId", channelId);
-            attributes.put("channelName", channelName);
-            attributes.put("timestamp", timestamp);
-            attributes.put("from", from);
-            attributes.put("until", until);
-
-            searchContext.setAttributes(attributes);
-
-            // Always add facets as late as possible so that the search context
-            // fields can be considered by the facets
-
-            List<Facet> facets = new ArrayList<Facet>();
-
-            if (Validator.isNotNull(channelId)) {
-                Facet facet = new MultiValueFacet(searchContext);
-                facet.setFieldName("channelId");
-                facets.add(facet);
-            }
-
-            if (Validator.isNotNull(channelName)) {
-                Facet facet = new MultiValueFacet(searchContext);
-                facet.setFieldName("channelName");
-                facets.add(facet);
-            }
-
-            if (Validator.isNotNull(timestamp)) {
-                Facet facet = new MultiValueFacet(searchContext);
-                facet.setFieldName("timestamp");
-                facets.add(facet);
-            }
-
-            searchContext.setFacets(facets);
-            searchContext.setSorts(sort);
-
-            Indexer<Measurement> indexer = IndexerRegistryUtil
-                    .nullSafeGetIndexer(Measurement.class);
-
-            return indexer.search(searchContext);
-
-        } catch (Exception e) {
-            throw new SystemException(e);
-        }
+        return indexer.search(searchContext);
 
     }
 
@@ -419,6 +345,62 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         return measurement;
 
+    }
+    
+    protected SearchContext buildSearchContext(long userId, long groupId, String data, int status, Date from,
+            Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
+            throws PortalException {
+
+        SearchContext searchContext = new SearchContext();
+
+        searchContext.setAttribute(Field.STATUS, status);
+
+        if (Validator.isNotNull(data)) {
+            searchContext.setAttribute("data", data);
+        }
+
+        searchContext.setAttribute("from", from);
+        searchContext.setAttribute("until", until);
+
+        searchContext.setAttribute("paginationType", "more");
+
+        Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+        searchContext.setCompanyId(group.getCompanyId());
+
+        searchContext.setEnd(end);
+        if (groupId > 0) {
+            searchContext.setGroupIds(new long[] { groupId });
+        }
+        searchContext.setSorts(sort);
+        searchContext.setStart(start);
+        searchContext.setUserId(userId);
+
+        searchContext.setAndSearch(andSearch);
+
+        if (params != null) {
+
+            String keywords = (String) params.remove("keywords");
+
+            if (Validator.isNotNull(keywords)) {
+                searchContext.setKeywords(keywords);
+            }
+        }
+
+        QueryConfig queryConfig = new QueryConfig();
+
+        queryConfig.setHighlightEnabled(false);
+        queryConfig.setScoreEnabled(false);
+
+        searchContext.setQueryConfig(queryConfig);
+
+        if (sort != null) {
+            searchContext.setSorts(sort);
+        }
+
+        searchContext.setStart(start);
+
+        return searchContext;
     }
 
     private static final Log _log = LogFactoryUtil.getLog(MeasurementLocalServiceImpl.class.getName());

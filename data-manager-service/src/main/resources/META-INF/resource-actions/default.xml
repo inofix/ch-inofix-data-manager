@@ -6,7 +6,7 @@
     
     Created:    2017-09-18 11:02 by Christian Berndt
     Modified:   2017-09-18 11:02 by Christian Berndt
-    Version:    1.0.0
+    Version:    1.0.1
 -->
 <resource-action-mapping>
     <model-resource>
@@ -27,7 +27,6 @@
                 <action-key>VIEW</action-key>
             </supports>
             <site-member-defaults>
-<!--                 <action-key>ADD_MEASUREMENT</action-key> -->
                 <action-key>VIEW</action-key>
             </site-member-defaults>
             <guest-defaults/>
