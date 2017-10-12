@@ -89,7 +89,6 @@
                         disabled="<%=!hasUpdatePermission%>"
                         helpMessage="data-help" />
     
-    
                 </aui:fieldset>
         
             </aui:fieldset-group>
