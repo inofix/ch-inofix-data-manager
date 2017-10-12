@@ -39,14 +39,15 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:32
- * @modified 2017-09-27 14:20
- * @version 1.0.3
+ * @modified 2017-10-12 16:12
+ * @version 1.0.4
  */
 @Component(
     immediate = true,
     property = {
         "com.liferay.portlet.css-class-wrapper=portlet-data-manager",
         "com.liferay.portlet.display-category=category.inofix",
+        "com.liferay.portlet.header-portlet-css=/css/main.css", 
         "com.liferay.portlet.instanceable=false",
         "javax.portlet.display-name=Data Manager",
         "javax.portlet.init-param.template-path=/",
