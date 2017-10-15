@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-10-15 22:02 by Christian Berndt
-    Version:     1.0.6
+    Modified:    2017-10-15 22:08 by Christian Berndt
+    Version:     1.0.7
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -27,8 +27,13 @@
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearch"%>
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearchTerms"%>
 
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
+<%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
+<%@page import="com.liferay.portal.kernel.json.JSONObject"%>
 <%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
 <%@page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil"%>
+<%@page import="com.liferay.portal.kernel.log.Log"%>
+<%@page import="com.liferay.portal.kernel.log.LogFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.portlet.PortalPreferences"%>
 <%@page import="com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
@@ -92,4 +97,16 @@
             markupView = ""; 
         }
     }
+    
+    JSONObject jsonSchemaObj = null; 
+    
+    try {
+        jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema); 
+    } catch (Exception e) {
+        _log.error(e);
+    }
+%>
+
+<%!
+    private static Log _log = LogFactoryUtil.getLog("ch_inofix_data_web.init_jsp");
 %>
