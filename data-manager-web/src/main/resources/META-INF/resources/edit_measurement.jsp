@@ -2,11 +2,13 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-09-27 14:20 by Christian Berndt
-    Version:     1.0.1
+    Modified:    2017-10-15 23:04 by Christian Berndt
+    Version:     1.0.2
 --%>
 
 <%@ include file="/init.jsp"%>
+
+<%@page import="java.util.Iterator"%>
 
 <%
     Measurement measurement = (Measurement) request.getAttribute(DataManagerWebKeys.MEASUREMENT);
@@ -33,7 +35,6 @@
                 MeasurementActionKeys.DELETE);
         hasPermissionsPermission = MeasurementPermission.contains(permissionChecker, measurement,
                 MeasurementActionKeys.PERMISSIONS);
-        
 
     } else {
 
@@ -51,10 +52,17 @@
     renderResponse.setTitle(title);
 
     request.setAttribute("showTitle", "true"); // used by inofix-theme
+
+    Iterator<String> keys = null;
+
+    if (jsonSchemaObj != null) {
+        JSONObject propertiesObj = jsonSchemaObj.getJSONObject("items").getJSONObject("properties");
+        keys = propertiesObj.keys();
+    }
 %>
 
 <div class="container-fluid-1280">
-
+    
     <portlet:actionURL name="updateMeasurement" var="updateMeasurementURL">
         <portlet:param name="mvcPath" value="/edit_measurement.jsp" />
     </portlet:actionURL>
@@ -76,18 +84,32 @@
                     <aui:input name="backURL" type="hidden"
                         value="<%=backURL%>" />
     
-                    <aui:input name="untilDate" type="hidden"
-                        disabled="<%=!hasUpdatePermission%>" />
-    
                     <aui:input name="redirect" type="hidden"
                         value="<%=redirect%>" />
     
                     <aui:input name="measurementId" type="hidden"
                         disabled="<%=!hasUpdatePermission%>" />
-    
-                    <aui:input name="data"
-                        disabled="<%=!hasUpdatePermission%>"
-                        helpMessage="data-help" />
+                    
+                    <c:choose>
+                        <c:when test="<%= keys != null %>">
+                        <%
+                            String data = measurement.getData(); 
+                            JSONObject dataObj = JSONFactoryUtil.createJSONObject(data); 
+                            
+                            while (keys.hasNext()) {
+                                String key = keys.next();
+                        %>
+                            <aui:input name="<%= key %>" type="text" value="<%= dataObj.get(key) %>" />
+                        <%
+                            }
+                        %>
+                        </c:when>
+                        <c:otherwise>
+                            <aui:input name="data"
+                                disabled="<%=!hasUpdatePermission%>"
+                                helpMessage="data-help" />                        
+                        </c:otherwise>
+                    </c:choose>                   
     
                 </aui:fieldset>
         
