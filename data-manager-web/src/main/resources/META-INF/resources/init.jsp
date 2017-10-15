@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-09-27 12:06 by Christian Berndt
-    Version:     1.0.5
+    Modified:    2017-10-15 22:02 by Christian Berndt
+    Version:     1.0.6
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -58,6 +58,8 @@
     PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
 
     String dataURL = portletPreferences.getValue("dataURL", "");
+    
+    String jsonSchema = portletPreferences.getValue("jsonSchema", "");
 
     String markupView = "lexicon";
     
@@ -81,6 +83,7 @@
     
     if (Validator.isNotNull(dataManagerConfiguration)) {
         
+        jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
         markupView = portletPreferences.getValue("markup-view", dataManagerConfiguration.markupView());
         showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("show-search-speed", String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
         
