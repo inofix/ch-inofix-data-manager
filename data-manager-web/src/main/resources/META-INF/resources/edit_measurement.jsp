@@ -2,13 +2,11 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-10-16 17:32 by Christian Berndt
-    Version:     1.0.3
+    Modified:    2017-10-16 22:01 by Christian Berndt
+    Version:     1.0.4
 --%>
 
 <%@ include file="/init.jsp"%>
-
-<%@page import="java.util.Iterator"%>
 
 <%
     Measurement measurement = (Measurement) request.getAttribute(DataManagerWebKeys.MEASUREMENT);
@@ -52,16 +50,6 @@
     renderResponse.setTitle(title);
 
     request.setAttribute("showTitle", "true"); // used by inofix-theme
-
-    Iterator<String> keys = null;
-
-    if (jsonSchemaObj != null) {
-        JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
-        if (itemsObj != null) {
-            JSONObject propertiesObj = itemsObj.getJSONObject("properties");            
-            keys = propertiesObj.keys();
-        }    
-    }
 %>
 
 <div class="container-fluid-1280">
@@ -131,4 +119,3 @@
         
     </aui:form>
 </div>
-

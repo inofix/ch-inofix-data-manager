@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-10-15 22:08 by Christian Berndt
-    Version:     1.0.7
+    Modified:    2017-10-16 22:00 by Christian Berndt
+    Version:     1.0.8
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -48,6 +48,7 @@
 <%@page import="com.liferay.portal.kernel.util.WebKeys"%>
 
 <%@page import="java.util.Date"%>
+<%@page import="java.util.Iterator"%>
 <%@page import="java.util.List"%>
 
 <%@page import="javax.portlet.PortletURL"%>
@@ -104,6 +105,16 @@
         jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema); 
     } catch (Exception e) {
         _log.error(e);
+    }
+    
+    Iterator<String> keys = null;
+
+    if (jsonSchemaObj != null) {
+        JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
+        if (itemsObj != null) {
+            JSONObject propertiesObj = itemsObj.getJSONObject("properties");            
+            keys = propertiesObj.keys();
+        }    
     }
 %>
 
