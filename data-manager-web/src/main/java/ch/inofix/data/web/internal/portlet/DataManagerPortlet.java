@@ -1,6 +1,7 @@
 package ch.inofix.data.web.internal.portlet;
 
 import com.liferay.portal.kernel.exception.NoSuchResourceException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -22,15 +23,22 @@ import ch.inofix.data.service.MeasurementService;
 import ch.inofix.data.web.internal.constants.DataManagerWebKeys;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -170,8 +178,48 @@ public class DataManagerPortlet extends MVCPortlet {
         long measurementId = ParamUtil.getLong(actionRequest, "measurementId");
 
         ServiceContext serviceContext = ServiceContextFactory.getInstance(Measurement.class.getName(), actionRequest);
+        
+        PortletPreferences portletPreferences = actionRequest.getPreferences();
+        
+        String jsonSchema = portletPreferences.getValue("jsonSchema", "{}"); 
+        
+        com.liferay.portal.kernel.json.JSONObject jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema); 
+        
+        Iterator<String> keys = null;
 
-        String data = ParamUtil.getString(actionRequest, "data");
+        if (jsonSchemaObj != null) {
+            com.liferay.portal.kernel.json.JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
+            if (itemsObj != null) {
+                com.liferay.portal.kernel.json.JSONObject propertiesObj = itemsObj.getJSONObject("properties");
+                keys = propertiesObj.keys();
+            }
+        }
+        
+        String data = null; 
+        
+        if (keys != null) {
+            
+            com.liferay.portal.kernel.json.JSONObject dataObj = JSONFactoryUtil.createJSONObject();
+            
+            while (keys.hasNext()) {
+                
+                String key = keys.next();
+                
+                String value = actionRequest.getParameter(key); 
+                
+                dataObj.put(key, value);
+                
+            }
+            
+            data = dataObj.toJSONString();
+            
+        } else {
+        
+            data = ParamUtil.getString(actionRequest, "data");
+        
+        }
+                
+        // TODO: validate data against configured JSON-schema
 
         Measurement measurement = null;
 
@@ -193,6 +241,18 @@ public class DataManagerPortlet extends MVCPortlet {
         actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
 
         actionRequest.setAttribute(DataManagerWebKeys.MEASUREMENT, measurement);
+    }
+    
+    protected void validateMeasurement(String measurement) {
+
+        try (InputStream inputStream = getClass().getResourceAsStream("/path/to/your/schema.json")) {
+            JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
+            Schema schema = SchemaLoader.load(rawSchema);
+            schema.validate(new JSONObject("{\"hello\" : \"world\"}"));
+            // throws a ValidationException if this object is invalid
+        } catch (Exception e) {
+            _log.error(e);
+        }
     }
 
     private MeasurementService _measurementService;
