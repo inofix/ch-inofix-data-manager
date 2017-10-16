@@ -2,3 +2,9 @@ Bundle-Name: Inofix Data Manager Web
 Bundle-SymbolicName: ch.inofix.data.web
 Bundle-Version: 1.0.0
 Export-Package: ch.inofix.data.constants
+Include-Resource: \
+    @error_prone_annotations-2.1.1.jar,\
+    @google-collections-1.0.jar,\
+    @guava-23.2-jre.jar,\
+    @handy-uri-templates-1.1.6.jar,\
+    @org.everit.json.schema-1.6.0.jar
