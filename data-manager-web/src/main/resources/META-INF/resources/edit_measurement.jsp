@@ -2,8 +2,8 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-10-15 23:04 by Christian Berndt
-    Version:     1.0.2
+    Modified:    2017-10-16 17:32 by Christian Berndt
+    Version:     1.0.3
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -56,8 +56,11 @@
     Iterator<String> keys = null;
 
     if (jsonSchemaObj != null) {
-        JSONObject propertiesObj = jsonSchemaObj.getJSONObject("items").getJSONObject("properties");
-        keys = propertiesObj.keys();
+        JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
+        if (itemsObj != null) {
+            JSONObject propertiesObj = itemsObj.getJSONObject("properties");            
+            keys = propertiesObj.keys();
+        }    
     }
 %>
 
@@ -93,13 +96,18 @@
                     <c:choose>
                         <c:when test="<%= keys != null %>">
                         <%
-                            String data = measurement.getData(); 
+                            String data = measurement.getData();
+                            Object value = null;
+                            
                             JSONObject dataObj = JSONFactoryUtil.createJSONObject(data); 
                             
                             while (keys.hasNext()) {
                                 String key = keys.next();
+                                if (dataObj != null) {
+                                    value = dataObj.get(key);
+                                }
                         %>
-                            <aui:input name="<%= key %>" type="text" value="<%= dataObj.get(key) %>" />
+                            <aui:input name="<%= key %>" type="text" value="<%= value %>" />
                         <%
                             }
                         %>
