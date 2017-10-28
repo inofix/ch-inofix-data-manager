@@ -2,16 +2,11 @@
     configuration.jsp: configuration of the data-manager portlet.
     
     Created:    2017-09-14 17:33 by Christian Berndt
-    Modified:   2017-10-15 22:03 by Christian Berndt
-    Version:    1.0.1
+    Modified:   2017-10-27 16:32 by Christian Berndt
+    Version:    1.0.2
 --%>
 
 <%@ include file="/init.jsp"%>
-
-<%@page import="com.liferay.portal.kernel.model.User"%>
-<%@page import="com.liferay.portal.kernel.service.UserServiceUtil"%>
-
-<%@page import="java.util.List"%>
 
 <%
     List<User> users = UserServiceUtil.getGroupUsers(scopeGroupId);

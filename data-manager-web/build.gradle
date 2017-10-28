@@ -5,6 +5,7 @@ dependencies {
     compileOnly group: 'com.google.collections', name: 'google-collections', version: '1.0'
     compileOnly group: 'com.google.errorprone', name: 'error_prone_annotations', version: '2.1.1'
     compileOnly group: "com.google.guava", name: "guava", version: "23.2-jre"
+    compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype", version: "2.0.0"
     compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib", version: "2.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "2.0.0"
