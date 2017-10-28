@@ -3,13 +3,13 @@ package ch.inofix.data.constants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 
 /**
-*
-* @author Christian Berndt
-* @created 2017-09-18 00:02
-* @modified 2017-09-18 00:02
-* @version 1.0.0
-*
-*/
+ *
+ * @author Christian Berndt
+ * @created 2017-09-18 00:02
+ * @modified 2017-09-18 00:02
+ * @version 1.0.0
+ *
+ */
 public class MeasurementActionKeys extends ActionKeys {
 
    public static final String ADD_MEASUREMENT = "ADD_MEASUREMENT";
