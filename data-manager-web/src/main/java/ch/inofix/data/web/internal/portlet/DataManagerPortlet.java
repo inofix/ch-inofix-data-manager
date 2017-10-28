@@ -1,5 +1,6 @@
 package ch.inofix.data.web.internal.portlet;
 
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.NoSuchResourceException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -20,11 +21,13 @@ import com.liferay.portal.kernel.util.WebKeys;
 import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementService;
+import ch.inofix.data.web.configuration.DataManagerConfiguration;
 import ch.inofix.data.web.internal.constants.DataManagerWebKeys;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -39,7 +42,10 @@ import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -47,26 +53,36 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:32
- * @modified 2017-10-12 16:12
- * @version 1.0.4
+ * @modified 2017-10-25 23:16
+ * @version 1.0.5
  */
 @Component(
-    immediate = true,
-    property = {
+    configurationPid = "ch.inofix.data.web.configuration.DataManagerConfiguration",
+    immediate = true, 
+    property = { 
         "com.liferay.portlet.css-class-wrapper=portlet-data-manager",
-        "com.liferay.portlet.display-category=category.inofix",
-        "com.liferay.portlet.header-portlet-css=/css/main.css", 
-        "com.liferay.portlet.instanceable=false",
+        "com.liferay.portlet.display-category=category.inofix", 
+        "com.liferay.portlet.header-portlet-css=/css/main.css",
+        "com.liferay.portlet.instanceable=false", 
         "javax.portlet.display-name=Data Manager",
-        "javax.portlet.init-param.template-path=/",
+        "javax.portlet.init-param.template-path=/", 
         "javax.portlet.init-param.view-template=/view.jsp",
-        "javax.portlet.name=" + PortletKeys.DATA_MANAGER,
+        "javax.portlet.name=" + PortletKeys.DATA_MANAGER, 
         "javax.portlet.resource-bundle=content.Language",
-        "javax.portlet.security-role-ref=power-user,user"
-    },
+        "javax.portlet.security-role-ref=power-user,user" 
+    }, 
     service = Portlet.class
 )
 public class DataManagerPortlet extends MVCPortlet {
+
+    @Override
+    public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
+            throws IOException, PortletException {
+
+        renderRequest.setAttribute(DataManagerConfiguration.class.getName(), _dataManagerConfiguration);
+
+        super.doView(renderRequest, renderResponse);
+    }
 
     @Override
     public void processAction(ActionRequest actionRequest, ActionResponse actionResponse) {
@@ -78,9 +94,9 @@ public class DataManagerPortlet extends MVCPortlet {
 
                 deleteMeasurements(actionRequest, actionResponse);
                 addSuccessMessage(actionRequest, actionResponse);
-                
+
             } else if (cmd.equals(Constants.UPDATE)) {
-                
+
                 updateMeasurement(actionRequest, actionResponse);
                 addSuccessMessage(actionRequest, actionResponse);
 
@@ -93,7 +109,7 @@ public class DataManagerPortlet extends MVCPortlet {
 
         }
     }
-    
+
     @Override
     public void render(RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
@@ -109,6 +125,15 @@ public class DataManagerPortlet extends MVCPortlet {
         }
 
         super.render(renderRequest, renderResponse);
+    }
+
+    @Activate
+    @Modified
+    protected void activate(Map<Object, Object> properties) {
+
+        _dataManagerConfiguration = ConfigurableUtil.createConfigurable(
+                DataManagerConfiguration.class, properties);
+        
     }
 
     protected String getEditMeasurementURL(ActionRequest actionRequest, ActionResponse actionResponse,
@@ -154,7 +179,7 @@ public class DataManagerPortlet extends MVCPortlet {
         }
 
     }
-    
+
     protected void getMeasurement(PortletRequest portletRequest) throws Exception {
 
         long measurementId = ParamUtil.getLong(portletRequest, "measurementId");
@@ -178,13 +203,13 @@ public class DataManagerPortlet extends MVCPortlet {
         long measurementId = ParamUtil.getLong(actionRequest, "measurementId");
 
         ServiceContext serviceContext = ServiceContextFactory.getInstance(Measurement.class.getName(), actionRequest);
-        
+
         PortletPreferences portletPreferences = actionRequest.getPreferences();
-        
-        String jsonSchema = portletPreferences.getValue("jsonSchema", "{}"); 
-        
-        com.liferay.portal.kernel.json.JSONObject jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema); 
-        
+
+        String jsonSchema = portletPreferences.getValue("jsonSchema", "{}");
+
+        com.liferay.portal.kernel.json.JSONObject jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema);
+
         Iterator<String> keys = null;
 
         if (jsonSchemaObj != null) {
@@ -194,31 +219,31 @@ public class DataManagerPortlet extends MVCPortlet {
                 keys = propertiesObj.keys();
             }
         }
-        
-        String data = null; 
-        
+
+        String data = null;
+
         if (keys != null) {
-            
+
             com.liferay.portal.kernel.json.JSONObject dataObj = JSONFactoryUtil.createJSONObject();
-            
+
             while (keys.hasNext()) {
-                
+
                 String key = keys.next();
-                
-                String value = actionRequest.getParameter(key); 
-                
+
+                String value = actionRequest.getParameter(key);
+
                 dataObj.put(key, value);
-                
+
             }
-            
+
             data = dataObj.toJSONString();
-            
+
         } else {
-        
+
             data = ParamUtil.getString(actionRequest, "data");
-        
+
         }
-                
+
         // TODO: validate data against configured JSON-schema
 
         Measurement measurement = null;
@@ -242,7 +267,7 @@ public class DataManagerPortlet extends MVCPortlet {
 
         actionRequest.setAttribute(DataManagerWebKeys.MEASUREMENT, measurement);
     }
-    
+
     protected void validateMeasurement(String measurement) {
 
         try (InputStream inputStream = getClass().getResourceAsStream("/path/to/your/schema.json")) {
@@ -256,6 +281,8 @@ public class DataManagerPortlet extends MVCPortlet {
     }
 
     private MeasurementService _measurementService;
+
+    private volatile DataManagerConfiguration _dataManagerConfiguration;
 
     private static final Log _log = LogFactoryUtil.getLog(DataManagerPortlet.class.getName());
 

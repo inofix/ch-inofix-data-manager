@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-10-16 22:00 by Christian Berndt
-    Version:     1.0.8
+    Modified:    2017-10-25 23:18 by Christian Berndt
+    Version:     1.0.9
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -32,6 +32,7 @@
 <%@page import="com.liferay.portal.kernel.json.JSONObject"%>
 <%@page import="com.liferay.portal.kernel.language.LanguageUtil"%>
 <%@page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil"%>
+<%@page import="com.liferay.portal.kernel.model.User"%>
 <%@page import="com.liferay.portal.kernel.log.Log"%>
 <%@page import="com.liferay.portal.kernel.log.LogFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.portlet.PortalPreferences"%>
@@ -40,6 +41,7 @@
 <%@page import="com.liferay.portal.kernel.search.Hits"%>
 <%@page import="com.liferay.portal.kernel.search.Sort"%>
 <%@page import="com.liferay.portal.kernel.security.auth.PrincipalException"%>
+<%@page import="com.liferay.portal.kernel.service.UserServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Constants"%>
 <%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
 <%@page import="com.liferay.portal.kernel.util.HttpUtil"%>
@@ -61,13 +63,11 @@
 <portlet:defineObjects />
 
 <%
-    PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
-
     String dataURL = portletPreferences.getValue("dataURL", "");
     
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
 
-    String markupView = "lexicon";
+    String markupView = portletPreferences.getValue("markupView", "lexicon");
     
     Date now = new Date(); 
     
@@ -84,14 +84,17 @@
     
     String userName = portletPreferences.getValue("userName", "");
     
-    DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) request
+    DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) renderRequest
             .getAttribute(DataManagerConfiguration.class.getName());
-    
+        
     if (Validator.isNotNull(dataManagerConfiguration)) {
         
+        dataURL = portletPreferences.getValue("dataURL", dataManagerConfiguration.dataURL());
         jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
-        markupView = portletPreferences.getValue("markup-view", dataManagerConfiguration.markupView());
-        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("show-search-speed", String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
+        markupView = portletPreferences.getValue("markupView", dataManagerConfiguration.markupView());
+        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed", String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
+        userId = GetterUtil.getLong(portletPreferences.getValue("userId", dataManagerConfiguration.userId()));
+        userName = portletPreferences.getValue("userName", dataManagerConfiguration.userName());
         
         // because of current checkbox configuration
         if ("false".equals(markupView)) {

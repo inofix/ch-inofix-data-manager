@@ -2,22 +2,16 @@
     view.jsp: Default view of Inofix' data-manager.
     
     Created:     2017-09-10 16:37 by Christian Berndt
-    Modified:    2017-09-27 10:29 by Christian Berndt
-    Version:     1.0.1
+    Modified:    2017-09-28 16:51 by Christian Berndt
+    Version:     1.0.2
 --%>
 
 <%@ include file="/init.jsp" %>
 
 <%
+    // TODO: read view settings from configuration
     String [] columns = new String[] {"measurement-id", "data", "create-date", "user-name"};
     String displayStyle = ParamUtil.getString(request, "displayStyle");
-        
-    // TODO: read view settings from configuration
-//     if (Validator.isNotNull(timetrackerConfiguration)) {
-//         columns = portletPreferences.getValues("columns", timetrackerConfiguration.columns());
-//         maxLength = Integer.parseInt(portletPreferences.getValue("max-length", timetrackerConfiguration.maxLength()));
-//         //timeFormat = portletPreferences.getValue("time-format", timetrackerConfiguration.timeFormat());
-//     }
     
     String backURL = ParamUtil.getString(request, "backURL");
     String keywords = ParamUtil.getString(request, "keywords");
@@ -69,7 +63,7 @@
 %>
 
 <liferay-util:include page="/navigation.jsp"
-    servletContext="<%=application%>"/>
+    servletContext="<%=application%>"/>    
     
 <c:choose>
     <c:when test="<%= "export-import".equals(tabs1) %>">
