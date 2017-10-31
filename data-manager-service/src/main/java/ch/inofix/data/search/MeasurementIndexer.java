@@ -2,6 +2,7 @@ package ch.inofix.data.search;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
@@ -16,6 +17,8 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
@@ -27,7 +30,10 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -39,8 +45,8 @@ import ch.inofix.data.service.permission.MeasurementPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 10:52
- * @modified 2017-09-27 10:52
- * @version 1.1.3
+ * @modified 2017-10-31 13:36
+ * @version 1.1.4
  *
  */
 @Component(immediate = true, service = Indexer.class)
@@ -122,12 +128,44 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
     @Override
     protected Document doGetDocument(Measurement measurement) throws Exception {
+        
+        _log.info("doGetDocument");
+
+        // PortletPreferences portletPreferences = PortletPreferencesFactoryUtil
+        // .getStrictPortletSetup(measurement.getCompanyId(),
+        // measurement.getGroupId(), PortletKeys.DATA_MANAGER);
+
+        // portletPreferences =
+        // PortletPreferencesFactoryUtil.getPortletPreferences(request,
+        // portletId);
+
+        String jsonSchema = null;
+        long ownerId = measurement.getGroupId();
+        int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
+        long plid = 0;
+        
+        try {
+
+            PortletPreferences portletPreferences = PortletPreferencesLocalServiceUtil.getPortletPreferences(ownerId,
+                    ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
+            
+            javax.portlet.PortletPreferences preferences = PortletPreferencesFactoryUtil.fromDefaultXML(portletPreferences.getPreferences());
+
+            _log.info("portletPreferences = " + portletPreferences);
+            _log.info("preferences = " + preferences);
+            
+            jsonSchema = preferences.getValue("jsonSchema", "{}");
+
+        } catch (Exception e) {
+            _log.error(e);
+        }
+
+         _log.info("jsonSchema = " + jsonSchema);
 
         Document document = getBaseModelDocument(CLASS_NAME, measurement);
 
         document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
         document.addTextSortable("data", measurement.getData());
-
 
         return document;
 
@@ -214,8 +252,14 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
         _measurementLocalService = measurementLocalService;
     }
+    
+    @Reference(unbind = "-")
+    protected void setPortletPreferencesLocalService(PortletPreferencesLocalService portletPreferencesLocalService) {
+        _portletPreferencesLocalService = portletPreferencesLocalService;
+    }
 
     private static final Log _log = LogFactoryUtil.getLog(MeasurementIndexer.class);
 
     private MeasurementLocalService _measurementLocalService;
+    private PortletPreferencesLocalService _portletPreferencesLocalService;
 }
