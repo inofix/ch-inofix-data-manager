@@ -63,25 +63,16 @@
 <portlet:defineObjects />
 
 <%
-    String dataURL = portletPreferences.getValue("dataURL", "");
-    
+    String dataURL = portletPreferences.getValue("dataURL", "");    
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
-
-    String markupView = portletPreferences.getValue("markupView", "lexicon");
-    
-    Date now = new Date(); 
-    
-    String password = portletPreferences.getValue("password", "");
-    
-    boolean showSearchSpeed = false;
-    
+    String markupView = portletPreferences.getValue("markupView", "lexicon");   
+    Date now = new Date();     
+    String password = portletPreferences.getValue("password", "");   
+    boolean showSearchSpeed = false;    
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
-    String tabs2 = ParamUtil.getString(request, "tabs2", "export");
-    
-    long until = ParamUtil.getLong(request, "until", now.getTime());
-    
-    long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0"));
-    
+    String tabs2 = ParamUtil.getString(request, "tabs2", "export");    
+    long until = ParamUtil.getLong(request, "until", now.getTime());    
+    long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0")); 
     String userName = portletPreferences.getValue("userName", "");
     
     DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) renderRequest
