@@ -53,8 +53,8 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:32
- * @modified 2017-10-25 23:16
- * @version 1.0.5
+ * @modified 2017-10-31 10:14
+ * @version 1.0.6
  */
 @Component(
     configurationPid = "ch.inofix.data.web.configuration.DataManagerConfiguration",
@@ -104,7 +104,9 @@ public class DataManagerPortlet extends MVCPortlet {
 
         } catch (Exception e) {
 
-            // TODO: report errors to user
+            hideDefaultSuccessMessage(actionRequest);
+            SessionErrors.add(actionRequest, e.getClass(), e);
+
             _log.error(e);
 
         }
