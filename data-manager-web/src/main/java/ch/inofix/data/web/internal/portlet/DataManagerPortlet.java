@@ -53,8 +53,8 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:32
- * @modified 2017-10-31 10:14
- * @version 1.0.6
+ * @modified 2017-10-31 13:37
+ * @version 1.0.7
  */
 @Component(
     configurationPid = "ch.inofix.data.web.configuration.DataManagerConfiguration",
@@ -64,6 +64,9 @@ import org.osgi.service.component.annotations.Reference;
         "com.liferay.portlet.display-category=category.inofix", 
         "com.liferay.portlet.header-portlet-css=/css/main.css",
         "com.liferay.portlet.instanceable=false", 
+        "com.liferay.portlet.preferences-owned-by-group=true",
+        "com.liferay.portlet.preferences-unique-per-layout=false",
+        "com.liferay.portlet.scopeable=true",
         "javax.portlet.display-name=Data Manager",
         "javax.portlet.init-param.template-path=/", 
         "javax.portlet.init-param.view-template=/view.jsp",
