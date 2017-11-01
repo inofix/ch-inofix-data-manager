@@ -2,8 +2,8 @@
     configuration.jsp: configuration of the data-manager portlet.
     
     Created:    2017-09-14 17:33 by Christian Berndt
-    Modified:   2017-11-01 16:38 by Christian Berndt
-    Version:    1.0.3
+    Modified:   2017-11-01 17:09 by Christian Berndt
+    Version:    1.0.4
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -11,6 +11,14 @@
 <%
     List<User> users = UserServiceUtil.getGroupUsers(scopeGroupId);
 %>
+
+<style>
+<!--
+    .portlet-data-manager .panel-title {
+        position: relative;
+    }
+-->
+</style>
 
 <liferay-portlet:actionURL portletConfiguration="<%=true%>"
     var="configurationActionURL" />
@@ -30,7 +38,7 @@
     
         <div class="container-fluid-1280">
 
-            <liferay-ui:panel collapsible="<%=true%>"
+            <liferay-ui:panel collapsible="<%=true%>" extended="<%= true %>"
                 id="dataSourcePanel" markupView="<%=markupView%>"
                 persistState="<%=true%>" title="data-source">
 
