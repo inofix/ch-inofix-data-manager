@@ -2,8 +2,8 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-10-16 22:01 by Christian Berndt
-    Version:     1.0.4
+    Modified:    2017-11-01 23:37 by Christian Berndt
+    Version:     1.0.5
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -54,7 +54,7 @@
 
 <div class="container-fluid-1280">
     
-    <portlet:actionURL name="updateMeasurement" var="updateMeasurementURL">
+    <portlet:actionURL name="editMeasurement" var="updateMeasurementURL">
         <portlet:param name="mvcPath" value="/edit_measurement.jsp" />
     </portlet:actionURL>
 

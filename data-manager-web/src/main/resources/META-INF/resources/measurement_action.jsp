@@ -2,13 +2,11 @@
     measurement_action.jsp: The action menu of the data-manager's default view.
     
     Created:    2017-09-27 13:54 by Christian Berndt
-    Modified:   2017-09-27 13:54 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-01 23:49 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp"%>
-
-<%@page import="com.liferay.portal.kernel.dao.search.ResultRow"%>
 
 <%
     ResultRow row = (ResultRow) request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
@@ -49,7 +47,7 @@
 
     <c:if test="<%=hasDeletePermission%>">
 
-        <portlet:actionURL var="deleteURL">
+        <portlet:actionURL name="editMeasurement" var="deleteURL">
             <portlet:param name="cmd" value="<%= Constants.DELETE %>"/>
             <portlet:param name="redirect" value="<%=currentURL%>" />
             <portlet:param name="measurementId"

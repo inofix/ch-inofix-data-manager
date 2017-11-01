@@ -2,22 +2,12 @@ package ch.inofix.data.web.internal.portlet;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.NoSuchResourceException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
-
 import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementService;
@@ -26,14 +16,10 @@ import ch.inofix.data.web.internal.constants.DataManagerWebKeys;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Map;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -88,36 +74,10 @@ public class DataManagerPortlet extends MVCPortlet {
     }
 
     @Override
-    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse) {
-
-        String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-        try {
-            if (cmd.equals(Constants.DELETE)) {
-
-                deleteMeasurements(actionRequest, actionResponse);
-                addSuccessMessage(actionRequest, actionResponse);
-
-            } else if (cmd.equals(Constants.UPDATE)) {
-
-                updateMeasurement(actionRequest, actionResponse);
-                addSuccessMessage(actionRequest, actionResponse);
-
-            }
-
-        } catch (Exception e) {
-
-            hideDefaultSuccessMessage(actionRequest);
-            SessionErrors.add(actionRequest, e.getClass(), e);
-
-            _log.error(e);
-
-        }
-    }
-
-    @Override
     public void render(RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
+        
+        _log.info("render()");
 
         try {
             getMeasurement(renderRequest);
@@ -141,50 +101,6 @@ public class DataManagerPortlet extends MVCPortlet {
         
     }
 
-    protected String getEditMeasurementURL(ActionRequest actionRequest, ActionResponse actionResponse,
-            Measurement measurement) throws Exception {
-
-        ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-        String editMeasurementURL = getRedirect(actionRequest, actionResponse);
-
-        if (Validator.isNull(editMeasurementURL)) {
-            editMeasurementURL = PortalUtil.getLayoutFullURL(themeDisplay);
-        }
-
-        String namespace = actionResponse.getNamespace();
-        String windowState = actionResponse.getWindowState().toString();
-
-        editMeasurementURL = HttpUtil.setParameter(editMeasurementURL, "p_p_id", PortletKeys.DATA_MANAGER);
-        editMeasurementURL = HttpUtil.setParameter(editMeasurementURL, "p_p_state", windowState);
-        editMeasurementURL = HttpUtil.setParameter(editMeasurementURL, namespace + "mvcPath",
-                templatePath + "edit_task_record.jsp");
-        editMeasurementURL = HttpUtil.setParameter(editMeasurementURL, namespace + "redirect",
-                getRedirect(actionRequest, actionResponse));
-        editMeasurementURL = HttpUtil.setParameter(editMeasurementURL, namespace + "backURL",
-                ParamUtil.getString(actionRequest, "backURL"));
-        editMeasurementURL = HttpUtil.setParameter(editMeasurementURL, namespace + "measurementId",
-                measurement.getMeasurementId());
-
-        return editMeasurementURL;
-    }
-
-    protected void deleteMeasurements(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-
-        long measurementId = ParamUtil.getLong(actionRequest, "measurementId");
-
-        long[] measurementIds = ParamUtil.getLongValues(actionRequest, "deleteMeasurementIds");
-
-        if (measurementId > 0) {
-            measurementIds = new long[] { measurementId };
-        }
-
-        for (long id : measurementIds) {
-            _measurementService.deleteMeasurement(id);
-        }
-
-    }
-
     protected void getMeasurement(PortletRequest portletRequest) throws Exception {
 
         long measurementId = ParamUtil.getLong(portletRequest, "measurementId");
@@ -203,76 +119,8 @@ public class DataManagerPortlet extends MVCPortlet {
         this._measurementService = measurementService;
     }
 
-    protected void updateMeasurement(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-
-        long measurementId = ParamUtil.getLong(actionRequest, "measurementId");
-
-        ServiceContext serviceContext = ServiceContextFactory.getInstance(Measurement.class.getName(), actionRequest);
-
-        PortletPreferences portletPreferences = actionRequest.getPreferences();
-
-        String jsonSchema = portletPreferences.getValue("jsonSchema", "{}");
-
-        com.liferay.portal.kernel.json.JSONObject jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema);
-
-        Iterator<String> keys = null;
-
-        if (jsonSchemaObj != null) {
-            com.liferay.portal.kernel.json.JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
-            if (itemsObj != null) {
-                com.liferay.portal.kernel.json.JSONObject propertiesObj = itemsObj.getJSONObject("properties");
-                keys = propertiesObj.keys();
-            }
-        }
-
-        String data = null;
-
-        if (keys != null) {
-
-            com.liferay.portal.kernel.json.JSONObject dataObj = JSONFactoryUtil.createJSONObject();
-
-            while (keys.hasNext()) {
-
-                String key = keys.next();
-
-                String value = actionRequest.getParameter(key);
-
-                dataObj.put(key, value);
-
-            }
-
-            data = dataObj.toJSONString();
-
-        } else {
-
-            data = ParamUtil.getString(actionRequest, "data");
-
-        }
-
-        // TODO: validate data against configured JSON-schema
-
-        Measurement measurement = null;
-
-        if (measurementId <= 0) {
-
-            // Add measurement
-
-            measurement = _measurementService.addMeasurement(data, serviceContext);
-
-        } else {
-
-            // Update measurement
-
-            measurement = _measurementService.updateMeasurement(measurementId, data, serviceContext);
-        }
-
-        String redirect = getEditMeasurementURL(actionRequest, actionResponse, measurement);
-
-        actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-
-        actionRequest.setAttribute(DataManagerWebKeys.MEASUREMENT, measurement);
-    }
-
+    // TODO: move validate method to EditMeasurementMVCActionCommand
+    
     protected void validateMeasurement(String measurement) {
 
         try (InputStream inputStream = getClass().getResourceAsStream("/path/to/your/schema.json")) {

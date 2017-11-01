@@ -2,8 +2,8 @@
     view.jsp: Default view of Inofix' data-manager.
     
     Created:     2017-09-10 16:37 by Christian Berndt
-    Modified:    2017-09-28 16:51 by Christian Berndt
-    Version:     1.0.2
+    Modified:    2017-11-01 23:54 by Christian Berndt
+    Version:     1.0.3
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -86,9 +86,9 @@
                     </div>
                 </c:if> 
                     
-                <portlet:actionURL var="editSetURL"/>
+                <portlet:actionURL name="editMeasurement" var="editMeasurementURL"/>
                 
-                <aui:form action="<%= editSetURL %>" name="fm" 
+                <aui:form action="<%= editMeasurementURL %>" name="fm" 
                     onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "editSet();" %>'>
                     
                     <aui:input name="<%= Constants.CMD %>" type="hidden"/>  
