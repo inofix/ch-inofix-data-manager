@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-10-25 23:18 by Christian Berndt
-    Version:     1.0.9
+    Modified:    2017-11-01 23:50 by Christian Berndt
+    Version:     1.1.0
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -27,6 +27,7 @@
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearch"%>
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearchTerms"%>
 
+<%@page import="com.liferay.portal.kernel.dao.search.ResultRow"%>
 <%@page import="com.liferay.portal.kernel.json.JSONArray"%>
 <%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONObject"%>

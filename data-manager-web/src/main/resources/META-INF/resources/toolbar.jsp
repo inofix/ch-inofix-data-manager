@@ -2,8 +2,8 @@
     toolbar.jsp: The toolbar of the data manager portlet
     
     Created:    2017-09-12 10:44 by Christian Berndt
-    Modified:   2017-09-12 10:44 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-01 23:49 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -33,7 +33,6 @@
 
     downloadURL.setParameter("start", "0");
     downloadURL.setParameter("end", String.valueOf(Integer.MAX_VALUE));
-
 %>
 
 <liferay-frontend:management-bar
@@ -88,7 +87,7 @@
 
             form.attr('method', 'post');
             form.fm('<%= Constants.CMD %>').val('<%= Constants.DELETE %>');
-            form.fm('deleteTaskRecordIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
+            form.fm('deleteMeasurementIds').val(Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
 
             submitForm(form);
         }
