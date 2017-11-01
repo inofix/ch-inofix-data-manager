@@ -2,8 +2,8 @@
     configuration.jsp: configuration of the data-manager portlet.
     
     Created:    2017-09-14 17:33 by Christian Berndt
-    Modified:   2017-10-27 16:32 by Christian Berndt
-    Version:    1.0.2
+    Modified:   2017-11-01 16:38 by Christian Berndt
+    Version:    1.0.3
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -29,27 +29,23 @@
     <div class="portlet-configuration-body-content">
     
         <div class="container-fluid-1280">
-        
+
             <liferay-ui:panel collapsible="<%=true%>"
-                id="dataSourcePanel"
-                markupView="<%=markupView%>" persistState="<%=true%>"
-                title="data-source">
+                id="dataSourcePanel" markupView="<%=markupView%>"
+                persistState="<%=true%>" title="data-source">
 
                 <aui:input name="preferences--dataURL--"
-                    helpMessage="data-url-help" inlineField="<%=true%>"
-                    value="<%=dataURL%>" />
-                    
+                    helpMessage="data-url-help" value="<%=dataURL%>" />
+
                 <aui:input name="preferences--userName--"
-                    helpMessage="user-name-help" inlineField="<%=true%>"
-                    value="<%=userName%>" />
-                    
+                    helpMessage="user-name-help" value="<%=userName%>" />
+
                 <aui:input name="preferences--password--"
-                    helpMessage="password-help" inlineField="<%=true%>"
-                    type="password"
+                    helpMessage="password-help" type="password"
                     value="<%=password%>" />
-    
+
                 <aui:select name="preferences--userId--"
-                    helpMessage="user-id-help" inlineField="<%=true%>">
+                    helpMessage="user-id-help">
                     <%
                         for (User user1 : users) {
                     %>
@@ -60,13 +56,13 @@
                         }
                     %>
                 </aui:select>
-    
+
                 <aui:input name="preferences--groupId--" type="hidden"
                     value="<%=scopeGroupId%>" />
-    
+
                 <aui:input name="preferences--groupId--"
                     disabled="<%=true%>" helpMessage="group-id-help"
-                    inlineField="true" value="<%=scopeGroupId%>" />
+                    value="<%=scopeGroupId%>" />
 
             </liferay-ui:panel>
 
@@ -76,7 +72,7 @@
                 title="data-schema">
 
                 <aui:input name="preferences--jsonSchema--"
-                    helpMessage="json-schema-help" inlineField="true"
+                    helpMessage="json-schema-help"
                     type="textarea" value="<%=jsonSchema%>" />
 
             </liferay-ui:panel>
