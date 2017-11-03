@@ -76,8 +76,6 @@ public class DataManagerPortlet extends MVCPortlet {
     @Override
     public void render(RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
-        
-        _log.info("render()");
 
         try {
             getMeasurement(renderRequest);
