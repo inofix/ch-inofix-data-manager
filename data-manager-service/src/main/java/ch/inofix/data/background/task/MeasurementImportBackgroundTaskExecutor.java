@@ -24,8 +24,8 @@ import ch.inofix.data.service.MeasurementLocalServiceUtil;
 /**
  * @author Christian Berndt
  * @created 2017-09-01 22:00
- * @modified 2017-09-01 22:00
- * @version 1.0.0
+ * @modified 2017-11-02 22:16
+ * @version 1.0.1
  */
 public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBackgroundTaskExecutor {
 
@@ -42,17 +42,19 @@ public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBac
 
     @Override
     public BackgroundTaskExecutor clone() {
-        MeasurementImportBackgroundTaskExecutor taskRecordImportBackgroundTaskExecutor = new MeasurementImportBackgroundTaskExecutor();
+        MeasurementImportBackgroundTaskExecutor measurementImportBackgroundTaskExecutor = new MeasurementImportBackgroundTaskExecutor();
 
-        taskRecordImportBackgroundTaskExecutor
+        measurementImportBackgroundTaskExecutor
                 .setBackgroundTaskStatusMessageTranslator(getBackgroundTaskStatusMessageTranslator());
-        taskRecordImportBackgroundTaskExecutor.setIsolationLevel(getIsolationLevel());
+        measurementImportBackgroundTaskExecutor.setIsolationLevel(getIsolationLevel());
 
-        return taskRecordImportBackgroundTaskExecutor;
+        return measurementImportBackgroundTaskExecutor;
     }
 
     @Override
     public BackgroundTaskResult execute(BackgroundTask backgroundTask) throws Exception {
+        
+        _log.info("execute()");
 
         ExportImportConfiguration exportImportConfiguration = getExportImportConfiguration(backgroundTask);
 
@@ -62,6 +64,11 @@ public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBac
 
         for (FileEntry attachmentsFileEntry : attachmentsFileEntries) {
             try {
+                
+                String extension = attachmentsFileEntry.getExtension();
+                
+                _log.info("extension = " + extension);
+                
                 file = FileUtil.createTempFile("lar");
 
                 FileUtil.write(file, attachmentsFileEntry.getContentStream());
@@ -75,7 +82,7 @@ public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBac
                 if (_log.isDebugEnabled()) {
                     _log.debug(t, t);
                 } else if (_log.isWarnEnabled()) {
-                    _log.warn("Unable to import taskRecords: " + t.getMessage());
+                    _log.warn("Unable to import measurements: " + t.getMessage());
                 }
 
                 throw new SystemException(t);
@@ -111,4 +118,3 @@ public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBac
     }
 
 }
-

@@ -2,8 +2,8 @@
     navigation.jsp: Default navigation of Inofix' data-manager.
     
     Created:     2017-09-10 17:02 by Christian Berndt
-    Modified:    2017-09-10 17:02 by Christian Berndt
-    Version:     1.0.0
+    Modified:    2017-11-04 00:11 by Christian Berndt
+    Version:     1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -29,12 +29,14 @@
     </liferay-portlet:renderURL>
     
     <aui:form action="<%= searchURL.toString() %>" cssClass="measurement-search" name="searchFm">
+        <%-- 
         <c:if test="<%= formDateTime > 0 %>">           
             <div class="clear-message">
                 <liferay-frontend:management-bar-button href='<%= portletURL.toString() %>' icon='times' label='clear' />      
                 <aui:a cssClass="muted" href="<%= portletURL.toString() %>" label="clear-current-query-and-sorts"/>
             </div>
         </c:if> 
+        --%>
     </aui:form>
     
 </aui:nav-bar>

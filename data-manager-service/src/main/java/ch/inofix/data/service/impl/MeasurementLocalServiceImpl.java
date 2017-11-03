@@ -193,11 +193,17 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     public void importMeasurements(ExportImportConfiguration exportImportConfiguration, File file)
             throws PortalException {
 
+        _log.info("importMeasurements()");
+
+        _log.info("file = " + file);
+
         try {
             ImportController measurementImportController = ExportImportControllerRegistryUtil
                     .getImportController(Measurement.class.getName());
 
             measurementImportController.importFile(exportImportConfiguration, file);
+
+            _log.info("measurementImportController = " + measurementImportController);
 
         } catch (PortalException pe) {
             Throwable cause = pe.getCause();
@@ -217,10 +223,13 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     @Override
     public void importMeasurements(ExportImportConfiguration exportImportConfiguration, InputStream inputStream)
             throws PortalException {
+        
+        _log.info("importMeasurements()");
 
         File file = null;
 
         try {
+            
 
             // TODO: use extension from upload
             file = FileUtil.createTempFile("lar");
@@ -239,6 +248,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     @Override
     public long importMeasurementsInBackground(long userId, ExportImportConfiguration exportImportConfiguration,
             File file) throws PortalException {
+        
+        _log.info("importMeasurementsInBackground()");
 
         Map<String, Serializable> taskContextMap = new HashMap<>();
 
