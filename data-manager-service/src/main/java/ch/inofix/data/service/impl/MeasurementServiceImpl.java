@@ -14,10 +14,22 @@
 
 package ch.inofix.data.service.impl;
 
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Map;
+
+import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.Digester;
+import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 
 import ch.inofix.data.service.base.MeasurementServiceBaseImpl;
 import ch.inofix.data.constants.MeasurementActionKeys;
@@ -41,8 +53,8 @@ import ch.inofix.data.service.permission.DataManagerPortletPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 00:32
- * @modified 2017-09-27 12:22
- * @version 1.0.2
+ * @modified 2017-11-02 17:27
+ * @version 1.0.3
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
@@ -79,10 +91,24 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
     }
     
     @Override
-    public Hits search(long userId, long groupId, String keywords, int start, int end, Sort sort)
-            throws PortalException {
+    public String[] getTempFileNames(long groupId, String folderName) throws PortalException {
 
-        return measurementLocalService.search(userId, groupId, keywords, start, end, sort);
+        DataManagerPortletPermission.check(getPermissionChecker(), groupId,
+                MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
+
+        return TempFileEntryUtil.getTempFileNames(groupId, getUserId(),
+                DigesterUtil.digestHex(Digester.SHA_256, folderName));
+    }
+    
+    @Override
+    public void deleteBackgroundTask(long groupId, long backgroundTaskId) throws PortalException {
+
+        _log.info("deleteBackgroundTask()");
+
+        DataManagerPortletPermission.check(getPermissionChecker(), groupId, MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
+
+        BackgroundTaskManagerUtil.deleteBackgroundTask(backgroundTaskId);
+
     }
 
     @Override
@@ -92,6 +118,30 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
 
         return measurementLocalService.deleteMeasurement(measurementId);
 
+    }
+    
+    @Override
+    public long importMeasurementsInBackground(ExportImportConfiguration exportImportConfiguration,
+            InputStream inputStream) throws PortalException {
+        
+        _log.info("importMeasurementsInBackground()");
+
+        Map<String, Serializable> settingsMap = exportImportConfiguration.getSettingsMap();
+
+        long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
+
+        DataManagerPortletPermission.check(getPermissionChecker(), targetGroupId,
+                MeasurementActionKeys.IMPORT_MEASUREMENTS);
+
+        return measurementLocalService.importMeasurementsInBackground(getUserId(), exportImportConfiguration,
+                inputStream);
+    }
+    
+    @Override
+    public Hits search(long userId, long groupId, String keywords, int start, int end, Sort sort)
+            throws PortalException {
+
+        return measurementLocalService.search(userId, groupId, keywords, start, end, sort);
     }
 
     @Override
@@ -103,4 +153,6 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
         return measurementLocalService.updateMeasurement(measurementId, getUserId(), data, serviceContext);
 
     }
+    
+    private static Log _log = LogFactoryUtil.getLog(MeasurementServiceImpl.class.getName()); 
 }
