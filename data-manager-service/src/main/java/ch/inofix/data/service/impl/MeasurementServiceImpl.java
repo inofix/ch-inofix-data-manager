@@ -53,8 +53,8 @@ import ch.inofix.data.service.permission.DataManagerPortletPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 00:32
- * @modified 2017-11-02 17:27
- * @version 1.0.3
+ * @modified 2017-11-09 19:20
+ * @version 1.0.4
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
@@ -122,9 +122,9 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
     
     @Override
     public long importMeasurementsInBackground(ExportImportConfiguration exportImportConfiguration,
-            InputStream inputStream) throws PortalException {
+            InputStream inputStream, String extension) throws PortalException {
         
-        _log.info("importMeasurementsInBackground()");
+        _log.info("importMeasurementsInBackground(inputStream)");
 
         Map<String, Serializable> settingsMap = exportImportConfiguration.getSettingsMap();
 
@@ -134,7 +134,7 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
                 MeasurementActionKeys.IMPORT_MEASUREMENTS);
 
         return measurementLocalService.importMeasurementsInBackground(getUserId(), exportImportConfiguration,
-                inputStream);
+                inputStream, extension);
     }
     
     @Override

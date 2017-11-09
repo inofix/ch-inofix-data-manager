@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -59,8 +60,8 @@ import ch.inofix.data.service.MeasurementService;
  * 
  * @author Christian Berndt
  * @created 2017-11-01 17:20
- * @modified 2017-11-01 17:20
- * @version 1.0.0
+ * @modified 2017-11-09 19:17
+ * @version 1.0.1
  *
  */
 @Component(
@@ -224,35 +225,41 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
 
         try {
             if (cmd.equals(Constants.ADD_TEMP)) {
+                
                 addTempFileEntry(actionRequest, ExportImportHelper.TEMP_FOLDER_NAME);
-
                 validateFile(actionRequest, actionResponse, ExportImportHelper.TEMP_FOLDER_NAME);
-
                 hideDefaultSuccessMessage(actionRequest);
+                
             } else if (cmd.equals("deleteBackgroundTasks")) {
+                
                 deleteBackgroundTasks(actionRequest, actionResponse);
-
                 hideDefaultSuccessMessage(actionRequest);
+                
             } else if (cmd.equals(Constants.DELETE_TEMP)) {
+                
                 deleteTempFileEntry(actionRequest, actionResponse, ExportImportHelper.TEMP_FOLDER_NAME);
-
                 hideDefaultSuccessMessage(actionRequest);
+                
             } else if (cmd.equals(Constants.IMPORT)) {
+                
                 hideDefaultSuccessMessage(actionRequest);
-
                 importData(actionRequest, ExportImportHelper.TEMP_FOLDER_NAME);
-
                 String redirect = ParamUtil.getString(actionRequest, "redirect");
-
+                
+                _log.info("redirect = " + redirect);
+                
                 sendRedirect(actionRequest, actionResponse, redirect);
+                
             }
         } catch (Exception e) {
             if (cmd.equals(Constants.ADD_TEMP) || cmd.equals(Constants.DELETE_TEMP)) {
 
                 hideDefaultSuccessMessage(actionRequest);
-
                 handleUploadException(actionRequest, actionResponse, ExportImportHelper.TEMP_FOLDER_NAME, e);
+                
             } else {
+                
+                // TODO: remove dependencies to LARFile*
                 if (e instanceof LARFileException || e instanceof LARFileSizeException
                         || e instanceof LARTypeException) {
 
@@ -317,7 +324,11 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
     protected void importData(ActionRequest actionRequest, String fileName, InputStream inputStream) throws Exception {
 
         _log.info("importData()");
+                
+        String extension = FileUtil.getExtension(fileName); 
 
+        _log.info("extension = " + extension);
+        
         ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
         long groupId = ParamUtil.getLong(actionRequest, "groupId");
@@ -331,7 +342,7 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
                 .addDraftExportImportConfiguration(themeDisplay.getUserId(),
                         ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT, importLayoutSettingsMap);
 
-        _measurementService.importMeasurementsInBackground(exportImportConfiguration, inputStream);
+        _measurementService.importMeasurementsInBackground(exportImportConfiguration, inputStream, extension);
 
     }
 
