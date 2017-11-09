@@ -62,8 +62,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-09-27 14:13
- * @version 1.1.2
+ * @modified 2017-11-09 19:19
+ * @version 1.1.3
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -266,7 +266,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
     @Override
     public long importMeasurementsInBackground(long userId, ExportImportConfiguration exportImportConfiguration,
-            InputStream inputStream) throws PortalException {
+            InputStream inputStream, String extension) throws PortalException {
 
         _log.info("importMeasurementsInBackground()");
 
@@ -274,7 +274,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         try {
 
-            file = FileUtil.createTempFile("lar");
+            file = FileUtil.createTempFile(extension);
 
             FileUtil.write(file, inputStream);
 

@@ -2,8 +2,8 @@
     import_measurements_resources.jsp: configure the measurements import.
     
     Created:    2017-11-02 19:46 by Christian Berndt
-    Modified:   2017-11-02 19:46 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-09 21:10 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -35,7 +35,7 @@
 <liferay-ui:error exception="<%= LARTypeException.class %>">
 
     <%
-    LARTypeException lte = (LARTypeException)errorException;
+        LARTypeException lte = (LARTypeException)errorException;
     %>
 
     <liferay-ui:message arguments="<%= lte.getMessage() %>" key="please-import-a-lar-file-of-the-correct-type-x" />
@@ -58,7 +58,8 @@
 <aui:form action="<%= importMeasurementsURL %>" cssClass="lfr-export-dialog" method="post" name="fm1">
 
     <portlet:renderURL var="portletURL">
-        <portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+        <portlet:param name="tabs1" value="export-import"/>
+        <portlet:param name="tabs2" value="import"/>
     </portlet:renderURL>
 
     <aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />

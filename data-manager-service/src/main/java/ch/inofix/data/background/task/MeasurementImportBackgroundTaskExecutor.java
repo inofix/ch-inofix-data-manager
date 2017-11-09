@@ -24,8 +24,8 @@ import ch.inofix.data.service.MeasurementLocalServiceUtil;
 /**
  * @author Christian Berndt
  * @created 2017-09-01 22:00
- * @modified 2017-11-02 22:16
- * @version 1.0.1
+ * @modified 2017-11-09 20:47
+ * @version 1.0.2
  */
 public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBackgroundTaskExecutor {
 
@@ -69,7 +69,7 @@ public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBac
                 
                 _log.info("extension = " + extension);
                 
-                file = FileUtil.createTempFile("lar");
+                file = FileUtil.createTempFile(extension);
 
                 FileUtil.write(file, attachmentsFileEntry.getContentStream());
 

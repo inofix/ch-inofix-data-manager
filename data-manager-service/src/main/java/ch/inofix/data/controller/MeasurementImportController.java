@@ -18,17 +18,20 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataContextFactoryUtil;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManager;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
+import ch.inofix.data.exception.FileFormatException;
 import ch.inofix.data.internal.exportimport.util.ExportImportThreadLocal;
 import ch.inofix.data.service.MeasurementLocalService;
 
@@ -36,8 +39,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-11-03 23:26
- * @version 1.0.7
+ * @modified 2017-11-09 18:43
+ * @version 1.0.8
  *
  */
 @Component(
@@ -94,48 +97,90 @@ public class MeasurementImportController extends BaseExportImportController impl
 
     protected void doImportFile(File file, long userId, long groupId) throws Exception {
         
+        _log.info("doImportFile");
+
         ServiceContext serviceContext = new ServiceContext();
         serviceContext.setScopeGroupId(groupId);
         serviceContext.setUserId(userId);
+        
+        String extension = FileUtil.getExtension(file.getName().toLowerCase());        
+        
+        _log.info("extension = " + extension);     
 
-         StopWatch stopWatch = new StopWatch();
+        StopWatch stopWatch = new StopWatch();
 
-         stopWatch.start();
+        stopWatch.start();
 
-         int numAdded = 0;
-         int numProcessed = 0;
-         int numImported = 0;
-         int numIgnored = 0;
+        int numAdded = 0;
+        int numProcessed = 0;
+        int numImported = 0;
+        int numIgnored = 0;
+        
+        if ("xml".equals(extension)) {
 
-        Document document = SAXReaderUtil.read(file);
+            Document document = SAXReaderUtil.read(file);
 
-        // TODO: read xPath selector from configuration
-        String selector = "//ChannelData";
-        List<Node> channels = document.selectNodes(selector);
-        int numValues = document.selectNodes("//VT").size();
+            // TODO: read xPath selector from configuration
+            String selector = "//ChannelData";
+            List<Node> channels = document.selectNodes(selector);
+            int numValues = document.selectNodes("//VT").size();
 
-        for (Node channel : channels) {
+            for (Node channel : channels) {
 
-            Element channelElement = (Element) channel;
+                Element channelElement = (Element) channel;
 
-            String id = channelElement
-                    .attributeValue("channelId");
-            String name = channelElement.attributeValue("name");
-            String unit = channelElement.attributeValue("unit");
+                String id = channelElement.attributeValue("channelId");
+                String name = channelElement.attributeValue("name");
+                String unit = channelElement.attributeValue("unit");
 
-            List<Node> values = channel.selectNodes("descendant::VT");
+                List<Node> values = channel.selectNodes("descendant::VT");
 
-            for (Node value : values) {
-                
-                Element valueElement = (Element) value;
-                String timestamp = valueElement.attributeValue("t");
-                String val = valueElement.getText();
+                for (Node value : values) {
 
-                JSONObject jsonObject = createJSONObject(id,
-                        name, unit, timestamp, val);
+                    Element valueElement = (Element) value;
+                    String timestamp = valueElement.attributeValue("t");
+                    String val = valueElement.getText();
 
-                int status = addMeasurement(serviceContext, userId,
-                        jsonObject);
+                    JSONObject jsonObject = createJSONObject(id, name, unit, timestamp, val);
+
+                    int status = addMeasurement(serviceContext, userId, jsonObject);
+
+                    if (status == IGNORED) {
+                        numIgnored++;
+                    }
+
+                    if (status == IMPORTED) {
+                        numImported++;
+                    }
+
+                    if (numProcessed % 100 == 0 && numProcessed > 0) {
+
+                        float completed = ((Integer) numProcessed).floatValue() / numValues * 100;
+
+                        _log.info("Processed " + numProcessed + " of " + numValues + " measurements in "
+                                + stopWatch.getTime() + " ms (" + completed + "%).");
+                    }
+
+                    numProcessed++;
+
+                }
+
+            }
+
+        } else if ("json".equals(extension)) {
+
+            _log.info("import json");
+
+            String json = new String(FileUtil.getBytes(file));
+            JSONArray jsonArray = JSONFactoryUtil.createJSONArray(json);
+
+            int numValues = jsonArray.length();
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                int status = addMeasurement(serviceContext, userId, jsonObject);
 
                 if (status == IGNORED) {
                     numIgnored++;
@@ -147,21 +192,20 @@ public class MeasurementImportController extends BaseExportImportController impl
 
                 if (numProcessed % 100 == 0 && numProcessed > 0) {
 
-                    float completed = ((Integer) numProcessed)
-                            .floatValue() / numValues * 100;
+                    float completed = ((Integer) numProcessed).floatValue() / numValues * 100;
 
-                    _log.info("Processed " + numProcessed + " of "
-                            + numValues + " measurements in "
-                            + stopWatch.getTime() + " ms (" + completed
-                            + "%).");
+                    _log.info("Processed " + numProcessed + " of " + numValues + " measurements in "
+                            + stopWatch.getTime() + " ms (" + completed + "%).");
                 }
 
-                numProcessed++;                
-                
+                numProcessed++;
+
             }
 
+        } else {
+            throw new FileFormatException();
         }
-        
+
         if (_log.isInfoEnabled()) {
             _log.info("Importing measurements takes " + stopWatch.getTime() + " ms.");
             _log.info("Added " + numAdded + " measurements as new, since they did not have a measurementId.");
@@ -192,7 +236,7 @@ public class MeasurementImportController extends BaseExportImportController impl
         String id = jsonObject.getString("id");
         String name = jsonObject.getString("channelName");
         String timestamp = jsonObject.getString("timestamp");
-        
+
         LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
         params.put("id", id);
         params.put("name", name);
@@ -201,11 +245,10 @@ public class MeasurementImportController extends BaseExportImportController impl
         // TODO: Filter by id / name and timestamp
         Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, -1, null, null,
                 params, true, 0, Integer.MAX_VALUE, null);
-        
+
         _log.info("hits.getLength = " + hits.getLength());
 
-        if (hits.getLength() == 1) {
-//            if (hits.getLength() == 0) {
+        if (hits.getLength() == 0) {
 
             _measurementLocalService.addMeasurement(userId, jsonObject.toString(), serviceContext);
 
