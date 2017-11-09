@@ -2,8 +2,8 @@
     import_measurements_processes.jsp: list of import processes
     
     Created:    2017-11-02 18:24 by Christian Berndt
-    Modified:   2017-11-02 18:24 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-09 22:42 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -31,6 +31,7 @@
 <portlet:actionURL name="importMeasurements" var="deleteBackgroundTasksURL"/>
 
 <aui:form action="<%= deleteBackgroundTasksURL %>" method="get" name="fm">
+
     <aui:input name="<%= Constants.CMD %>" type="hidden" />
     <aui:input name="deleteBackgroundTaskIds" type="hidden" />
     <aui:input name="redirect" type="hidden" value="<%= currentURL.toString() %>" />
@@ -49,26 +50,32 @@
         <liferay-ui:search-container-results>
 
             <%
-            int backgroundTasksCount = 0;
-            List<BackgroundTask> backgroundTasks = null;
+                int backgroundTasksCount = 0;
+                List<BackgroundTask> backgroundTasks = null;
 
-            if (navigation.equals("all")) {
-                backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, MeasurementImportBackgroundTaskExecutor.class.getName());
-                backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId, MeasurementImportBackgroundTaskExecutor.class.getName(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
-            }
-            else {
-                boolean completed = false;
+                if (navigation.equals("all")) {
+                    backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId,
+                            MeasurementImportBackgroundTaskExecutor.class.getName());
+                    backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId,
+                            MeasurementImportBackgroundTaskExecutor.class.getName(), searchContainer.getStart(),
+                            searchContainer.getEnd(), searchContainer.getOrderByComparator());
+                } else {
+                    boolean completed = false;
 
-                if (navigation.equals("completed")) {
-                    completed = true;
+                    if (navigation.equals("completed")) {
+                        completed = true;
+                    }
+
+                    backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId,
+                            MeasurementImportBackgroundTaskExecutor.class.getName(), completed);
+                    backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId,
+                            MeasurementImportBackgroundTaskExecutor.class.getName(), completed,
+                            searchContainer.getStart(), searchContainer.getEnd(),
+                            searchContainer.getOrderByComparator());
                 }
 
-                backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, MeasurementImportBackgroundTaskExecutor.class.getName(), completed);
-                backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId, MeasurementImportBackgroundTaskExecutor.class.getName(), completed, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
-            }
-
-            searchContainer.setResults(backgroundTasks);
-            searchContainer.setTotal(backgroundTasksCount);
+                searchContainer.setResults(backgroundTasks);
+                searchContainer.setTotal(backgroundTasksCount);
             %>
 
         </liferay-ui:search-container-results>
@@ -221,7 +228,7 @@
 
                     <liferay-ui:search-container-column-jsp
                         name="status"
-                        path="/publish_process_message.jsp"
+                        path="/import_process_message.jsp"
                     />
 
                     <liferay-ui:search-container-column-date
@@ -307,3 +314,14 @@
         <liferay-ui:search-iterator displayStyle="<%= displayStyle %>" markupView="<%= markupView %>" />
     </liferay-ui:search-container>
 </aui:form>
+
+<%
+    int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, MeasurementExportBackgroundTaskExecutor.class.getName(), false);
+%>
+
+<div class="hide incomplete-process-message">
+    <liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
+        <liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
+    </liferay-util:include>
+</div>
+
