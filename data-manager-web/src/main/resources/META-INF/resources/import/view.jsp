@@ -8,6 +8,19 @@
 
 <%@ include file="/init.jsp" %>
 
+<%@page import="com.liferay.portal.kernel.dao.search.SearchContainer"%>
+<%@page import="com.liferay.portal.kernel.util.CalendarFactoryUtil"%>
+
+<%@page import="java.util.Calendar"%>
+
+<%
+    long backgroundTaskId = ParamUtil.getLong(request, "backgroundTaskId");
+    Calendar calendar = CalendarFactoryUtil.getCalendar(timeZone, locale);
+
+    int timeZoneOffset = timeZone.getOffset(calendar.getTimeInMillis());
+
+%>
+
 <%
     String displayStyle = ParamUtil.getString(request, "displayStyle", "list");
     long groupId = scopeGroupId;
@@ -41,7 +54,7 @@
     if ("completed".equals(navigation)) {
         completed = true;
     }
-
+    
 //     backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(scopeGroupId,
 //             TaskRecordExportBackgroundTaskExecutor.class.getName(), 0, 20, orderByComparator);
 //     backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(scopeGroupId,
@@ -82,3 +95,30 @@
 --%>
     </c:otherwise>
 </c:choose>
+
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="importMeasurements" var="importProcessesURL">
+    <portlet:param name="<%= Constants.CMD %>" value="<%= Constants.IMPORT %>" />
+    <portlet:param name="<%= SearchContainer.DEFAULT_CUR_PARAM %>" value="<%= ParamUtil.getString(request, SearchContainer.DEFAULT_CUR_PARAM) %>" />
+    <portlet:param name="<%= SearchContainer.DEFAULT_DELTA_PARAM %>" value="<%= ParamUtil.getString(request, SearchContainer.DEFAULT_DELTA_PARAM) %>" />
+<%--        <portlet:param name="groupId" value="<%= String.valueOf(groupDisplayContextHelper.getGroupId()) %>" /> --%>
+<%--        <portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" /> --%>
+    <portlet:param name="displayStyle" value="<%= displayStyle %>" />
+    <portlet:param name="navigation" value="<%= navigation %>" />
+    <portlet:param name="orderByCol" value="<%= orderByCol %>" />
+    <portlet:param name="orderByType" value="<%= orderByType %>" />
+    <portlet:param name="searchContainerId" value="<%= searchContainerId %>" />
+</liferay-portlet:resourceURL>
+    
+<aui:script use="liferay-export-import">
+
+    new Liferay.ExportImport(
+        {
+            incompleteProcessMessageNode: '#<portlet:namespace />incompleteProcessMessage',
+            locale: '<%= locale.toLanguageTag() %>',
+            namespace: '<portlet:namespace />',
+            processesNode: '#importProcessesSearchContainer',
+            processesResourceURL: '<%= HtmlUtil.escapeJS(importProcessesURL.toString()) %>',
+            timeZoneOffset: <%= timeZoneOffset %>
+        }
+    );
+</aui:script>
