@@ -2,8 +2,8 @@
     export_import_toolbar.jsp: the export-import toolbar.
     
     Created:    2017-11-02 16:56 by Christian Berndt
-    Modified:   2017-11-02 16:56 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-09 13:25 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -16,7 +16,7 @@
     String navigation = ParamUtil.getString(request, "navigation", "all");
     String searchContainerId = ParamUtil.getString(request, "searchContainerId");
     
-    PortletURL portletURL = renderResponse.createRenderURL();
+    PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
     portletURL.setParameter("groupId", String.valueOf(groupId));
     portletURL.setParameter("displayStyle", displayStyle);
