@@ -2,13 +2,11 @@
     view_measurements.jsp: search-container of Inofix' data-manager.
     
     Created:     2017-09-27 10:31 by Christian Berndt
-    Modified:    2017-09-27 10:31 by Christian Berndt
-    Version:     1.0.0
+    Modified:    2017-11-10 13:29 by Christian Berndt
+    Version:     1.0.1
 --%>
 
 <%@ include file="/init.jsp"%>
-
-<%@page import="ch.inofix.data.web.internal.search.EntriesChecker"%>
 
 <%
     MeasurementSearch searchContainer = (MeasurementSearch) request.getAttribute("view.jsp-searchContainer");

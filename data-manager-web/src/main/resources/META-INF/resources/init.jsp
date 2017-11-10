@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-09 22:02 by Christian Berndt
-    Version:     1.1.2
+    Modified:    2017-11-10 13:29 by Christian Berndt
+    Version:     1.1.3
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -28,6 +28,7 @@
 <%@page import="ch.inofix.data.service.util.MeasurementUtil"%>
 <%@page import="ch.inofix.data.web.configuration.DataManagerConfiguration"%>
 <%@page import="ch.inofix.data.web.internal.constants.DataManagerWebKeys"%>
+<%@page import="ch.inofix.data.web.internal.search.EntriesChecker"%>
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearch"%>
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearchTerms"%>
 

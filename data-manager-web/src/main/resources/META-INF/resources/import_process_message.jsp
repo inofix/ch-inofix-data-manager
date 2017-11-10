@@ -1,9 +1,9 @@
 <%--
-    publish_process_message.jsp: TODO
+    publish_process_message.jsp: display the status of the respective background task.
     
     Created:     2017-11-02 22:27 by Christian Berndt
-    Modified:    2017-11-02 22:27 by Christian Berndt
-    Version:     1.0.0
+    Modified:    2017-11-09 22:54 by Christian Berndt
+    Version:     1.0.1
 --%>
 
 
@@ -109,14 +109,19 @@
     </c:if>
 </c:if>
 
-<c:if test="<%= Validator.isNotNull(backgroundTask.getStatusMessage()) %>">
+<%-- <c:if test="<%=Validator.isNotNull(backgroundTask.getStatusMessage())%>"> --%>
     <h5>
-        <a href="javascript:Liferay.fire('<portlet:namespace />viewBackgroundTaskDetails', {nodeId: 'backgroundTaskStatusMessage<%= backgroundTask.getBackgroundTaskId() %>', title: $('#<portlet:namespace />backgroundTaskName<%= backgroundTask.getBackgroundTaskId() %>').text()}); void(0);"><liferay-ui:message key="see-more-details" /></a>
+        <a href="javascript:Liferay.fire('<portlet:namespace />viewBackgroundTaskDetails', {nodeId: 'backgroundTaskStatusMessage<%=backgroundTask.getBackgroundTaskId()%>', title: $('#<portlet:namespace />backgroundTaskName<%=backgroundTask.getBackgroundTaskId()%>').text()}); void(0);"><liferay-ui:message
+                key="see-more-details" /></a>
     </h5>
 
-    <div class="background-task-status-message hide" id="<portlet:namespace />backgroundTaskStatusMessage<%= backgroundTask.getBackgroundTaskId() %>">
-        <liferay-util:include page="/publish_process_message_task_details.jsp" servletContext="<%= application %>">
-            <liferay-util:param name="backgroundTaskId" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
+    <div class="background-task-status-message hide"
+        id="<portlet:namespace />backgroundTaskStatusMessage<%=backgroundTask.getBackgroundTaskId()%>">
+        <liferay-util:include
+            page="/import_process_message_task_details.jsp"
+            servletContext="<%=application%>">
+            <liferay-util:param name="backgroundTaskId"
+                value="<%=String.valueOf(backgroundTask.getBackgroundTaskId())%>" />
         </liferay-util:include>
     </div>
-</c:if>
+<%-- </c:if> --%>

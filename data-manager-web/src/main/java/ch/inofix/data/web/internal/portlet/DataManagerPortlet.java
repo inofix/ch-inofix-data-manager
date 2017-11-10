@@ -39,8 +39,8 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:32
- * @modified 2017-10-31 13:37
- * @version 1.0.7
+ * @modified 2017-11-09 23:04
+ * @version 1.0.8
  */
 @Component(
     configurationPid = "ch.inofix.data.web.configuration.DataManagerConfiguration",
@@ -49,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
         "com.liferay.portlet.css-class-wrapper=portlet-data-manager",
         "com.liferay.portlet.display-category=category.inofix", 
         "com.liferay.portlet.header-portlet-css=/css/main.css",
+        "com.liferay.portlet.header-portlet-javascript=/js/main.js",
         "com.liferay.portlet.instanceable=false", 
         "com.liferay.portlet.preferences-owned-by-group=true",
         "com.liferay.portlet.preferences-unique-per-layout=false",
