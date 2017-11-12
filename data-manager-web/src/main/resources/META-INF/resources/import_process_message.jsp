@@ -1,5 +1,5 @@
 <%--
-    publish_process_message.jsp: display the status of the respective background task.
+    import_process_message.jsp: display the status of the respective background task.
     
     Created:     2017-11-02 22:27 by Christian Berndt
     Modified:    2017-11-09 22:54 by Christian Berndt

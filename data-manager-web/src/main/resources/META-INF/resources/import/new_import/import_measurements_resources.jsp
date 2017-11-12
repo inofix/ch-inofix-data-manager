@@ -2,8 +2,8 @@
     import_measurements_resources.jsp: configure the measurements import.
     
     Created:    2017-11-02 19:46 by Christian Berndt
-    Modified:   2017-11-09 21:10 by Christian Berndt
-    Version:    1.0.1
+    Modified:   2017-11-10 18:16 by Christian Berndt
+    Version:    1.0.2
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -21,9 +21,6 @@
 
     FileEntry fileEntry = ExportImportHelperUtil.getTempFileEntry(groupId, themeDisplay.getUserId(),
             ExportImportHelper.TEMP_FOLDER_NAME);
-
-//     ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user.getUserId(),
-//             themeDisplay.getSiteGroupId(), new HashMap<String, String[]>(), fileEntry);
 %>
 
 <%-- <liferay-ui:error exception="<%= LARFileException.class %>" message="please-specify-a-lar-file-to-import" /> --%>
@@ -40,10 +37,6 @@
 
     <liferay-ui:message arguments="<%= lte.getMessage() %>" key="please-import-a-lar-file-of-the-correct-type-x" />
 </liferay-ui:error>
-
-<%-- <liferay-ui:error exception="<%= LayoutImportException.class %>" message="an-unexpected-error-occurred-while-importing-your-file" /> --%>
-
-<%-- <liferay-ui:error exception="<%= LayoutPrototypeException.class %>"> --%>
 
 <% // TODO: what else can go wrong? see import_layouts_resources.jsp %>
 

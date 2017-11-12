@@ -2,23 +2,17 @@
     import/view.jsp: default view of the measurements import
     
     Created:    2017-11-01 18:58 by Christian Berndt
-    Modified:   2017-11-01 18:58 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-10 17:12 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
-
-<%@page import="com.liferay.portal.kernel.dao.search.SearchContainer"%>
-<%@page import="com.liferay.portal.kernel.util.CalendarFactoryUtil"%>
-
-<%@page import="java.util.Calendar"%>
 
 <%
     long backgroundTaskId = ParamUtil.getLong(request, "backgroundTaskId");
     Calendar calendar = CalendarFactoryUtil.getCalendar(timeZone, locale);
 
     int timeZoneOffset = timeZone.getOffset(calendar.getTimeInMillis());
-
 %>
 
 <%
@@ -27,11 +21,11 @@
     String navigation = ParamUtil.getString(request, "navigation", "all");
     String orderByCol = ParamUtil.getString(request, "orderByCol", "create-date");
     String orderByType = ParamUtil.getString(request, "orderByType", "desc");
-    String searchContainerId = "importTaskRecordProcesses";
+    String searchContainerId = "importMeasurementProcesses";
     tabs1 = ParamUtil.getString(request, "tabs1"); 
     tabs2 = ParamUtil.getString(request, "tabs2"); 
 
-    PortletURL portletURL = renderResponse.createRenderURL();
+    PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
     portletURL.setParameter("groupId", String.valueOf(groupId));
     portletURL.setParameter("displayStyle", displayStyle);
@@ -56,9 +50,9 @@
     }
     
 //     backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(scopeGroupId,
-//             TaskRecordExportBackgroundTaskExecutor.class.getName(), 0, 20, orderByComparator);
+//             MeasurementExportBackgroundTaskExecutor.class.getName(), 0, 20, orderByComparator);
 //     backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(scopeGroupId,
-//             TaskRecordExportBackgroundTaskExecutor.class.getName());
+//             MeasurementExportBackgroundTaskExecutor.class.getName());
 %>
 
 <% // TODO: enable permission checks %>
@@ -70,8 +64,7 @@
             <liferay-ui:message key="you-do-not-have-permission-to-access-the-requested-resource" />
         </div>
     </c:when>
-    <c:otherwise>
-    
+    <c:otherwise>   
         <liferay-util:include page="/import/processes_list/view.jsp" servletContext="<%= application %>">
             <liferay-util:param name="displayStyle" value="<%= displayStyle %>" />
             <liferay-util:param name="navigation" value="<%= navigation %>" />
@@ -84,15 +77,6 @@
             <liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
             <liferay-util:param name="displayStyle" value="<%= displayStyle %>" />
         </liferay-util:include>
-        
-<%--          
-            <portlet:actionURL name="importMeasurements" var="importMeasurementsURL">
-                <portlet:param name="<%= Constants.CMD %>" value="<%= Constants.IMPORT %>" />
-                <portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-            </portlet:actionURL>
-
-            <aui:nav-item href="<%= importMeasurementsURL %>" iconCssClass="icon-arrow-down" label="import" />
---%>
     </c:otherwise>
 </c:choose>
 
