@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-10 13:29 by Christian Berndt
-    Version:     1.1.3
+    Modified:    2017-11-10 17:10 by Christian Berndt
+    Version:     1.1.4
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -45,6 +45,7 @@
 <%@page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistryUtil"%>
 <%@page import="com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker"%>
 <%@page import="com.liferay.portal.kernel.dao.search.ResultRow"%>
+<%@page import="com.liferay.portal.kernel.dao.search.SearchContainer"%>
 <%@page import="com.liferay.portal.kernel.json.JSONArray"%>
 <%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONObject"%>
@@ -71,6 +72,7 @@
 <%@page import="com.liferay.portal.kernel.service.TicketLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.UserServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.UserLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.util.CalendarFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Constants"%>
 <%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
 <%@page import="com.liferay.portal.kernel.util.HtmlUtil"%>
@@ -89,6 +91,7 @@
 <%@page import="com.liferay.portal.kernel.util.WebKeys"%>
 
 <%@page import="java.text.DecimalFormatSymbols"%>
+<%@page import="java.util.Calendar"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Iterator"%>
