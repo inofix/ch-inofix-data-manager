@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-10 17:10 by Christian Berndt
-    Version:     1.1.4
+    Modified:    2017-11-13 17:04 by Christian Berndt
+    Version:     1.1.5
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -104,6 +104,8 @@
 <%@page import="javax.portlet.PortletRequest"%>
 <%@page import="javax.portlet.ResourceURL"%>
 
+<%@page import="org.apache.commons.collections.IteratorUtils"%>
+
 <liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
@@ -151,13 +153,13 @@
         _log.error(e);
     }
     
-    Iterator<String> keys = null;
+    List<String> keys = null;
 
     if (jsonSchemaObj != null) {
         JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
         if (itemsObj != null) {
             JSONObject propertiesObj = itemsObj.getJSONObject("properties");            
-            keys = propertiesObj.keys();
+            keys = IteratorUtils.toList(propertiesObj.keys());
         }    
     }
 %>
