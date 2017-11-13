@@ -3,8 +3,6 @@ package ch.inofix.data.web.internal.portlet.action;
 import javax.portlet.PortletRequest;
 import javax.servlet.http.HttpServletRequest;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -24,8 +22,6 @@ public class ActionUtil {
 
     public static Measurement getMeasurement(HttpServletRequest request) throws Exception {
 
-        _log.info("getMeasurement(request)");
-
         long measurementId = ParamUtil.getLong(request, "measurementId");
 
         Measurement measurement = null;
@@ -39,13 +35,9 @@ public class ActionUtil {
 
     public static Measurement getMeasurement(PortletRequest portletRequest) throws Exception {
 
-        _log.info("getMeasurement(portletRequest)");
-
         HttpServletRequest request = PortalUtil.getHttpServletRequest(portletRequest);
 
         return getMeasurement(request);
     }
-
-    private static Log _log = LogFactoryUtil.getLog(ActionUtil.class.getName());
 
 }
