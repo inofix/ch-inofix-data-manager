@@ -333,6 +333,8 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
 
         long groupId = ParamUtil.getLong(actionRequest, "groupId");
         boolean privateLayout = ParamUtil.getBoolean(actionRequest, "privateLayout");
+        
+        // TODO: remove dependency from ExportImportConfigurationSettingsMapFactory
 
         Map<String, Serializable> importLayoutSettingsMap = ExportImportConfigurationSettingsMapFactory
                 .buildImportLayoutSettingsMap(themeDisplay.getUserId(), groupId, privateLayout, null,

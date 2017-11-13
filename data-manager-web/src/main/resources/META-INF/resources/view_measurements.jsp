@@ -2,8 +2,8 @@
     view_measurements.jsp: search-container of Inofix' data-manager.
     
     Created:     2017-09-27 10:31 by Christian Berndt
-    Modified:    2017-11-10 13:29 by Christian Berndt
-    Version:     1.0.1
+    Modified:    2017-11-13 16:49 by Christian Berndt
+    Version:     1.0.2
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -30,17 +30,17 @@
         modelVar="measurement" keyProperty="measurementId">
 
         <portlet:renderURL var="editURL">
-            <portlet:param name="redirect" value="<%=currentURL%>" />
             <portlet:param name="measurementId"
                 value="<%=String.valueOf(measurement.getMeasurementId())%>" />
-            <portlet:param name="mvcPath" value="/edit_measurement.jsp" />
+            <portlet:param name="mvcRenderCommandName" value="editMeasurement" />
+            <portlet:param name="redirect" value="<%=currentURL%>" />
         </portlet:renderURL>
 
         <portlet:renderURL var="viewURL">
-            <portlet:param name="redirect" value="<%=currentURL%>" />
             <portlet:param name="measurementId"
                 value="<%=String.valueOf(measurement.getMeasurementId())%>" />
-            <portlet:param name="mvcPath" value="/edit_measurement.jsp" />
+            <portlet:param name="mvcRenderCommandName" value="editMeasurement" />
+            <portlet:param name="redirect" value="<%=currentURL%>" />
         </portlet:renderURL>
 
         <%
@@ -60,11 +60,11 @@
                 detailURL = viewURL.toString();
             }
         %>
-
+        
         <%@ include file="/search_columns.jspf"%>
-
+                
         <liferay-ui:search-container-column-jsp align="right"
-            cssClass="entry-action" path="/measurement_action.jsp"
+            cssClass="entry-action" path="/measurement_action.jsp"  
             valign="top" />
 
     </liferay-ui:search-container-row>

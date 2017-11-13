@@ -2,13 +2,15 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-11-01 23:37 by Christian Berndt
-    Version:     1.0.5
+    Modified:    2017-11-13 16:53 by Christian Berndt
+    Version:     1.0.6
 --%>
 
 <%@ include file="/init.jsp"%>
 
 <%
+    String cmd = Constants.ADD; 
+
     Measurement measurement = (Measurement) request.getAttribute(DataManagerWebKeys.MEASUREMENT);
 
     String namespace = portletDisplay.getNamespace();
@@ -21,6 +23,8 @@
     boolean hasPermissionsPermission = false;
 
     if (measurement != null) {
+        
+        cmd = Constants.UPDATE;
 
         title = LanguageUtil.format(request, "edit-measurement-x",
                 String.valueOf(measurement.getMeasurementId()));
@@ -55,13 +59,14 @@
 <div class="container-fluid-1280">
     
     <portlet:actionURL name="editMeasurement" var="updateMeasurementURL">
-        <portlet:param name="mvcPath" value="/edit_measurement.jsp" />
+        <portlet:param name="mvcRenderCommandName" value="editMeasurement" />
+<%--         <portlet:param name="mvcPath" value="/edit_measurement.jsp" /> --%>
     </portlet:actionURL>
 
     <aui:form method="post" action="<%=updateMeasurementURL%>" name="fm">
     
         <aui:input name="cmd" type="hidden" 
-            value="<%= Constants.UPDATE %>"/>
+            value="<%= cmd  %>"/>
     
         <aui:model-context bean="<%=measurement%>"
             model="<%=Measurement.class%>" />
@@ -89,8 +94,7 @@
                             
                             JSONObject dataObj = JSONFactoryUtil.createJSONObject(data); 
                             
-                            while (keys.hasNext()) {
-                                String key = keys.next();
+                            for (String key : keys) {
                                 if (dataObj != null) {
                                     value = dataObj.get(key);
                                 }
