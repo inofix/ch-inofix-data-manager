@@ -1,8 +1,6 @@
 package ch.inofix.data.web.internal.portlet.action;
 
 import java.util.Iterator;
-import java.util.List;
-
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
@@ -20,7 +18,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -36,7 +33,6 @@ import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.exception.NoSuchMeasurementException;
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementService;
-import ch.inofix.data.service.util.MeasurementUtil;
 
 /**
  * 
@@ -58,17 +54,10 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
     protected void deleteGroupMeasurements(ActionRequest actionRequest) throws Exception {
 
         _log.info("deleteGroupMeasurements()");
-        
+
         ServiceContext serviceContext = ServiceContextFactory.getInstance(Measurement.class.getName(), actionRequest);
 
-        Hits hits = _measurementService.search(serviceContext.getUserId(), serviceContext.getScopeGroupId(), null, 0,
-                Integer.MAX_VALUE, null);
-
-        List<Measurement> measurements = MeasurementUtil.getMeasurements(hits);
-
-        for (Measurement measurement : measurements) {
-            _measurementService.deleteMeasurement(measurement.getMeasurementId());
-        }
+        _measurementService.deleteGroupMeasurements(serviceContext.getScopeGroupId());
 
     }
 
@@ -121,6 +110,8 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
             }
         } catch (NoSuchMeasurementException | PrincipalException e) {
             
+            _log.error(e);
+            
             SessionErrors.add(actionRequest, e.getClass());
 
             actionResponse.setRenderParameter("mvcPath", "/error.jsp");
@@ -131,6 +122,8 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
         } catch (Exception e) {
 
             SessionErrors.add(actionRequest, e.getClass());
+            
+            actionResponse.setRenderParameter("mvcPath", "/error.jsp");
         }
     }
     

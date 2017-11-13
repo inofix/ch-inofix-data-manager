@@ -16,6 +16,7 @@ package ch.inofix.data.service.impl;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
@@ -53,8 +54,8 @@ import ch.inofix.data.service.permission.DataManagerPortletPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 00:32
- * @modified 2017-11-09 19:20
- * @version 1.0.4
+ * @modified 2017-11-13 21:18
+ * @version 1.0.5
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
@@ -83,6 +84,40 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
         return measurementLocalService.createMeasurement(0);
     }
     
+    
+    
+    @Override
+    public void deleteBackgroundTask(long groupId, long backgroundTaskId) throws PortalException {
+
+        _log.info("deleteBackgroundTask()");
+
+        DataManagerPortletPermission.check(getPermissionChecker(), groupId, MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
+
+        BackgroundTaskManagerUtil.deleteBackgroundTask(backgroundTaskId);
+
+    }
+    
+    @Override
+    public List<Measurement> deleteGroupMeasurements(long groupId) throws PortalException {
+        
+        _log.info("deleteGroupMeasurements()");
+
+        DataManagerPortletPermission.check(getPermissionChecker(), groupId,
+                MeasurementActionKeys.DELETE_GROUP_MEASUREMENTS);
+
+        return measurementLocalService.deleteGroupMeasurements(groupId);
+    }
+
+    @Override
+    public Measurement deleteMeasurement(long measurementId) throws PortalException {
+
+        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.DELETE);
+
+        return measurementLocalService.deleteMeasurement(measurementId);
+
+    }
+
+    
     @Override
     public Measurement getMeasurement(long measurementId) throws PortalException {
 
@@ -98,26 +133,6 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
 
         return TempFileEntryUtil.getTempFileNames(groupId, getUserId(),
                 DigesterUtil.digestHex(Digester.SHA_256, folderName));
-    }
-    
-    @Override
-    public void deleteBackgroundTask(long groupId, long backgroundTaskId) throws PortalException {
-
-        _log.info("deleteBackgroundTask()");
-
-        DataManagerPortletPermission.check(getPermissionChecker(), groupId, MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
-
-        BackgroundTaskManagerUtil.deleteBackgroundTask(backgroundTaskId);
-
-    }
-
-    @Override
-    public Measurement deleteMeasurement(long measurementId) throws PortalException {
-
-        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.DELETE);
-
-        return measurementLocalService.deleteMeasurement(measurementId);
-
     }
     
     @Override

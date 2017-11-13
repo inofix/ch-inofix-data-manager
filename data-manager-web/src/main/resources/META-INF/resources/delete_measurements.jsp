@@ -2,8 +2,8 @@
     delete_measurements.jsp: Delete all measurements of this group
     
     Created:    2017-11-03 23:43 by Christian Berndt
-    Modified:   2017-11-03 23:43 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-13 21:47 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -27,8 +27,6 @@
         var="deleteGroupMeasurementsURL">
         <portlet:param name="<%=Constants.CMD%>"
             value="deleteGroupMeasurements" />
-        <portlet:param name="groupId"
-            value="<%=String.valueOf(scopeGroupId)%>" />
         <portlet:param name="mvcPath" value="/view.jsp" />
         <portlet:param name="tabs1" value="export-import" />
         <portlet:param name="tabs2" value="delete" />
