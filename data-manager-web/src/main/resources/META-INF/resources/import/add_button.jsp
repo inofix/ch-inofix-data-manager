@@ -2,8 +2,8 @@
     add_button.jsp: create a new import process
     
     Created:    2017-06-08 00:32 by Christian Berndt
-    Modified:   2017-07-05 11:38 by Christian Berndt
-    Version:    1.0.3
+    Modified:   2017-11-13 20:19 by Christian Berndt
+    Version:    1.0.4
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -16,8 +16,8 @@
 <liferay-frontend:add-menu>
 
     <portlet:renderURL var="addImportProcessURL">
-        <portlet:param name="groupId" value="<%=String.valueOf(scopeGroupId)%>" />
-        <portlet:param name="mvcPath" value="/import/new_import/import_measurements.jsp" />
+        <portlet:param name="<%= Constants.CMD %>" value="<%= Constants.IMPORT %>" />
+        <portlet:param name="mvcRenderCommandName" value="importMeasurements" />
         <portlet:param name="tabs1" value="export-import" />
     </portlet:renderURL>
 
