@@ -3,8 +3,8 @@
     for the default view of the data manager portlet.
 
     Created:     2017-09-27 13:17 by Christian Berndt
-    Modified:    2017-11 13 18:03 by Christian Berndt
-    Version:     1.0.2
+    Modified:    2017-11-13 22:35 by Christian Berndt
+    Version:     1.0.3
 --%>
 
 <%
@@ -20,7 +20,7 @@
 
 <c:if test='<%="data".equals(column)%>'>
     <c:choose>
-        <c:when test="<%= keys != null %>">
+        <c:when test="<%= fields.size() > 0 %>">
         <%
             String data = measurement.getData();
             Object valueObj = null;
@@ -28,16 +28,16 @@
             
             JSONObject dataObj = JSONFactoryUtil.createJSONObject(data); 
             
-            for (String key : keys) {
+            for (String field : fields) {
                 
                 if (dataObj != null) {
-                    valueObj = dataObj.get(key);
+                    valueObj = dataObj.get(field);
                     if (valueObj != null) {
                         value = valueObj.toString();
                     }
                 }
         %>
-            <liferay-ui:search-container-column-text property="<%= "dataMap[" + key + "]" %>" name="<%= key %>"
+            <liferay-ui:search-container-column-text property="<%= "dataMap[" + field + "]" %>" name="<%= field %>"
                 orderable="<%= false %>" href="<%=detailURL%>" value="<%= value %>" />
         <%
             }
