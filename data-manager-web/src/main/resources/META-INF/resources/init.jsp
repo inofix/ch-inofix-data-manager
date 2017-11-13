@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-13 17:04 by Christian Berndt
-    Version:     1.1.5
+    Modified:    2017-11-13 18:51 by Christian Berndt
+    Version:     1.1.6
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -72,6 +72,7 @@
 <%@page import="com.liferay.portal.kernel.service.TicketLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.UserServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.UserLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.portal.kernel.util.CalendarFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Constants"%>
 <%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
@@ -127,8 +128,6 @@
     
     DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) liferayPortletRequest
             .getAttribute(DataManagerConfiguration.class.getName());
-//     DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) renderRequest
-//             .getAttribute(DataManagerConfiguration.class.getName());
         
     if (Validator.isNotNull(dataManagerConfiguration)) {
         
@@ -154,13 +153,25 @@
     }
     
     List<String> keys = null;
-
+    String[] requiredFields = null; 
+    
     if (jsonSchemaObj != null) {
+        
         JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
+        JSONArray requiredFieldsArray = null;
+        
         if (itemsObj != null) {
             JSONObject propertiesObj = itemsObj.getJSONObject("properties");            
             keys = IteratorUtils.toList(propertiesObj.keys());
-        }    
+            requiredFieldsArray = itemsObj.getJSONArray("required"); 
+        }
+          
+        if (requiredFieldsArray != null) {
+            requiredFields = new String[requiredFieldsArray.length()];
+            for (int i=0; i< requiredFieldsArray.length(); i++) {
+                requiredFields[i] = requiredFieldsArray.getString(i); 
+            }
+        }        
     }
 %>
 

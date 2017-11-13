@@ -2,8 +2,8 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-11-13 16:53 by Christian Berndt
-    Version:     1.0.6
+    Modified:    2017-11-13 18:59 by Christian Berndt
+    Version:     1.0.7
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -60,7 +60,6 @@
     
     <portlet:actionURL name="editMeasurement" var="updateMeasurementURL">
         <portlet:param name="mvcRenderCommandName" value="editMeasurement" />
-<%--         <portlet:param name="mvcPath" value="/edit_measurement.jsp" /> --%>
     </portlet:actionURL>
 
     <aui:form method="post" action="<%=updateMeasurementURL%>" name="fm">
@@ -95,11 +94,20 @@
                             JSONObject dataObj = JSONFactoryUtil.createJSONObject(data); 
                             
                             for (String key : keys) {
+                                
                                 if (dataObj != null) {
                                     value = dataObj.get(key);
                                 }
+                                
+                                boolean required = false;
+                                
+                                if (requiredFields != null) {
+                                    
+                                    required = ArrayUtil.contains(requiredFields, key);
+                                    
+                                }
                         %>
-                            <aui:input name="<%= key %>" type="text" value="<%= value %>" />
+                            <aui:input name="<%= key %>" required="<%= required %>" type="text" value="<%= value %>" />                       
                         <%
                             }
                         %>
