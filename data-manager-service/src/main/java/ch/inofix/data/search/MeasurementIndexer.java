@@ -1,6 +1,8 @@
 package ch.inofix.data.search;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -15,6 +17,8 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PortletPreferences;
@@ -40,6 +44,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementLocalService;
 import ch.inofix.data.service.permission.MeasurementPermission;
+import ch.inofix.data.service.util.JSONSchemaUtil;
 
 /**
  *
@@ -128,44 +133,53 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
     @Override
     protected Document doGetDocument(Measurement measurement) throws Exception {
-        
-        _log.info("doGetDocument");
 
-        // PortletPreferences portletPreferences = PortletPreferencesFactoryUtil
-        // .getStrictPortletSetup(measurement.getCompanyId(),
-        // measurement.getGroupId(), PortletKeys.DATA_MANAGER);
-
-        // portletPreferences =
-        // PortletPreferencesFactoryUtil.getPortletPreferences(request,
-        // portletId);
+        List<String> fields = new ArrayList<String>();
 
         String jsonSchema = null;
         long ownerId = measurement.getGroupId();
         int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
         long plid = 0;
-        
+
         try {
 
             PortletPreferences portletPreferences = PortletPreferencesLocalServiceUtil.getPortletPreferences(ownerId,
                     ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
-            
-            javax.portlet.PortletPreferences preferences = PortletPreferencesFactoryUtil.fromDefaultXML(portletPreferences.getPreferences());
 
-            _log.info("portletPreferences = " + portletPreferences);
-            _log.info("preferences = " + preferences);
-            
+            javax.portlet.PortletPreferences preferences = PortletPreferencesFactoryUtil
+                    .fromDefaultXML(portletPreferences.getPreferences());
+
             jsonSchema = preferences.getValue("jsonSchema", "{}");
+
+            JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonSchema);
+
+            fields = JSONSchemaUtil.getFields(jsonObject);
 
         } catch (Exception e) {
             _log.error(e);
         }
 
-         _log.info("jsonSchema = " + jsonSchema);
+        String data = measurement.getData();
+
+        JSONObject dataObj = JSONFactoryUtil.createJSONObject(data);
 
         Document document = getBaseModelDocument(CLASS_NAME, measurement);
 
         document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
-        document.addTextSortable("data", measurement.getData());
+        document.addTextSortable("data", data);
+
+        for (String field : fields) {
+
+            if (dataObj != null) {
+
+                String value = dataObj.getString(field);
+
+                if (Validator.isNotNull(value)) {
+                    document.addTextSortable(field, value);
+
+                }
+            }
+        }
 
         return document;
 

@@ -2,10 +2,11 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-13 21:52 by Christian Berndt
-    Version:     1.1.7
+    Modified:    2017-11-13 22:11 by Christian Berndt
+    Version:     1.1.8
 --%>
 
+<%@page import="ch.inofix.data.service.util.JSONSchemaUtil"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet"%>
 <%@taglib uri="http://liferay.com/tld/aui" prefix="aui"%>
@@ -153,27 +154,9 @@
         _log.error(e);
     }
     
-    List<String> keys = null;
-    String[] requiredFields = null; 
-    
-    if (jsonSchemaObj != null) {
-        
-        JSONObject itemsObj = jsonSchemaObj.getJSONObject("items");
-        JSONArray requiredFieldsArray = null;
-        
-        if (itemsObj != null) {
-            JSONObject propertiesObj = itemsObj.getJSONObject("properties");            
-            keys = IteratorUtils.toList(propertiesObj.keys());
-            requiredFieldsArray = itemsObj.getJSONArray("required"); 
-        }
-          
-        if (requiredFieldsArray != null) {
-            requiredFields = new String[requiredFieldsArray.length()];
-            for (int i=0; i< requiredFieldsArray.length(); i++) {
-                requiredFields[i] = requiredFieldsArray.getString(i); 
-            }
-        }        
-    }
+    List<String> fields = JSONSchemaUtil.getFields(jsonSchemaObj); 
+    String[] requiredFields = JSONSchemaUtil.getRequiredFields(jsonSchemaObj); 
+
 %>
 
 <%!

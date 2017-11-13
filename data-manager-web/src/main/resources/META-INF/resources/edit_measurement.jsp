@@ -2,8 +2,8 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-11-13 18:59 by Christian Berndt
-    Version:     1.0.7
+    Modified:    2017-11-13 22:24 by Christian Berndt
+    Version:     1.0.8
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -86,28 +86,28 @@
                         disabled="<%=!hasUpdatePermission%>" />
                     
                     <c:choose>
-                        <c:when test="<%= keys != null %>">
+                        <c:when test="<%= fields.size() > 0 %>">
                         <%
                             String data = measurement.getData();
                             Object value = null;
                             
                             JSONObject dataObj = JSONFactoryUtil.createJSONObject(data); 
                             
-                            for (String key : keys) {
+                            for (String field : fields) {
                                 
                                 if (dataObj != null) {
-                                    value = dataObj.get(key);
+                                    value = dataObj.get(field);
                                 }
                                 
                                 boolean required = false;
                                 
                                 if (requiredFields != null) {
                                     
-                                    required = ArrayUtil.contains(requiredFields, key);
+                                    required = ArrayUtil.contains(requiredFields, field);
                                     
                                 }
                         %>
-                            <aui:input name="<%= key %>" required="<%= required %>" type="text" value="<%= value %>" />                       
+                            <aui:input name="<%= field %>" required="<%= required %>" type="text" value="<%= value %>" />                       
                         <%
                             }
                         %>
