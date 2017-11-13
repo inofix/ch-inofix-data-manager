@@ -3,8 +3,8 @@
     for the default view of the data manager portlet.
 
     Created:     2017-09-27 13:17 by Christian Berndt
-    Modified:    2017-10-16 22:13 by Christian Berndt
-    Version:     1.0.1
+    Modified:    2017-11 13 18:03 by Christian Berndt
+    Version:     1.0.2
 --%>
 
 <%
@@ -17,23 +17,28 @@
     <liferay-ui:search-container-column-date property="createDate"
         name="create-date" orderable="true" href="<%=detailURL%>" />
 </c:if>
+
 <c:if test='<%="data".equals(column)%>'>
     <c:choose>
         <c:when test="<%= keys != null %>">
         <%
             String data = measurement.getData();
-            Object value = null;
+            Object valueObj = null;
+            String value = null;
             
             JSONObject dataObj = JSONFactoryUtil.createJSONObject(data); 
             
-            while (keys.hasNext()) {
-                String key = keys.next();
+            for (String key : keys) {
+                
                 if (dataObj != null) {
-                    value = dataObj.get(key);
+                    valueObj = dataObj.get(key);
+                    if (valueObj != null) {
+                        value = valueObj.toString();
+                    }
                 }
         %>
-            <liferay-ui:search-container-column-text name="<%= key %>"
-                orderable="<%= false %>" href="<%=detailURL%>" value="<%= value.toString() %>" />
+            <liferay-ui:search-container-column-text property="<%= "dataMap[" + key + "]" %>" name="<%= key %>"
+                orderable="<%= false %>" href="<%=detailURL%>" value="<%= value %>" />
         <%
             }
         %>
