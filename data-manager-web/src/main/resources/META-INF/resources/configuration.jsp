@@ -2,8 +2,8 @@
     configuration.jsp: configuration of the data-manager portlet.
     
     Created:    2017-09-14 17:33 by Christian Berndt
-    Modified:   2017-11-01 17:09 by Christian Berndt
-    Version:    1.0.4
+    Modified:   2017-11-14 10:26 by Christian Berndt
+    Version:    1.0.5
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -82,6 +82,15 @@
                 <aui:input name="preferences--jsonSchema--"
                     helpMessage="json-schema-help"
                     type="textarea" value="<%=jsonSchema%>" />
+
+            </liferay-ui:panel>
+            
+            <liferay-ui:panel collapsible="<%=true%>" extended="<%= true %>"
+                id="fieldSettingsPanel" markupView="<%=markupView%>"
+                persistState="<%=true%>" title="field-settings">
+
+                <aui:input name="preferences--timestampField--"
+                    helpMessage="timestamp-field-help" value="<%=timestampField%>" />
 
             </liferay-ui:panel>
 

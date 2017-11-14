@@ -3,16 +3,17 @@ package ch.inofix.data.web.configuration;
 import aQute.bnd.annotation.metatype.Meta;
 
 /**
-*
-* @author Christian Berndt
-* @created 2017-09-10 16:51
-* @modified 2017-10-25 22:59
-* @version 1.0.2
-*
-*/
+ *
+ * @author Christian Berndt
+ * @created 2017-09-10 16:51
+ * @modified 2017-11-14 10:32
+ * @version 1.0.3
+ *
+ */
 @Meta.OCD(
     id = "ch.inofix.data.web.configuration.DataManagerConfiguration", 
-    localization = "content/Language", name = "data.manager.configuration.name"
+    localization = "content/Language", 
+    name = "data.manager.configuration.name"
 )
 public interface DataManagerConfiguration {
     
@@ -28,6 +29,9 @@ public interface DataManagerConfiguration {
     @Meta.AD(deflt = "false", required = false)
     public boolean showSearchSpeeed();
     
+    @Meta.AD(deflt = "", required = false)
+    public String timestampField();
+
     @Meta.AD(deflt = "", required = false)
     public String userId();
 
