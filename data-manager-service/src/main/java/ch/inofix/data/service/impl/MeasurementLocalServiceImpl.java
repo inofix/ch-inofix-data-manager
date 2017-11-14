@@ -62,8 +62,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-11-09 19:19
- * @version 1.1.3
+ * @modified 2017-11-14 12:28
+ * @version 1.1.4
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -306,13 +306,13 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
             andOperator = true;
         }
 
-        return search(userId, groupId, data, WorkflowConstants.STATUS_ANY, null, null, null, andOperator, start, end,
-                sort);
+        return search(userId, groupId, data, null, null, WorkflowConstants.STATUS_ANY, null, null, null, andOperator,
+                start, end, sort);
 
     }
 
     @Override
-    public Hits search(long userId, long groupId, String data, int status, Date from, Date until,
+    public Hits search(long userId, long groupId, String data, String id, String timestamp, int status, Date from, Date until,
             LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
             throws PortalException {
 
@@ -322,7 +322,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class.getName());
 
-        SearchContext searchContext = buildSearchContext(userId, groupId, data, status, from, until, params, andSearch,
+        SearchContext searchContext = buildSearchContext(userId, groupId, data, id, timestamp, status, from, until, params, andSearch,
                 start, end, sort);
 
         return indexer.search(searchContext);
@@ -358,16 +358,24 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
     }
     
-    protected SearchContext buildSearchContext(long userId, long groupId, String data, int status, Date from,
+    protected SearchContext buildSearchContext(long userId, long groupId, String data, String id, String timestamp, int status, Date from,
             Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
             throws PortalException {
 
         SearchContext searchContext = new SearchContext();
+        
+        searchContext.setAttribute("advancedSearch", true);
 
         searchContext.setAttribute(Field.STATUS, status);
 
         if (Validator.isNotNull(data)) {
             searchContext.setAttribute("data", data);
+        }
+        if (Validator.isNotNull(id)) {
+            searchContext.setAttribute("id", id);
+        }
+        if (Validator.isNotNull(timestamp)) {
+            searchContext.setAttribute("timestamp", timestamp);
         }
 
         searchContext.setAttribute("from", from);

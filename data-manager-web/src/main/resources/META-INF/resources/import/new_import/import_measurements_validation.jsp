@@ -2,8 +2,8 @@
     import_measurements_validation.jsp: validate the measurements import.
     
     Created:    2017-11-02 17:58 by Christian Berndt
-    Modified:   2017-11-02 17:58 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-11-14 14:18 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -53,7 +53,7 @@
                 metadataExplanationContainer: '#<portlet:namespace />metadataExplanationContainer',
                 multipleFiles: false,
                 namespace: '<portlet:namespace />',
-                'strings.dropFileText': '<liferay-ui:message key="drop-a-xml-or-xls-file-here-to-import" />',
+                'strings.dropFileText': '<liferay-ui:message key="drop-a-json-file-here-to-import" />',
                 'strings.fileCannotBeSavedText': '<liferay-ui:message key="the-file-x-cannot-be-imported" />',
                 'strings.pendingFileText': '<liferay-ui:message key="this-file-was-previously-uploaded-but-not-actually-imported" />',
                 'strings.uploadsCompleteText': '<liferay-ui:message key="the-file-is-ready-to-be-imported" />',
