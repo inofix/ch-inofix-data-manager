@@ -50,8 +50,8 @@ import ch.inofix.data.service.util.JSONSchemaUtil;
  *
  * @author Christian Berndt
  * @created 2017-09-27 10:52
- * @modified 2017-11-14 12:07
- * @version 1.1.5
+ * @modified 2017-11-14 14:49
+ * @version 1.1.6
  *
  */
 @Component(immediate = true, service = Indexer.class)
@@ -114,6 +114,8 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
             SearchContext searchContext) throws Exception {
         
         addSearchTerm(searchQuery, searchContext, "data", false);
+        addSearchTerm(searchQuery, searchContext, "id", false);
+        addSearchTerm(searchQuery, searchContext, "timestamp", false);
 
         LinkedHashMap<String, Object> params = (LinkedHashMap<String, Object>) searchContext.getAttribute("params");
 
@@ -194,7 +196,6 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
                 document.addTextSortable("timestamp", timestamp);
 
             }
-
         }
 
         return document;

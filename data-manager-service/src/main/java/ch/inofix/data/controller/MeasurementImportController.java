@@ -4,7 +4,6 @@ import static ch.inofix.data.internal.exportimport.util.ExportImportLifecycleCon
 import static ch.inofix.data.internal.exportimport.util.ExportImportLifecycleConstants.PROCESS_FLAG_MEASUREMENTS_IMPORT_IN_PROCESS;
 
 import java.io.File;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -23,9 +22,14 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
@@ -39,8 +43,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-11-09 18:43
- * @version 1.0.8
+ * @modified 2017-11-14 14:48
+ * @version 1.0.9
  *
  */
 @Component(
@@ -232,21 +236,26 @@ public class MeasurementImportController extends BaseExportImportController impl
     }
 
     private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject jsonObject) throws Exception {
+        
+        // Read timestamp field name from configuration
+        
+        long ownerId = serviceContext.getScopeGroupId();
+        int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
+        long plid = 0;
+        
+        PortletPreferences portletPreferences = PortletPreferencesLocalServiceUtil.getPortletPreferences(ownerId,
+                ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
+
+        javax.portlet.PortletPreferences preferences = PortletPreferencesFactoryUtil
+                .fromDefaultXML(portletPreferences.getPreferences());
+
+        String timestampField = preferences.getValue("timestampField", "timestamp");
 
         String id = jsonObject.getString("id");
-        String name = jsonObject.getString("channelName");
-        String timestamp = jsonObject.getString("timestamp");
+        String timestamp = jsonObject.getString(timestampField);
 
-        LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
-        params.put("id", id);
-        params.put("name", name);
-        params.put("timestamp", timestamp);
-
-        // TODO: Filter by id / name and timestamp
-        Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, -1, null, null,
-                params, true, 0, Integer.MAX_VALUE, null);
-
-        _log.info("hits.getLength = " + hits.getLength());
+        Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, timestamp,
+                WorkflowConstants.STATUS_ANY, null, null, null, true, 0, Integer.MAX_VALUE, null);
 
         if (hits.getLength() == 0) {
 
@@ -263,7 +272,7 @@ public class MeasurementImportController extends BaseExportImportController impl
     private static JSONObject createJSONObject(String id, String name, String unit, String timestamp, String value) {
 
         // TODO: read json-schema from portlet configuration
-        // (see MeasuremenIndexer)
+        // (see above)
         JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
         jsonObject.put("channelId", id);
         jsonObject.put("channelName", name);
