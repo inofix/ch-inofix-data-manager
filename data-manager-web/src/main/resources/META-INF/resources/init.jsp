@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-13 22:11 by Christian Berndt
-    Version:     1.1.8
+    Modified:    2017-11-14 10:29 by Christian Berndt
+    Version:     1.1.9
 --%>
 
 <%@page import="ch.inofix.data.service.util.JSONSchemaUtil"%>
@@ -124,6 +124,7 @@
     boolean showSearchSpeed = false;    
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
     String tabs2 = ParamUtil.getString(request, "tabs2", "import");    
+    String timestampField = portletPreferences.getValue("timestampField", "");   
     long until = ParamUtil.getLong(request, "until", now.getTime());    
     long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0")); 
     String userName = portletPreferences.getValue("userName", "");
@@ -137,6 +138,7 @@
         jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
         markupView = portletPreferences.getValue("markupView", dataManagerConfiguration.markupView());
         showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed", String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
+        timestampField = portletPreferences.getValue("timestampField", dataManagerConfiguration.timestampField());
         userId = GetterUtil.getLong(portletPreferences.getValue("userId", dataManagerConfiguration.userId()));
         userName = portletPreferences.getValue("userName", dataManagerConfiguration.userName());
         
