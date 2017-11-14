@@ -50,8 +50,8 @@ import ch.inofix.data.service.util.JSONSchemaUtil;
  *
  * @author Christian Berndt
  * @created 2017-09-27 10:52
- * @modified 2017-10-31 13:36
- * @version 1.1.4
+ * @modified 2017-11-14 12:07
+ * @version 1.1.5
  *
  */
 @Component(immediate = true, service = Indexer.class)
@@ -140,6 +140,7 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
         long ownerId = measurement.getGroupId();
         int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
         long plid = 0;
+        String timestampFieldName = null;
 
         try {
 
@@ -150,6 +151,7 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
                     .fromDefaultXML(portletPreferences.getPreferences());
 
             jsonSchema = preferences.getValue("jsonSchema", "{}");
+            timestampFieldName = preferences.getValue("timestampField", "timestamp");
 
             JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonSchema);
 
@@ -168,6 +170,8 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
         document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
         document.addTextSortable("data", data);
 
+        // Index field according to jsonSchema
+
         for (String field : fields) {
 
             if (dataObj != null) {
@@ -179,6 +183,18 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
                 }
             }
+        }
+
+        // Index timestamp field
+
+        if (dataObj != null) {
+
+            String timestamp = dataObj.getString(timestampFieldName);
+            if (Validator.isNotNull(timestamp)) {
+                document.addTextSortable("timestamp", timestamp);
+
+            }
+
         }
 
         return document;
