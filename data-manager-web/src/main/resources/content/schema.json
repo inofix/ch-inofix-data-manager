@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/inofix/ardu-report-lib/master/schemas/meta-schema.json",
-    "$id": "https://raw.githubusercontent.com/inofix/ardu-report-lib/master/schemas/default-schema.json",
+    "$id": "https://raw.githubusercontent.com/inofix/ch-inofix-data-manager/master/data-manager-web/src/main/resources/content/schema.json",
     "title": "Data Manager Schema",
     "description": "Sample configuration for INOFIX' Data Manager portlet.",
     "type": "array",
