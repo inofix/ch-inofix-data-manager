@@ -37,11 +37,11 @@ public class ImportMeasurementsMVCResourceCommand extends BaseMVCResourceCommand
     protected void doServeResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse)
             throws Exception {
         
-        _log.info("doServeResource()");
+//        _log.info("doServeResource()");
 
         String cmd = ParamUtil.getString(resourceRequest, Constants.CMD);
 
-        _log.info("cmd = " + cmd);
+//        _log.info("cmd = " + cmd);
 
         PortletRequestDispatcher portletRequestDispatcher = null;
 
