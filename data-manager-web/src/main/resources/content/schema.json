@@ -1,0 +1,36 @@
+{
+    "$schema": "https://raw.githubusercontent.com/inofix/ardu-report-lib/master/schemas/meta-schema.json",
+    "$id": "https://raw.githubusercontent.com/inofix/ardu-report-lib/master/schemas/default-schema.json",
+    "title": "Data Manager Schema",
+    "description": "Sample configuration for INOFIX' Data Manager portlet.",
+    "type": "array",
+    "minItems": 1,
+    "uniqueItems": true,
+    "items": {
+        "type": "object",
+        "properties": {
+            "time": {
+                "type": "string",
+                "key": "time"
+            },
+            "id": {
+                "type": "string",
+                "key": "id"
+            },
+            "value": {
+                "type": "number",
+                "key": "value"
+            },
+            "unit": {
+                "type": "string",
+                "key": "unit"
+            },
+            "threshold": {
+                "type": "number",
+                "key": "threshold"
+            }
+        },
+        "minProperties": 2,
+        "required": ["time", "id", "value"]
+    }
+}
