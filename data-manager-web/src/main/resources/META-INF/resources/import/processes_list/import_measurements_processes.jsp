@@ -2,8 +2,8 @@
     import_measurements_processes.jsp: list of import processes
     
     Created:    2017-11-02 18:24 by Christian Berndt
-    Modified:   2017-11-09 22:42 by Christian Berndt
-    Version:    1.0.1
+    Modified:   2017-11-19 13:29 by Christian Berndt
+    Version:    1.0.2
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -28,15 +28,14 @@
     OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType);
 %>
 
-<portlet:actionURL name="importMeasurements" var="deleteBackgroundTasksURL"/>
+<portlet:actionURL name="importMeasurements" var="deleteBackgroundTasksURL">
+    <portlet:param name="redirect" value="<%= currentURL %>"/>
+</portlet:actionURL>
 
 <aui:form action="<%= deleteBackgroundTasksURL %>" method="get" name="fm">
 
     <aui:input name="<%= Constants.CMD %>" type="hidden" />
     <aui:input name="deleteBackgroundTaskIds" type="hidden" />
-    <aui:input name="redirect" type="hidden" value="<%= currentURL.toString() %>" />
-    <aui:input name="tabs1" type="hidden" value="<%= tabs1 %>"/>
-    <aui:input name="tabs2" type="hidden" value="<%= tabs2 %>"/>
     
     <liferay-ui:search-container
         emptyResultsMessage="no-import-processes-were-found"
@@ -289,16 +288,18 @@
                             <portlet:param name="backgroundTaskId" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
                         </portlet:actionURL>
 
+                        <%-- TODO: Method in MVCActionCommand not yet implemented 
                         <liferay-ui:icon icon="reload" markupView="<%= markupView %>" message="relaunch" url="<%= relaunchURL %>" />
-
+                        --%>
+                        
                         <portlet:actionURL name="importMeasurements" var="deleteBackgroundTaskURL">
-                            <portlet:param name="<%= Constants.CMD %>" value="deleteBackgroundTasks" />                            
-                            <portlet:param name="redirect" value="<%= portletURL.toString() %>" />
+                            <portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />                            
                             <portlet:param name="deleteBackgroundTaskIds" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
+                            <portlet:param name="redirect" value="<%= currentURL %>" />
                         </portlet:actionURL>
 
                         <%
-                        Date completionDate = backgroundTask.getCompletionDate();
+                            Date completionDate = backgroundTask.getCompletionDate();
                         %>
 
                         <liferay-ui:icon-delete
@@ -324,4 +325,3 @@
         <liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
     </liferay-util:include>
 </div>
-

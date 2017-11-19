@@ -2,8 +2,8 @@
     import/view.jsp: default view of the measurements import
     
     Created:    2017-11-01 18:58 by Christian Berndt
-    Modified:   2017-11-10 17:12 by Christian Berndt
-    Version:    1.0.1
+    Modified:   2017-11-19 22:53 by Christian Berndt
+    Version:    1.0.2
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -22,37 +22,12 @@
     String orderByCol = ParamUtil.getString(request, "orderByCol", "create-date");
     String orderByType = ParamUtil.getString(request, "orderByType", "desc");
     String searchContainerId = "importMeasurementProcesses";
-    tabs1 = ParamUtil.getString(request, "tabs1"); 
-    tabs2 = ParamUtil.getString(request, "tabs2"); 
-
-    PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
-    portletURL.setParameter("groupId", String.valueOf(groupId));
-    portletURL.setParameter("displayStyle", displayStyle);
-    portletURL.setParameter("mvcPath", "/import/view.jsp"); 
-    portletURL.setParameter("navigation", navigation);
-    portletURL.setParameter("orderByCol", orderByCol);
-    portletURL.setParameter("orderByType", orderByType);
-    portletURL.setParameter("searchContainerId", searchContainerId);
-    portletURL.setParameter("tabs1", tabs1);
-    portletURL.setParameter("tabs2", tabs2);
-
-//     OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFactoryUtil
-//             .getBackgroundTaskOrderByComparator(orderByCol, orderByType);
-
-//     int backgroundTasksCount = 0;
-//     List<BackgroundTask> backgroundTasks = null;
 
     boolean completed = false;
 
     if ("completed".equals(navigation)) {
         completed = true;
     }
-    
-//     backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(scopeGroupId,
-//             MeasurementExportBackgroundTaskExecutor.class.getName(), 0, 20, orderByComparator);
-//     backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(scopeGroupId,
-//             MeasurementExportBackgroundTaskExecutor.class.getName());
 %>
 
 <% // TODO: enable permission checks %>
@@ -84,13 +59,13 @@
     <portlet:param name="<%= Constants.CMD %>" value="<%= Constants.IMPORT %>" />
     <portlet:param name="<%= SearchContainer.DEFAULT_CUR_PARAM %>" value="<%= ParamUtil.getString(request, SearchContainer.DEFAULT_CUR_PARAM) %>" />
     <portlet:param name="<%= SearchContainer.DEFAULT_DELTA_PARAM %>" value="<%= ParamUtil.getString(request, SearchContainer.DEFAULT_DELTA_PARAM) %>" />
-<%--        <portlet:param name="groupId" value="<%= String.valueOf(groupDisplayContextHelper.getGroupId()) %>" /> --%>
-<%--        <portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" /> --%>
     <portlet:param name="displayStyle" value="<%= displayStyle %>" />
     <portlet:param name="navigation" value="<%= navigation %>" />
     <portlet:param name="orderByCol" value="<%= orderByCol %>" />
     <portlet:param name="orderByType" value="<%= orderByType %>" />
     <portlet:param name="searchContainerId" value="<%= searchContainerId %>" />
+    <portlet:param name="tabs1" value="<%= tabs1 %>" />
+    <portlet:param name="tabs2" value="<%= tabs2 %>" />
 </liferay-portlet:resourceURL>
     
 <aui:script use="liferay-export-import">

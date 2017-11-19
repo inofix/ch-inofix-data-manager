@@ -60,8 +60,8 @@ import ch.inofix.data.service.MeasurementService;
  * 
  * @author Christian Berndt
  * @created 2017-11-01 17:20
- * @modified 2017-11-09 19:17
- * @version 1.0.1
+ * @modified 2017-11-19 22:58
+ * @version 1.0.2
  *
  */
 @Component(
@@ -168,12 +168,6 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
             }
         }
 
-        String tabs1 = ParamUtil.getString(actionRequest, "tabs1");
-        String tabs2 = ParamUtil.getString(actionRequest, "tabs2");
-
-        actionResponse.setRenderParameter("tabs1", tabs1);
-        actionResponse.setRenderParameter("tabs2", tabs2);
-
         addSuccessMessage(actionRequest, actionResponse);
 
     }
@@ -223,42 +217,41 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
 
         _log.info("cmd = " + cmd);
 
+        String redirect = ParamUtil.getString(actionRequest, "redirect");
+
         try {
             if (cmd.equals(Constants.ADD_TEMP)) {
-                
+
                 addTempFileEntry(actionRequest, ExportImportHelper.TEMP_FOLDER_NAME);
                 validateFile(actionRequest, actionResponse, ExportImportHelper.TEMP_FOLDER_NAME);
                 hideDefaultSuccessMessage(actionRequest);
-                
-            } else if (cmd.equals("deleteBackgroundTasks")) {
-                
+
+            } else if (cmd.equals(Constants.DELETE)) {
+
                 deleteBackgroundTasks(actionRequest, actionResponse);
-                hideDefaultSuccessMessage(actionRequest);
-                
+
+                sendRedirect(actionRequest, actionResponse, redirect);
+
             } else if (cmd.equals(Constants.DELETE_TEMP)) {
-                
+
                 deleteTempFileEntry(actionRequest, actionResponse, ExportImportHelper.TEMP_FOLDER_NAME);
                 hideDefaultSuccessMessage(actionRequest);
-                
+
             } else if (cmd.equals(Constants.IMPORT)) {
-                
-                hideDefaultSuccessMessage(actionRequest);
+
                 importData(actionRequest, ExportImportHelper.TEMP_FOLDER_NAME);
-                String redirect = ParamUtil.getString(actionRequest, "redirect");
-                
-                _log.info("redirect = " + redirect);
-                
+
                 sendRedirect(actionRequest, actionResponse, redirect);
-                
+
             }
         } catch (Exception e) {
             if (cmd.equals(Constants.ADD_TEMP) || cmd.equals(Constants.DELETE_TEMP)) {
 
                 hideDefaultSuccessMessage(actionRequest);
                 handleUploadException(actionRequest, actionResponse, ExportImportHelper.TEMP_FOLDER_NAME, e);
-                
+
             } else {
-                
+
                 // TODO: remove dependencies to LARFile*
                 if (e instanceof LARFileException || e instanceof LARFileSizeException
                         || e instanceof LARTypeException) {
@@ -274,7 +267,6 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
                 }
             }
         }
-
     }
 
     protected void handleUploadException(ActionRequest actionRequest, ActionResponse actionResponse, String folderName,
