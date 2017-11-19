@@ -2,8 +2,8 @@
  * main.scss: css specific to the data-manager-portlet.
  *
  * Created:     2017-10-12 16:17 by Christian Berndt
- * Modified:    2017-11-01 16:55 by Christian Berndt
- * Version:     1.0.1
+ * Modified:    2017-11-19 22:49 by Christian Berndt
+ * Version:     1.0.2
  * 
  */
 @import "bourbon";
@@ -22,4 +22,23 @@
             padding-right: 15px; 
         }    
     }  
+}
+ 
+.item-remove {
+    .taglib-text-icon {    
+        &:before {
+            content: "\f00d"; 
+            font-family: 'fontawesome-alloy';
+            -webkit-font-smoothing: antialiased;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: normal;
+            line-height: 1;
+            *margin-right: .3em;
+            margin-right: .4em;
+            speak: none;
+            text-decoration: inherit;
+            text-transform: none;
+        }
+    }
 }
