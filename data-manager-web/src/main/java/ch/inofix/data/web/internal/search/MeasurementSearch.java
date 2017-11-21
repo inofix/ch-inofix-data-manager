@@ -28,8 +28,8 @@ import ch.inofix.data.model.Measurement;
  *
  * @author Christian Berndt
  * @created 2017-09-27 11:57
- * @modified 2017-11-21 17:08
- * @version 1.0.1
+ * @modified 2017-11-21 18:11
+ * @version 1.0.2
  *
  */
 public class MeasurementSearch extends SearchContainer<Measurement> {
@@ -57,7 +57,7 @@ public class MeasurementSearch extends SearchContainer<Measurement> {
         orderableHeaders.put("from", "from_Number_sortable");
         orderableHeaders.put("id", "id_sortable");
         orderableHeaders.put("measurement-id", "taskRecordId_Number_sortable");
-        orderableHeaders.put("modified-date", "modifiedDate_Number_sortable");
+        orderableHeaders.put("modified-date", "modified_sortable");
         orderableHeaders.put("name", "name");
         orderableHeaders.put("status", "status_Number_sortable");
         orderableHeaders.put("timestamp", "timestamp_sortable");
