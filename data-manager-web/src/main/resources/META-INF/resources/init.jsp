@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-21 19:50 by Christian Berndt
-    Version:     1.2.2
+    Modified:    2017-11-21 21:20 by Christian Berndt
+    Version:     1.2.4
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -21,6 +21,9 @@
 <%@page import="ch.inofix.data.constants.MeasurementActionKeys"%>
 <%@page import="ch.inofix.data.constants.PortletKeys"%>
 <%@page import="ch.inofix.data.exception.FileFormatException"%>
+<%@page import="ch.inofix.data.exception.MeasurementIdException"%>
+<%@page import="ch.inofix.data.exception.MeasurementNameException"%>
+<%@page import="ch.inofix.data.exception.MeasurementTimestampException"%>
 <%@page import="ch.inofix.data.exception.NoSuchMeasurementException"%>
 <%@page import="ch.inofix.data.model.Measurement"%>
 <%@page import="ch.inofix.data.service.MeasurementServiceUtil"%>
@@ -122,14 +125,16 @@
 <%
     String[] columns = portletPreferences.getValue("columns", "id,name,timestamp,modified-date,user-name").split(StringPool.COMMA);
     String dataURL = portletPreferences.getValue("dataURL", "");
+    String idField = portletPreferences.getValue("idField", "id");
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
     String markupView = portletPreferences.getValue("markupView", "lexicon");
+    String nameField = portletPreferences.getValue("nameField", "name");
     Date now = new Date();
     String password = portletPreferences.getValue("password", "");
     boolean showSearchSpeed = false;
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
     String tabs2 = ParamUtil.getString(request, "tabs2", "import");
-    String timestampField = portletPreferences.getValue("timestampField", "");
+    String timestampField = portletPreferences.getValue("timestampField", "timestamp");
     long until = ParamUtil.getLong(request, "until", now.getTime());
     long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0"));
     String userName = portletPreferences.getValue("userName", "");
@@ -141,12 +146,12 @@
 
         columns = portletPreferences.getValues("columns", dataManagerConfiguration.columns());
         dataURL = portletPreferences.getValue("dataURL", dataManagerConfiguration.dataURL());
+        idField = portletPreferences.getValue("idField", dataManagerConfiguration.idField());
         jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
         markupView = portletPreferences.getValue("markupView", dataManagerConfiguration.markupView());
-        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed",
-                String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
-        timestampField = portletPreferences.getValue("timestampField",
-                dataManagerConfiguration.timestampField());
+        nameField = portletPreferences.getValue("nameField", dataManagerConfiguration.nameField());
+        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed",String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
+        timestampField = portletPreferences.getValue("timestampField", dataManagerConfiguration.timestampField());
         userId = GetterUtil.getLong(portletPreferences.getValue("userId", dataManagerConfiguration.userId()));
         userName = portletPreferences.getValue("userName", dataManagerConfiguration.userName());
 

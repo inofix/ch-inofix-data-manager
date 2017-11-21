@@ -33,6 +33,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import ch.inofix.data.constants.PortletKeys;
+import ch.inofix.data.exception.MeasurementIdException;
+import ch.inofix.data.exception.MeasurementNameException;
+import ch.inofix.data.exception.MeasurementTimestampException;
 import ch.inofix.data.exception.NoSuchMeasurementException;
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementService;
@@ -41,8 +44,8 @@ import ch.inofix.data.service.MeasurementService;
  * 
  * @author Christian Berndt
  * @created 2017-11-01 23:30
- * @modified 2017-11-20 00:31
- * @version 1.0.2
+ * @modified 2017-11-21 21:39
+ * @version 1.0.3
  *
  */
 @Component(
@@ -84,13 +87,12 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
     protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
         String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-        
-        _log.info("doProcessAction");
-        _log.info("cmd = " + cmd);
 
         ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-        Measurement measurement = null; 
+        String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+        Measurement measurement = null;
 
         try {
             if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
@@ -98,11 +100,10 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
             } else if (cmd.equals(Constants.DELETE)) {
                 deleteMeasurements(actionRequest);
             } else if (cmd.equals("deleteGroupMeasurements")) {
-                deleteGroupMeasurements(actionRequest); 
+                deleteGroupMeasurements(actionRequest);
             }
-            
+
             if (Validator.isNotNull(cmd)) {
-                String redirect = ParamUtil.getString(actionRequest, "redirect");
                 if (measurement != null) {
 
                     redirect = getSaveAndContinueRedirect(actionRequest, measurement, themeDisplay.getLayout(),
@@ -111,21 +112,20 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
                     sendRedirect(actionRequest, actionResponse, redirect);
                 }
             }
+        } catch (MeasurementIdException | MeasurementNameException | MeasurementTimestampException e) {
+
+            SessionErrors.add(actionRequest, e.getClass());
+
         } catch (NoSuchMeasurementException | PrincipalException e) {
-            
-            _log.error(e);
-            
+
             SessionErrors.add(actionRequest, e.getClass());
 
             actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 
-            // TODO: Define set of exceptions reported back to user. For an
-            // example, see EditCategoryMVCActionCommand.java.
-
         } catch (Exception e) {
 
             SessionErrors.add(actionRequest, e.getClass());
-            
+
             actionResponse.setRenderParameter("mvcPath", "/error.jsp");
         }
     }

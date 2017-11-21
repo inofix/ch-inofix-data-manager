@@ -6,8 +6,8 @@ import aQute.bnd.annotation.metatype.Meta;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:51
- * @modified 2017-11-21 19:51
- * @version 1.0.5
+ * @modified 2017-11-21 20:36
+ * @version 1.0.6
  *
  */
 @Meta.OCD(
@@ -23,16 +23,22 @@ public interface DataManagerConfiguration {
     @Meta.AD(deflt = "", required = false)
     public String dataURL();
     
+    @Meta.AD(deflt = "id", required = false)
+    public String idField();
+    
     @Meta.AD(deflt = "{}", required = false)
     public String jsonSchema();
     
     @Meta.AD(deflt = "lexicon", required = false)
     public String markupView();
     
+    @Meta.AD(deflt = "name", required = false)
+    public String nameField();
+
     @Meta.AD(deflt = "false", required = false)
     public boolean showSearchSpeeed();
     
-    @Meta.AD(deflt = "", required = false)
+    @Meta.AD(deflt = "timestamp", required = false)
     public String timestampField();
 
     @Meta.AD(deflt = "", required = false)

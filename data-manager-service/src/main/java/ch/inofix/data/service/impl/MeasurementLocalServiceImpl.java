@@ -46,6 +46,9 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import ch.inofix.data.background.task.MeasurementExportBackgroundTaskExecutor;
 import ch.inofix.data.background.task.MeasurementImportBackgroundTaskExecutor;
+import ch.inofix.data.exception.MeasurementIdException;
+import ch.inofix.data.exception.MeasurementNameException;
+import ch.inofix.data.exception.MeasurementTimestampException;
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
 
@@ -65,8 +68,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-11-21 12:20
- * @version 1.1.6
+ * @modified 2017-11-21 21:17
+ * @version 1.1.7
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -86,7 +89,10 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         // Measurement
 
-        User user = userPersistence.findByPrimaryKey(userId);
+        User user = userLocalService.getUser(userId);
+        
+        validate(id, name, timestamp); 
+        
         long groupId = serviceContext.getScopeGroupId();
 
         long measurementId = counterLocalService.increment();
@@ -376,17 +382,12 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         // Measurement
 
-        User user = userPersistence.findByPrimaryKey(userId);
+//        User user = userPersistence.findByPrimaryKey(userId);
 
         Measurement measurement = measurementPersistence.findByPrimaryKey(measurementId);
+        
+        validate(id, name, timestamp);
 
-        long groupId = serviceContext.getScopeGroupId();
-
-        measurement.setUuid(serviceContext.getUuid());
-        measurement.setGroupId(groupId);
-        measurement.setCompanyId(user.getCompanyId());
-        measurement.setUserId(user.getUserId());
-        measurement.setUserName(user.getFullName());
         measurement.setExpandoBridgeAttributes(serviceContext);
 
         measurement.setData(data);
@@ -467,6 +468,21 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         searchContext.setStart(start);
 
         return searchContext;
+    }
+    
+    protected void validate(String id, String name, Date timestamp) throws PortalException {
+
+        if (Validator.isNull(id)) {
+            throw new MeasurementIdException();
+        }
+
+        if (Validator.isNull(name)) {
+            throw new MeasurementNameException();
+        }
+
+        if (Validator.isNull(timestamp)) {
+            throw new MeasurementTimestampException();
+        }
     }
 
     private static final Log _log = LogFactoryUtil.getLog(MeasurementLocalServiceImpl.class.getName());

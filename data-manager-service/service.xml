@@ -4,8 +4,8 @@
     service.xml: model and service configuration of the data manager. 
 
     Created:    2017-03-08 19:28 by Christian Berndt 
-    Modified:   2017-11-20 00:13 by Christian Berndt 
-    Version:    1.0.5
+    Modified:   2017-11-21 21:16 by Christian Berndt 
+    Version:    1.0.6
 -->
 <service-builder package-path="ch.inofix.data">
     <author>Christian Berndt</author>    
@@ -63,7 +63,10 @@
 
     <exceptions>
         <exception>FileFormat</exception>
+        <exception>MeasurementId</exception>
         <exception>MeasurementJSON</exception>
+        <exception>MeasurementName</exception>
+        <exception>MeasurementTimestamp</exception>
         <exception>MeasurementXLS</exception>
         <exception>MeasurementXML</exception>
     </exceptions>

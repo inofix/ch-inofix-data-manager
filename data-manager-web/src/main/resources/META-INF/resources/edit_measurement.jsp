@@ -2,8 +2,8 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-11-21 12:36 by Christian Berndt
-    Version:     1.0.9
+    Modified:    2017-11-21 21:17 by Christian Berndt
+    Version:     1.1.0
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -64,13 +64,28 @@
 
     <aui:form method="post" action="<%=updateMeasurementURL%>" name="fm">
     
-        <aui:input name="cmd" type="hidden" 
+        <aui:input name="<%= Constants.CMD %>" type="hidden" 
             value="<%= cmd  %>"/>
+            
+        <aui:input name="redirect" type="hidden" 
+            value="<%= redirect  %>"/>
     
         <aui:model-context bean="<%=measurement%>"
             model="<%=Measurement.class%>" />
     
         <div class="lfr-form-content">
+        
+            <liferay-ui:error
+                exception="<%= MeasurementIdException.class %>"
+                message="please-enter-a-valid-id" />
+                
+            <liferay-ui:error
+                exception="<%= MeasurementNameException.class %>"
+                message="please-enter-a-valid-name" />
+                
+            <liferay-ui:error
+                exception="<%= MeasurementTimestampException.class %>"
+                message="please-enter-a-valid-timestamp" />
         
             <aui:fieldset-group markupView="<%= markupView %>">
  
@@ -78,15 +93,6 @@
     
                     <aui:input name="backURL" type="hidden"
                         value="<%=backURL%>" />
-    
-                    <aui:input name="id" type=""
-                        value="<%= measurement.getId() %>" />
-    
-                    <aui:input name="name" type=""
-                        value="<%= measurement.getName() %>" />
-    
-                    <aui:input name="timestamp" type=""
-                        value="<%= measurement.getTimestamp() %>" />
     
                     <aui:input name="measurementId" type="hidden"
                         disabled="<%=!hasUpdatePermission%>" />
@@ -119,6 +125,18 @@
                         %>
                         </c:when>
                         <c:otherwise>
+                            <aui:input name="id"
+                                disabled="<%=!hasUpdatePermission%>"
+                                helpMessage="id-help" />
+
+                            <aui:input name="name"
+                                disabled="<%=!hasUpdatePermission%>"
+                                helpMessage="name-help" />
+                                
+                            <aui:input name="timestamp"
+                                disabled="<%=!hasUpdatePermission%>"
+                                helpMessage="timestamp-help" />
+                                
                             <aui:input name="data"
                                 disabled="<%=!hasUpdatePermission%>"
                                 helpMessage="data-help" />                        
