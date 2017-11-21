@@ -31,8 +31,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -41,15 +39,14 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementLocalService;
-import ch.inofix.data.service.permission.MeasurementPermission;
 import ch.inofix.data.service.util.JSONSchemaUtil;
 
 /**
  *
  * @author Christian Berndt
  * @created 2017-09-27 10:52
- * @modified 2017-11-14 14:49
- * @version 1.1.6
+ * @modified 2017-11-21
+ * @version 1.1.7
  *
  */
 @Component(immediate = true, service = Indexer.class)
@@ -70,17 +67,12 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     }
 
     @Override
-    public boolean hasPermission(PermissionChecker permissionChecker, String entryClassName, long entryClassPK,
-            String actionId) throws Exception {
-        
-        return MeasurementPermission.contains(permissionChecker, entryClassPK, ActionKeys.VIEW);
-    }
-
-    @Override
     public void postProcessContextBooleanFilter(BooleanFilter contextBooleanFilter, SearchContext searchContext)
             throws Exception {
+        
+        _log.info("postProcessContextBooleanFilter");
 
-        addStatus(contextBooleanFilter, searchContext);
+        addStatus(contextBooleanFilter, searchContext);        
 
         // id
 

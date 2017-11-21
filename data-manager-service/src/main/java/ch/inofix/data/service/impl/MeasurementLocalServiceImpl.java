@@ -324,8 +324,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public Hits search(long userId, long groupId, String data, String id, Date timestamp, int status, Date from, Date until,
-            LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
+    public Hits search(long userId, long groupId, String data, String id, Date timestamp, int status, Date from,
+            Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
             throws PortalException {
 
         if (sort == null) {
@@ -334,8 +334,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class.getName());
 
-        SearchContext searchContext = buildSearchContext(userId, groupId, data, id, timestamp, status, from, until, params, andSearch,
-                start, end, sort);
+        SearchContext searchContext = buildSearchContext(userId, groupId, data, id, timestamp, status, from, until,
+                params, andSearch, start, end, sort);
 
         return indexer.search(searchContext);
 

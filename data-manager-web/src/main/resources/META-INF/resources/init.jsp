@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-21 12:57 by Christian Berndt
-    Version:     1.2.1
+    Modified:    2017-11-21 19:50 by Christian Berndt
+    Version:     1.2.2
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -120,31 +120,33 @@
 <portlet:defineObjects />
 
 <%
-    String[] columns = portletPreferences.getValue("columns", "id,name,timestamp").split(StringPool.COMMA);    
-    String dataURL = portletPreferences.getValue("dataURL", "");    
+    String[] columns = portletPreferences.getValue("columns", "id,name,timestamp,modified-date,user-name").split(StringPool.COMMA);
+    String dataURL = portletPreferences.getValue("dataURL", "");
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
-    String markupView = portletPreferences.getValue("markupView", "lexicon");   
-    Date now = new Date();     
-    String password = portletPreferences.getValue("password", "");   
-    boolean showSearchSpeed = false;    
+    String markupView = portletPreferences.getValue("markupView", "lexicon");
+    Date now = new Date();
+    String password = portletPreferences.getValue("password", "");
+    boolean showSearchSpeed = false;
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
-    String tabs2 = ParamUtil.getString(request, "tabs2", "import");    
-    String timestampField = portletPreferences.getValue("timestampField", "");   
-    long until = ParamUtil.getLong(request, "until", now.getTime());    
-    long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0")); 
+    String tabs2 = ParamUtil.getString(request, "tabs2", "import");
+    String timestampField = portletPreferences.getValue("timestampField", "");
+    long until = ParamUtil.getLong(request, "until", now.getTime());
+    long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0"));
     String userName = portletPreferences.getValue("userName", "");
-    
+
     DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) liferayPortletRequest
-    .getAttribute(DataManagerConfiguration.class.getName());
-        
+            .getAttribute(DataManagerConfiguration.class.getName());
+
     if (Validator.isNotNull(dataManagerConfiguration)) {
 
         columns = portletPreferences.getValues("columns", dataManagerConfiguration.columns());
         dataURL = portletPreferences.getValue("dataURL", dataManagerConfiguration.dataURL());
         jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
         markupView = portletPreferences.getValue("markupView", dataManagerConfiguration.markupView());
-        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed",String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
-        timestampField = portletPreferences.getValue("timestampField",dataManagerConfiguration.timestampField());
+        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed",
+                String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
+        timestampField = portletPreferences.getValue("timestampField",
+                dataManagerConfiguration.timestampField());
         userId = GetterUtil.getLong(portletPreferences.getValue("userId", dataManagerConfiguration.userId()));
         userName = portletPreferences.getValue("userName", dataManagerConfiguration.userName());
 
