@@ -1,10 +1,10 @@
 package ch.inofix.data.search;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanQuery;
@@ -35,7 +34,6 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
@@ -63,7 +61,7 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
         setDefaultSelectedFieldNames(Field.ASSET_TAG_NAMES, Field.COMPANY_ID, Field.ENTRY_CLASS_NAME,
                 Field.ENTRY_CLASS_PK, Field.GROUP_ID, Field.MODIFIED_DATE, Field.SCOPE_GROUP_ID, Field.UID);
         setFilterSearch(true);
-        setPermissionAware(true);
+        setPermissionAware(false);
     }
 
     @Override
@@ -74,48 +72,65 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     @Override
     public boolean hasPermission(PermissionChecker permissionChecker, String entryClassName, long entryClassPK,
             String actionId) throws Exception {
+        
         return MeasurementPermission.contains(permissionChecker, entryClassPK, ActionKeys.VIEW);
     }
 
     @Override
     public void postProcessContextBooleanFilter(BooleanFilter contextBooleanFilter, SearchContext searchContext)
             throws Exception {
-        
-        if (_log.isDebugEnabled()) {
-            _log.debug("postProcessSearchQuery()");
-        }
 
         addStatus(contextBooleanFilter, searchContext);
+
+        // id
+
+        String id = (String) searchContext.getAttribute("id");
+
+        if (Validator.isNotNull(id)) {
+
+            contextBooleanFilter.addRequiredTerm("id", id);
+        }
+
+        // timestamp
+
+        long timestamp = GetterUtil.getLong(searchContext.getAttribute("timestamp"));
+
+        if (timestamp > 0) {
+            contextBooleanFilter.addRequiredTerm("timestamp", timestamp);
+        }
 
         // from- and until-date
 
         // TODO
-//        Date fromDate = GetterUtil.getDate(searchContext.getAttribute("fromDate"), DateFormat.getDateInstance(), null);
-//        Date untilDate = GetterUtil.getDate(searchContext.getAttribute("untilDate"), DateFormat.getDateInstance(),
-//                null);
-//
-//        long max = Long.MAX_VALUE;
-//        long min = Long.MIN_VALUE;
-//
-//        if (fromDate != null) {
-//            min = fromDate.getTime();
-//        }
-//
-//        if (untilDate != null) {
-//            max = untilDate.getTime();
-//        }
-//
-//        contextBooleanFilter.addRangeTerm("fromDate_Number_sortable", min, max);
+        // Date fromDate =
+        // GetterUtil.getDate(searchContext.getAttribute("fromDate"),
+        // DateFormat.getDateInstance(), null);
+        // Date untilDate =
+        // GetterUtil.getDate(searchContext.getAttribute("untilDate"),
+        // DateFormat.getDateInstance(),
+        // null);
+        //
+        // long max = Long.MAX_VALUE;
+        // long min = Long.MIN_VALUE;
+        //
+        // if (fromDate != null) {
+        // min = fromDate.getTime();
+        // }
+        //
+        // if (untilDate != null) {
+        // max = untilDate.getTime();
+        // }
+        //
+        // contextBooleanFilter.addRangeTerm("fromDate_Number_sortable", min,
+        // max);
 
     }
 
     @Override
     public void postProcessSearchQuery(BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
             SearchContext searchContext) throws Exception {
-        
+                
         addSearchTerm(searchQuery, searchContext, "data", false);
-        addSearchTerm(searchQuery, searchContext, "id", false);
-        addSearchTerm(searchQuery, searchContext, "timestamp", false);
 
         LinkedHashMap<String, Object> params = (LinkedHashMap<String, Object>) searchContext.getAttribute("params");
 
@@ -130,71 +145,45 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
     @Override
     protected void doDelete(Measurement measurement) throws Exception {
+        
         deleteDocument(measurement.getCompanyId(), measurement.getMeasurementId());
     }
 
     @Override
     protected Document doGetDocument(Measurement measurement) throws Exception {
 
-        List<String> fields = new ArrayList<String>();
-
-        String jsonSchema = null;
-        long ownerId = measurement.getGroupId();
-        int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
-        long plid = 0;
-        String timestampFieldName = null;
-
-        try {
-
-            PortletPreferences portletPreferences = PortletPreferencesLocalServiceUtil.getPortletPreferences(ownerId,
-                    ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
-
-            javax.portlet.PortletPreferences preferences = PortletPreferencesFactoryUtil
-                    .fromDefaultXML(portletPreferences.getPreferences());
-
-            jsonSchema = preferences.getValue("jsonSchema", "{}");
-            timestampFieldName = preferences.getValue("timestampField", "timestamp");
-
-            JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonSchema);
-
-            fields = JSONSchemaUtil.getFields(jsonObject);
-
-        } catch (Exception e) {
-            _log.error(e);
-        }
-
-        String data = measurement.getData();
-
-        JSONObject dataObj = JSONFactoryUtil.createJSONObject(data);
-
         Document document = getBaseModelDocument(CLASS_NAME, measurement);
 
         document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
-        document.addTextSortable("data", data);
+        document.addTextSortable("data", measurement.getData());
+        document.addTextSortable("id", measurement.getId());
+        document.addTextSortable("name", measurement.getName());
+        document.addNumberSortable(Field.STATUS, WorkflowConstants.STATUS_APPROVED);
 
-        // Index field according to jsonSchema
-
-        for (String field : fields) {
-
-            if (dataObj != null) {
-
-                String value = dataObj.getString(field);
-
-                if (Validator.isNotNull(value)) {
-                    document.addTextSortable(field, value);
-
-                }
-            }
+        if (measurement.getTimestamp() != null) {
+            document.addNumber("timestamp", measurement.getTimestamp().getTime());
         }
 
-        // Index timestamp field
+        PortletPreferences portletPreferences = getPreferences(measurement.getGroupId());
+        String json = portletPreferences.getValue("jsonSchema", "{}");
+        JSONObject jsonSchema = JSONFactoryUtil.createJSONObject(json);
+        List<String> schemaFields = JSONSchemaUtil.getFields(jsonSchema);
 
-        if (dataObj != null) {
+        String data = measurement.getData();
+        JSONObject jsonObject = JSONFactoryUtil.createJSONObject(data);
 
-            String timestamp = dataObj.getString(timestampFieldName);
-            if (Validator.isNotNull(timestamp)) {
-                document.addTextSortable("timestamp", timestamp);
+        // Index JSON data according to schema
 
+        for (String schemaField : schemaFields) {
+
+            if (jsonObject != null) {
+
+                String value = jsonObject.getString(schemaField);
+
+                if (Validator.isNotNull(value)) {
+                    document.addTextSortable("json_" + schemaField, value);
+
+                }
             }
         }
 
@@ -205,7 +194,7 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     @Override
     protected Summary doGetSummary(Document document, Locale locale, String snippet, PortletRequest portletRequest,
             PortletResponse portletResponse) throws Exception {
-
+        
         Summary summary = createSummary(document, Field.TITLE, Field.CONTENT);
 
         return summary;
@@ -213,7 +202,7 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
     @Override
     protected void doReindex(String className, long classPK) throws Exception {
-
+        
         Measurement measurement = _measurementLocalService.getMeasurement(classPK);
 
         doReindex(measurement);
@@ -233,6 +222,22 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
         IndexWriterHelperUtil.updateDocument(getSearchEngineId(), measurement.getCompanyId(), document,
                 isCommitImmediately());
+    }
+    
+    protected PortletPreferences getPreferences(long groupId) throws PortalException {
+
+        long ownerId = groupId;
+        int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
+        long plid = 0;
+
+        com.liferay.portal.kernel.model.PortletPreferences portletPreferences = _portletPreferencesLocalService
+                .getPortletPreferences(ownerId, ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
+
+        PortletPreferences preferences = PortletPreferencesFactoryUtil
+                .fromDefaultXML(portletPreferences.getPreferences());
+
+        return preferences;
+
     }
 
     protected void reindexMeasurements(long companyId) throws PortalException {
@@ -289,8 +294,9 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
         _portletPreferencesLocalService = portletPreferencesLocalService;
     }
 
-    private static final Log _log = LogFactoryUtil.getLog(MeasurementIndexer.class);
-
     private MeasurementLocalService _measurementLocalService;
     private PortletPreferencesLocalService _portletPreferencesLocalService;
+    
+    private static final Log _log = LogFactoryUtil.getLog(MeasurementIndexer.class);
+
 }
