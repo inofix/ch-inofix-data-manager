@@ -2,15 +2,13 @@
     view.jsp: Default view of Inofix' data-manager.
     
     Created:     2017-09-10 16:37 by Christian Berndt
-    Modified:    2017-11-01 23:54 by Christian Berndt
-    Version:     1.0.3
+    Modified:    2017-11-20 01:14 by Christian Berndt
+    Version:     1.0.4
 --%>
 
 <%@ include file="/init.jsp" %>
 
 <%
-    // TODO: read view settings from configuration
-    String [] columns = new String[] {"measurement-id", "data", "create-date", "user-name"};
     String displayStyle = ParamUtil.getString(request, "displayStyle");
     
     String backURL = ParamUtil.getString(request, "backURL");

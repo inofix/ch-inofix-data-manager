@@ -139,7 +139,7 @@
         
     if (Validator.isNotNull(dataManagerConfiguration)) {
 
-        columns = portletPreferences.getValue("columns", dataManagerConfiguration.columns()).split(StringPool.COMMA);
+        columns = portletPreferences.getValues("columns", dataManagerConfiguration.columns());
         dataURL = portletPreferences.getValue("dataURL", dataManagerConfiguration.dataURL());
         jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
         markupView = portletPreferences.getValue("markupView", dataManagerConfiguration.markupView());
