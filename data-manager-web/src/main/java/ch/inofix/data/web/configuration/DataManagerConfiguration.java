@@ -6,8 +6,8 @@ import aQute.bnd.annotation.metatype.Meta;
  *
  * @author Christian Berndt
  * @created 2017-09-10 16:51
- * @modified 2017-11-20 01:09
- * @version 1.0.4
+ * @modified 2017-11-21 19:51
+ * @version 1.0.5
  *
  */
 @Meta.OCD(
@@ -17,7 +17,7 @@ import aQute.bnd.annotation.metatype.Meta;
 )
 public interface DataManagerConfiguration {
     
-    @Meta.AD(deflt = "id|name|timestamp|modified-date", required = false)
+    @Meta.AD(deflt = "id|name|timestamp|modified-date|user-name", required = false)
     public String[] columns();
     
     @Meta.AD(deflt = "", required = false)
