@@ -10,6 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.portlet.PortletPreferences;
+
 import org.apache.commons.lang.time.StopWatch;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -21,15 +23,16 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataContextFactoryUtil;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManager;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.portal.kernel.exception.NoSuchPortletPreferencesException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -48,8 +51,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-11-20 00:40
- * @version 1.1.0
+ * @modified 2017-11-21 18:57
+ * @version 1.1.1
  *
  */
 @Component(
@@ -223,6 +226,28 @@ public class MeasurementImportController extends BaseExportImportController impl
         }
 
     }
+    
+    protected PortletPreferences getPreferences(long groupId) throws PortalException {
+
+        long ownerId = groupId;
+        int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
+        long plid = 0;
+        PortletPreferences preferences = null;
+
+        try {
+
+            com.liferay.portal.kernel.model.PortletPreferences portletPreferences = _portletPreferencesLocalService
+                    .getPortletPreferences(ownerId, ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
+
+            preferences = PortletPreferencesFactoryUtil.fromDefaultXML(portletPreferences.getPreferences());
+
+        } catch (NoSuchPortletPreferencesException e) {
+            _log.warn(e.getMessage());
+        }
+
+        return preferences;
+
+    }
 
     protected int getProcessFlag() {
 
@@ -239,20 +264,17 @@ public class MeasurementImportController extends BaseExportImportController impl
     protected void setMeasurementLocalService(MeasurementLocalService measurementLocalService) {
         this._measurementLocalService = measurementLocalService;
     }
+    
+    @Reference(unbind = "-")
+    protected void setPortletPreferencesLocalService(PortletPreferencesLocalService portletPreferencesLocalService) {
+        _portletPreferencesLocalService = portletPreferencesLocalService;
+    }
 
     private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject jsonObject) throws Exception {
 
         // Read timestamp field name from configuration
 
-        long ownerId = serviceContext.getScopeGroupId();
-        int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
-        long plid = 0;
-
-        PortletPreferences portletPreferences = PortletPreferencesLocalServiceUtil.getPortletPreferences(ownerId,
-                ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
-
-        javax.portlet.PortletPreferences preferences = PortletPreferencesFactoryUtil
-                .fromDefaultXML(portletPreferences.getPreferences());
+        PortletPreferences preferences = getPreferences(serviceContext.getScopeGroupId());
 
         String timestampField = "timestamp"; 
         
@@ -324,6 +346,7 @@ public class MeasurementImportController extends BaseExportImportController impl
 
     private ExportImportLifecycleManager _exportImportLifecycleManager;
     private MeasurementLocalService _measurementLocalService;
+    private PortletPreferencesLocalService _portletPreferencesLocalService;
 
     private static final Log _log = LogFactoryUtil.getLog(MeasurementImportController.class.getName());
 
