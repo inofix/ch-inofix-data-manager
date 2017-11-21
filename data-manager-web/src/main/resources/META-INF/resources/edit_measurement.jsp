@@ -2,8 +2,8 @@
     edit_measurement.jsp: edit a single measurement.
 
     Created:     2017-09-18 11:17 by Christian Berndt
-    Modified:    2017-11-13 22:24 by Christian Berndt
-    Version:     1.0.8
+    Modified:    2017-11-21 12:36 by Christian Berndt
+    Version:     1.0.9
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -79,8 +79,14 @@
                     <aui:input name="backURL" type="hidden"
                         value="<%=backURL%>" />
     
-                    <aui:input name="redirect" type="hidden"
-                        value="<%=redirect%>" />
+                    <aui:input name="id" type=""
+                        value="<%= measurement.getId() %>" />
+    
+                    <aui:input name="name" type=""
+                        value="<%= measurement.getName() %>" />
+    
+                    <aui:input name="timestamp" type=""
+                        value="<%= measurement.getTimestamp() %>" />
     
                     <aui:input name="measurementId" type="hidden"
                         disabled="<%=!hasUpdatePermission%>" />

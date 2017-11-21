@@ -10,9 +10,13 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
+		<field name="status" type="int" />
 		<field name="data" type="String">
 			<hint name="max-length">5000</hint>
 			<hint-collection name="TEXTAREA" />
 		</field>
+		<field name="id" type="String" />
+		<field name="name" type="String" />
+		<field name="timestamp" type="Date" />
 	</model>
 </model-hints>

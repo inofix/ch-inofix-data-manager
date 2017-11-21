@@ -2,11 +2,10 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-14 10:29 by Christian Berndt
-    Version:     1.1.9
+    Modified:    2017-11-21 12:57 by Christian Berndt
+    Version:     1.2.1
 --%>
 
-<%@page import="ch.inofix.data.service.util.JSONSchemaUtil"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet"%>
 <%@taglib uri="http://liferay.com/tld/aui" prefix="aui"%>
@@ -27,6 +26,7 @@
 <%@page import="ch.inofix.data.service.MeasurementServiceUtil"%>
 <%@page import="ch.inofix.data.service.permission.DataManagerPortletPermission"%>
 <%@page import="ch.inofix.data.service.permission.MeasurementPermission"%>
+<%@page import="ch.inofix.data.service.util.JSONSchemaUtil"%>
 <%@page import="ch.inofix.data.service.util.MeasurementUtil"%>
 <%@page import="ch.inofix.data.web.configuration.DataManagerConfiguration"%>
 <%@page import="ch.inofix.data.web.internal.constants.DataManagerWebKeys"%>
@@ -34,6 +34,7 @@
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearch"%>
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearchTerms"%>
 
+<%@page import="com.liferay.asset.kernel.model.AssetRenderer"%>
 <%@page import="com.liferay.background.task.kernel.util.comparator.BackgroundTaskComparatorFactoryUtil"%>
 <%@page import="com.liferay.exportimport.kernel.lar.ExportImportHelper"%>
 <%@page import="com.liferay.exportimport.kernel.lar.ExportImportHelperUtil"%>
@@ -56,6 +57,7 @@
 <%@page import="com.liferay.portal.kernel.log.Log"%>
 <%@page import="com.liferay.portal.kernel.log.LogFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.model.Group"%>
+<%@page import="com.liferay.portal.kernel.model.Portlet"%>
 <%@page import="com.liferay.portal.kernel.model.Ticket"%>
 <%@page import="com.liferay.portal.kernel.model.TicketConstants"%>
 <%@page import="com.liferay.portal.kernel.model.User"%>
@@ -70,6 +72,7 @@
 <%@page import="com.liferay.portal.kernel.security.auth.PrincipalException"%>
 <%@page import="com.liferay.portal.kernel.security.permission.ResourceActionsUtil"%>
 <%@page import="com.liferay.portal.kernel.service.GroupLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.service.PortletLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.ServiceContext"%>
 <%@page import="com.liferay.portal.kernel.service.TicketLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.UserServiceUtil"%>
@@ -92,6 +95,7 @@
 <%@page import="com.liferay.portal.kernel.util.Time"%>
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
 <%@page import="com.liferay.portal.kernel.util.WebKeys"%>
+<%@page import="com.liferay.trash.kernel.util.TrashUtil"%>
 
 <%@page import="java.text.DecimalFormatSymbols"%>
 <%@page import="java.util.Calendar"%>
@@ -116,6 +120,7 @@
 <portlet:defineObjects />
 
 <%
+    String[] columns = portletPreferences.getValue("columns", "id,name,timestamp").split(StringPool.COMMA);    
     String dataURL = portletPreferences.getValue("dataURL", "");    
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
     String markupView = portletPreferences.getValue("markupView", "lexicon");   
@@ -130,35 +135,35 @@
     String userName = portletPreferences.getValue("userName", "");
     
     DataManagerConfiguration dataManagerConfiguration = (DataManagerConfiguration) liferayPortletRequest
-            .getAttribute(DataManagerConfiguration.class.getName());
+    .getAttribute(DataManagerConfiguration.class.getName());
         
     if (Validator.isNotNull(dataManagerConfiguration)) {
-        
+
+        columns = portletPreferences.getValues("columns", dataManagerConfiguration.columns());
         dataURL = portletPreferences.getValue("dataURL", dataManagerConfiguration.dataURL());
         jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
         markupView = portletPreferences.getValue("markupView", dataManagerConfiguration.markupView());
-        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed", String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
-        timestampField = portletPreferences.getValue("timestampField", dataManagerConfiguration.timestampField());
+        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed",String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
+        timestampField = portletPreferences.getValue("timestampField",dataManagerConfiguration.timestampField());
         userId = GetterUtil.getLong(portletPreferences.getValue("userId", dataManagerConfiguration.userId()));
         userName = portletPreferences.getValue("userName", dataManagerConfiguration.userName());
-        
+
         // because of current checkbox configuration
         if ("false".equals(markupView)) {
-            markupView = ""; 
+            markupView = "";
         }
     }
-    
-    JSONObject jsonSchemaObj = null; 
-    
+
+    JSONObject jsonSchemaObj = null;
+
     try {
-        jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema); 
+        jsonSchemaObj = JSONFactoryUtil.createJSONObject(jsonSchema);
     } catch (Exception e) {
         _log.error(e);
     }
-    
-    List<String> fields = JSONSchemaUtil.getFields(jsonSchemaObj); 
-    String[] requiredFields = JSONSchemaUtil.getRequiredFields(jsonSchemaObj); 
 
+    List<String> fields = JSONSchemaUtil.getFields(jsonSchemaObj);
+    String[] requiredFields = JSONSchemaUtil.getRequiredFields(jsonSchemaObj);
 %>
 
 <%!

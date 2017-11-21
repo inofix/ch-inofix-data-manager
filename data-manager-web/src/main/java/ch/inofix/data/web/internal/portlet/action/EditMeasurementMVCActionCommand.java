@@ -1,5 +1,8 @@
 package ch.inofix.data.web.internal.portlet.action;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -38,8 +41,8 @@ import ch.inofix.data.service.MeasurementService;
  * 
  * @author Christian Berndt
  * @created 2017-11-01 23:30
- * @modified 2017-11-13 16:58
- * @version 1.0.1
+ * @modified 2017-11-20 00:31
+ * @version 1.0.2
  *
  */
 @Component(
@@ -177,6 +180,11 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
         }
 
         String data = null;
+        String id = null;
+        String name = null;
+        Date timestamp = null;
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
 
         if (keys != null) {
 
@@ -197,6 +205,9 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
         } else {
 
             data = ParamUtil.getString(actionRequest, "data");
+            id = ParamUtil.getString(actionRequest, "id");
+            name = ParamUtil.getString(actionRequest, "name");
+            timestamp = ParamUtil.getDate(actionRequest, "timestamp", dateFormat);
 
         }
 
@@ -208,15 +219,16 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
 
             // Add measurement
 
-            measurement = _measurementService.addMeasurement(data, serviceContext);
+            measurement = _measurementService.addMeasurement(data, id, name, timestamp, serviceContext);
 
         } else {
 
             // Update measurement
 
-            measurement = _measurementService.updateMeasurement(measurementId, data, serviceContext);
+            measurement = _measurementService.updateMeasurement(measurementId, data, id, name, timestamp,
+                    serviceContext);
         }
-        
+
         return measurement;
 
     }

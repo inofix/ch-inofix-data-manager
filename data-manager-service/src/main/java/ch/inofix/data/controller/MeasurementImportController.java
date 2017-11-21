@@ -4,6 +4,10 @@ import static ch.inofix.data.internal.exportimport.util.ExportImportLifecycleCon
 import static ch.inofix.data.internal.exportimport.util.ExportImportLifecycleConstants.PROCESS_FLAG_MEASUREMENTS_IMPORT_IN_PROCESS;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -29,6 +33,7 @@ import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -43,8 +48,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-11-14 14:48
- * @version 1.0.9
+ * @modified 2017-11-20 00:40
+ * @version 1.1.0
  *
  */
 @Component(
@@ -236,30 +241,41 @@ public class MeasurementImportController extends BaseExportImportController impl
     }
 
     private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject jsonObject) throws Exception {
-        
+
         // Read timestamp field name from configuration
-        
+
         long ownerId = serviceContext.getScopeGroupId();
         int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
         long plid = 0;
-        
+
         PortletPreferences portletPreferences = PortletPreferencesLocalServiceUtil.getPortletPreferences(ownerId,
                 ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
 
         javax.portlet.PortletPreferences preferences = PortletPreferencesFactoryUtil
                 .fromDefaultXML(portletPreferences.getPreferences());
 
-        String timestampField = preferences.getValue("timestampField", "timestamp");
+        String timestampField = "timestamp"; 
+        
+        if (preferences != null) {
+            timestampField = preferences.getValue("timestampField", "timestamp");
+        }
 
         String id = jsonObject.getString("id");
-        String timestamp = jsonObject.getString(timestampField);
+        String name = jsonObject.getString("name");
+        Date timestamp = getDate(jsonObject.getString(timestampField)); 
+        
+        _log.info("id = " + id);
+        _log.info("name = " + name);
+        _log.info("timestamp = " + timestamp);
 
         Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, timestamp,
                 WorkflowConstants.STATUS_ANY, null, null, null, true, 0, Integer.MAX_VALUE, null);
+        
+        _log.info("hits.getLength()  = " + hits.getLength());
 
         if (hits.getLength() == 0) {
 
-            _measurementLocalService.addMeasurement(userId, jsonObject.toString(), serviceContext);
+            _measurementLocalService.addMeasurement(userId, jsonObject.toString(), id, name, timestamp, serviceContext);
 
             return IMPORTED;
 
@@ -281,6 +297,25 @@ public class MeasurementImportController extends BaseExportImportController impl
         jsonObject.put("value", value);
 
         return jsonObject;
+
+    }
+    
+    private static Date getDate(String str) {
+
+        Date date = null;
+
+        if (Validator.isNotNull(str)) {
+
+            try {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
+                date = dateFormat.parse(str);
+            } catch (ParseException e) {
+                _log.error(e.getMessage());
+            }
+
+        }
+
+        return date;
 
     }
     

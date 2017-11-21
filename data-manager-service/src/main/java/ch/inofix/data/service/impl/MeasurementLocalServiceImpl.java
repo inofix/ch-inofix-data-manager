@@ -37,7 +37,10 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -62,8 +65,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-11-14 12:28
- * @version 1.1.4
+ * @modified 2017-11-21 12:20
+ * @version 1.1.6
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -76,9 +79,10 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
      * measurement local service.
      */
 
-    @Override
     @Indexable(type = IndexableType.REINDEX)
-    public Measurement addMeasurement(long userId, String data, ServiceContext serviceContext) throws PortalException {
+    @Override
+    public Measurement addMeasurement(long userId, String data, String id, String name, Date timestamp,
+            ServiceContext serviceContext) throws PortalException {
 
         // Measurement
 
@@ -97,12 +101,20 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         measurement.setExpandoBridgeAttributes(serviceContext);
 
         measurement.setData(data);
+        measurement.setId(id);
+        measurement.setName(name);
+        measurement.setTimestamp(timestamp);
 
         measurementPersistence.update(measurement);
-        
+
         // Resources
 
         resourceLocalService.addModelResources(measurement, serviceContext);
+
+        // Asset
+
+        updateAsset(userId, measurement, serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames(),
+                serviceContext.getAssetPriority());
 
         return measurement;
 
@@ -312,12 +324,12 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public Hits search(long userId, long groupId, String data, String id, String timestamp, int status, Date from, Date until,
+    public Hits search(long userId, long groupId, String data, String id, Date timestamp, int status, Date from, Date until,
             LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
             throws PortalException {
 
         if (sort == null) {
-            sort = new Sort("timestamp", true);
+            sort = new Sort("timestamp_sortable", true);
         }
 
         Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class.getName());
@@ -328,18 +340,45 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         return indexer.search(searchContext);
 
     }
-
+    
     @Override
+    public void updateAsset(long userId, Measurement measurement, long[] assetCategoryIds, String[] assetTagNames,
+            Double priority) throws PortalException {
+        
+        _log.info("updateAsset");
+        _log.info("measurement.getName() = " + measurement.getName());
+
+        // TODO
+        boolean visible = true;
+        // boolean visible = false;
+        // if (measurement.isApproved()) {
+        // visible = true;
+        // publishDate = measurement.getCreateDate();
+        // }
+
+        Date publishDate = null;
+
+        String summary = HtmlUtil.extractText(StringUtil.shorten(measurement.getData(), 500));
+
+        String className = Measurement.class.getName();
+        long classPK = measurement.getMeasurementId();
+
+        assetEntryLocalService.updateEntry(userId, measurement.getGroupId(), measurement.getCreateDate(),
+                measurement.getModifiedDate(), className, classPK, measurement.getUuid(), 0, assetCategoryIds,
+                assetTagNames, true, visible, null, null, publishDate, null, ContentTypes.TEXT_HTML,
+                measurement.getName(), measurement.getName(), summary, null, null, 0, 0, priority);
+    }
+
     @Indexable(type = IndexableType.REINDEX)
-    public Measurement updateMeasurement(long measurementId, long userId,
-            String data, ServiceContext serviceContext) throws PortalException {
+    @Override
+    public Measurement updateMeasurement(long measurementId, long userId, String data, String id, String name,
+            Date timestamp, ServiceContext serviceContext) throws PortalException {
 
         // Measurement
 
         User user = userPersistence.findByPrimaryKey(userId);
 
-        Measurement measurement = measurementPersistence
-                .findByPrimaryKey(measurementId);
+        Measurement measurement = measurementPersistence.findByPrimaryKey(measurementId);
 
         long groupId = serviceContext.getScopeGroupId();
 
@@ -351,19 +390,27 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         measurement.setExpandoBridgeAttributes(serviceContext);
 
         measurement.setData(data);
+        measurement.setId(id);
+        measurement.setName(name);
+        measurement.setTimestamp(timestamp);
 
         measurementPersistence.update(measurement);
+        
+        // Asset
+
+        updateAsset(userId, measurement, serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames(),
+                serviceContext.getAssetPriority());
 
         return measurement;
 
     }
     
-    protected SearchContext buildSearchContext(long userId, long groupId, String data, String id, String timestamp, int status, Date from,
-            Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
-            throws PortalException {
+    protected SearchContext buildSearchContext(long userId, long groupId, String data, String id, Date timestamp,
+            int status, Date from, Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start,
+            int end, Sort sort) throws PortalException {
 
         SearchContext searchContext = new SearchContext();
-        
+
         searchContext.setAttribute("advancedSearch", true);
 
         searchContext.setAttribute(Field.STATUS, status);
@@ -375,7 +422,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
             searchContext.setAttribute("id", id);
         }
         if (Validator.isNotNull(timestamp)) {
-            searchContext.setAttribute("timestamp", timestamp);
+            searchContext.setAttribute("timestamp", timestamp.getTime());
         }
 
         searchContext.setAttribute("from", from);

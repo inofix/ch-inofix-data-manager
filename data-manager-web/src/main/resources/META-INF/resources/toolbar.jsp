@@ -2,17 +2,13 @@
     toolbar.jsp: The toolbar of the data manager portlet
     
     Created:    2017-09-12 10:44 by Christian Berndt
-    Modified:   2017-11-01 23:49 by Christian Berndt
-    Version:    1.0.1
+    Modified:   2017-11-21 01:15 by Christian Berndt
+    Version:    1.0.2
 --%>
 
 <%@ include file="/init.jsp"%>
 
-<%@page import="com.liferay.trash.kernel.util.TrashUtil"%>
-
 <%
-    String[] columns = (String[])request.getAttribute("view.jsp-columns");
-
     String orderByCol = ParamUtil.getString(request, "orderByCol", "modified-date");
 
     String orderByType = ParamUtil.getString(request, "orderByType", "desc");
@@ -41,7 +37,6 @@
     searchContainerId="<%= searchContainerId %>"
 >
 
-    <%-- TODO
     <liferay-frontend:management-bar-filters>
         <liferay-frontend:management-bar-sort
             orderByCol="<%= orderByCol %>"
@@ -50,8 +45,8 @@
             portletURL="<%= portletURL %>"
         />
     </liferay-frontend:management-bar-filters>
-     --%>
      
+    <%-- 
     <liferay-frontend:management-bar-buttons>
         <liferay-frontend:management-bar-button
             disabled="<%=total == 0%>"
@@ -60,7 +55,8 @@
         <liferay-util:include page="/display_style_buttons.jsp"
             servletContext="<%=application%>" />
     </liferay-frontend:management-bar-buttons>
-
+    --%>
+    
     <liferay-frontend:management-bar-action-buttons>
     
         <liferay-ui:icon-menu cssClass="pull-left">
