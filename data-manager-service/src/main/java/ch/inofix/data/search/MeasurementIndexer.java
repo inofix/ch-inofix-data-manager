@@ -61,7 +61,7 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
         setDefaultSelectedFieldNames(Field.ASSET_TAG_NAMES, Field.COMPANY_ID, Field.ENTRY_CLASS_NAME,
                 Field.ENTRY_CLASS_PK, Field.GROUP_ID, Field.MODIFIED_DATE, Field.SCOPE_GROUP_ID, Field.UID);
         setFilterSearch(true);
-        setPermissionAware(false);
+        setPermissionAware(true);
     }
 
     @Override

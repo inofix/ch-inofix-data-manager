@@ -3,13 +3,11 @@
     for the default view of the data manager portlet.
 
     Created:     2017-09-27 13:17 by Christian Berndt
-    Modified:    2017-11-13 22:35 by Christian Berndt
-    Version:     1.0.3
+    Modified:    2017-11-20 01:16 by Christian Berndt
+    Version:     1.0.4
 --%>
 
 <%
-    String[] columns = (String[])request.getAttribute("view.jsp-columns");
-
     for (String column : columns) {
 %>
 
@@ -49,6 +47,10 @@
         </c:otherwise>
     </c:choose> 
 </c:if>
+<c:if test='<%="id".equals(column)%>'>
+    <liferay-ui:search-container-column-text name="id"
+        orderable="true" href="<%=detailURL%>" />
+</c:if>
 <c:if test='<%="from".equals(column)%>'>
     <liferay-ui:search-container-column-text name="from"
         orderable="true" href="<%=detailURL%>" />
@@ -57,6 +59,10 @@
     <liferay-ui:search-container-column-date property="modifiedDate"
         name="modified-date" orderable="true" href="<%=detailURL%>" />
 </c:if>
+<c:if test='<%="name".equals(column)%>'>
+    <liferay-ui:search-container-column-text name="name"
+        orderable="true" href="<%=detailURL%>" />
+</c:if>
 <c:if test='<%="status".equals(column)%>'>
     <liferay-ui:search-container-column-status property="status"
         orderable="true" />
@@ -64,6 +70,10 @@
 <c:if test='<%="measurement-id".equals(column)%>'>
     <liferay-ui:search-container-column-text property="measurementId"
         name="measurement-id" orderable="true" href="<%=detailURL%>" />
+</c:if>
+<c:if test='<%="timestamp".equals(column)%>'>
+    <liferay-ui:search-container-column-text name="timestamp"
+        orderable="true" href="<%=detailURL%>" />
 </c:if>
 <c:if test='<%="until".equals(column)%>'>
     <liferay-ui:search-container-column-text name="until"

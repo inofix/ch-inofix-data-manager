@@ -28,8 +28,8 @@ import ch.inofix.data.model.Measurement;
  *
  * @author Christian Berndt
  * @created 2017-09-27 11:57
- * @modified 2017-09-27 11:57
- * @version 1.0.0
+ * @modified 2017-11-21 17:08
+ * @version 1.0.1
  *
  */
 public class MeasurementSearch extends SearchContainer<Measurement> {
@@ -43,20 +43,24 @@ public class MeasurementSearch extends SearchContainer<Measurement> {
         headerNames.add("create-date");
         headerNames.add("data");
         headerNames.add("from");
-        headerNames.add("modified-date");
-        headerNames.add("status"); 
+        headerNames.add("id");
         headerNames.add("measurement-id");
-        headerNames.add("ticket-url");
-        headerNames.add("work-package");
+        headerNames.add("modified-date");
+        headerNames.add("name");
+        headerNames.add("status"); 
+        headerNames.add("timestamp"); 
         headerNames.add("user-name");
         headerNames.add("until");
 
         orderableHeaders.put("create-date", "createDate_Number_sortable");
         orderableHeaders.put("data", "data_sortable");
         orderableHeaders.put("from", "from_Number_sortable");
-        orderableHeaders.put("modified-date", "modifiedDate_Number_sortable");
-        orderableHeaders.put("status", "status_Number_sortable");
+        orderableHeaders.put("id", "id_sortable");
         orderableHeaders.put("measurement-id", "taskRecordId_Number_sortable");
+        orderableHeaders.put("modified-date", "modifiedDate_Number_sortable");
+        orderableHeaders.put("name", "name");
+        orderableHeaders.put("status", "status_Number_sortable");
+        orderableHeaders.put("timestamp", "timestamp_sortable");
         orderableHeaders.put("until", "until_Number_sortable");
         orderableHeaders.put("user-name", "userName_sortable");
     }

@@ -16,6 +16,7 @@ package ch.inofix.data.service.impl;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -54,8 +55,8 @@ import ch.inofix.data.service.permission.DataManagerPortletPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 00:32
- * @modified 2017-11-13 21:18
- * @version 1.0.5
+ * @modified 2017-11-21 00:28
+ * @version 1.0.6
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
@@ -68,12 +69,13 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
      * remote service.
      */
     @Override
-    public Measurement addMeasurement(String data, ServiceContext serviceContext) throws PortalException {
+    public Measurement addMeasurement(String data, String id, String name, Date timestamp,
+            ServiceContext serviceContext) throws PortalException {
 
         DataManagerPortletPermission.check(getPermissionChecker(), serviceContext.getScopeGroupId(),
                 MeasurementActionKeys.ADD_MEASUREMENT);
 
-        return measurementLocalService.addMeasurement(getUserId(), data, serviceContext);
+        return measurementLocalService.addMeasurement(getUserId(), data, id, name, timestamp, serviceContext);
 
     }
 
@@ -83,23 +85,20 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
         // Create an empty measurement - no permission check required
         return measurementLocalService.createMeasurement(0);
     }
-    
-    
-    
+
     @Override
     public void deleteBackgroundTask(long groupId, long backgroundTaskId) throws PortalException {
 
-        _log.info("deleteBackgroundTask()");
-
-        DataManagerPortletPermission.check(getPermissionChecker(), groupId, MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
+        DataManagerPortletPermission.check(getPermissionChecker(), groupId,
+                MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
 
         BackgroundTaskManagerUtil.deleteBackgroundTask(backgroundTaskId);
 
     }
-    
+
     @Override
     public List<Measurement> deleteGroupMeasurements(long groupId) throws PortalException {
-        
+
         _log.info("deleteGroupMeasurements()");
 
         DataManagerPortletPermission.check(getPermissionChecker(), groupId,
@@ -117,14 +116,13 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
 
     }
 
-    
     @Override
     public Measurement getMeasurement(long measurementId) throws PortalException {
 
         MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.VIEW);
         return measurementLocalService.getMeasurement(measurementId);
     }
-    
+
     @Override
     public String[] getTempFileNames(long groupId, String folderName) throws PortalException {
 
@@ -134,12 +132,10 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
         return TempFileEntryUtil.getTempFileNames(groupId, getUserId(),
                 DigesterUtil.digestHex(Digester.SHA_256, folderName));
     }
-    
+
     @Override
     public long importMeasurementsInBackground(ExportImportConfiguration exportImportConfiguration,
             InputStream inputStream, String extension) throws PortalException {
-        
-        _log.info("importMeasurementsInBackground(inputStream)");
 
         Map<String, Serializable> settingsMap = exportImportConfiguration.getSettingsMap();
 
@@ -151,7 +147,7 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
         return measurementLocalService.importMeasurementsInBackground(getUserId(), exportImportConfiguration,
                 inputStream, extension);
     }
-    
+
     @Override
     public Hits search(long userId, long groupId, String keywords, int start, int end, Sort sort)
             throws PortalException {
@@ -160,12 +156,13 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
     }
 
     @Override
-    public Measurement updateMeasurement(long measurementId, String data, ServiceContext serviceContext)
-            throws PortalException {
+    public Measurement updateMeasurement(long measurementId, String data, String id, String name, Date timestamp,
+            ServiceContext serviceContext) throws PortalException {
 
         MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.UPDATE);
 
-        return measurementLocalService.updateMeasurement(measurementId, getUserId(), data, serviceContext);
+        return measurementLocalService.updateMeasurement(measurementId, getUserId(), data, id, name, timestamp,
+                serviceContext);
 
     }
     
