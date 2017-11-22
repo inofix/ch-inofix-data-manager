@@ -51,8 +51,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-11-21 18:57
- * @version 1.1.1
+ * @modified 2017-11-21 22:03
+ * @version 1.1.2
  *
  */
 @Component(
@@ -108,16 +108,28 @@ public class MeasurementImportController extends BaseExportImportController impl
     }
 
     protected void doImportFile(File file, long userId, long groupId) throws Exception {
-        
+
         _log.info("doImportFile");
 
         ServiceContext serviceContext = new ServiceContext();
         serviceContext.setScopeGroupId(groupId);
         serviceContext.setUserId(userId);
-        
-        String extension = FileUtil.getExtension(file.getName().toLowerCase());        
-        
-        _log.info("extension = " + extension);     
+
+        PortletPreferences portletPreferences = getPortletPreferences(groupId);
+
+        String idField = "id";
+        String nameField = "name";
+        String timestampField = "timestamp";
+
+        if (portletPreferences != null) {
+            idField = portletPreferences.getValue("idField", "id");
+            nameField = portletPreferences.getValue("nameField", "name");
+            timestampField = portletPreferences.getValue("timestampField", "timestamp");
+        }
+
+        String extension = FileUtil.getExtension(file.getName().toLowerCase());
+
+        _log.info("extension = " + extension);
 
         StopWatch stopWatch = new StopWatch();
 
@@ -127,7 +139,7 @@ public class MeasurementImportController extends BaseExportImportController impl
         int numProcessed = 0;
         int numImported = 0;
         int numIgnored = 0;
-        
+
         if ("xml".equals(extension)) {
 
             Document document = SAXReaderUtil.read(file);
@@ -141,8 +153,8 @@ public class MeasurementImportController extends BaseExportImportController impl
 
                 Element channelElement = (Element) channel;
 
-                String id = channelElement.attributeValue("channelId");
-                String name = channelElement.attributeValue("name");
+                String id = channelElement.attributeValue(idField);
+                String name = channelElement.attributeValue(nameField);
                 String unit = channelElement.attributeValue("unit");
 
                 List<Node> values = channel.selectNodes("descendant::VT");
@@ -150,9 +162,9 @@ public class MeasurementImportController extends BaseExportImportController impl
                 for (Node value : values) {
 
                     Element valueElement = (Element) value;
-                    String timestamp = valueElement.attributeValue("t");
+                    String timestamp = valueElement.attributeValue(timestampField);
                     String val = valueElement.getText();
-
+                    
                     JSONObject jsonObject = createJSONObject(id, name, unit, timestamp, val);
 
                     int status = addMeasurement(serviceContext, userId, jsonObject);
@@ -174,9 +186,7 @@ public class MeasurementImportController extends BaseExportImportController impl
                     }
 
                     numProcessed++;
-
                 }
-
             }
 
         } else if ("json".equals(extension)) {
@@ -211,7 +221,6 @@ public class MeasurementImportController extends BaseExportImportController impl
                 }
 
                 numProcessed++;
-
             }
 
         } else {
@@ -224,10 +233,9 @@ public class MeasurementImportController extends BaseExportImportController impl
             _log.info("Ignored " + numIgnored + " measurements since they already exist in this instance.");
             _log.info("Imported " + numImported + " measurements since they did not exist in this instance.");
         }
-
     }
     
-    protected PortletPreferences getPreferences(long groupId) throws PortalException {
+    protected PortletPreferences getPortletPreferences(long groupId) throws PortalException {
 
         long ownerId = groupId;
         int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
@@ -272,27 +280,13 @@ public class MeasurementImportController extends BaseExportImportController impl
 
     private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject jsonObject) throws Exception {
 
-        // Read timestamp field name from configuration
-
-        PortletPreferences preferences = getPreferences(serviceContext.getScopeGroupId());
-
-        String timestampField = "timestamp"; 
-        
-        if (preferences != null) {
-            timestampField = preferences.getValue("timestampField", "timestamp");
-        }
-
         String id = jsonObject.getString("id");
         String name = jsonObject.getString("name");
-        Date timestamp = getDate(jsonObject.getString(timestampField)); 
-        
-        _log.info("id = " + id);
-        _log.info("name = " + name);
-        _log.info("timestamp = " + timestamp);
+        Date timestamp = getDate(jsonObject.getString("timestamp"));
 
         Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, timestamp,
                 WorkflowConstants.STATUS_ANY, null, null, null, true, 0, Integer.MAX_VALUE, null);
-        
+
         _log.info("hits.getLength()  = " + hits.getLength());
 
         if (hits.getLength() == 0) {
@@ -309,12 +303,10 @@ public class MeasurementImportController extends BaseExportImportController impl
     
     private static JSONObject createJSONObject(String id, String name, String unit, String timestamp, String value) {
 
-        // TODO: read json-schema from portlet configuration
-        // (see above)
         JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-        jsonObject.put("channelId", id);
-        jsonObject.put("channelName", name);
-        jsonObject.put("channelUnit", unit);
+        jsonObject.put("id", id);
+        jsonObject.put("name", name);
+        jsonObject.put("unit", unit);
         jsonObject.put("timestamp", timestamp);
         jsonObject.put("value", value);
 
@@ -334,7 +326,6 @@ public class MeasurementImportController extends BaseExportImportController impl
             } catch (ParseException e) {
                 _log.error(e.getMessage());
             }
-
         }
 
         return date;
