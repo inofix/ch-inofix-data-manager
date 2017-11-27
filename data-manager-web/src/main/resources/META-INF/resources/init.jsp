@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-21 21:20 by Christian Berndt
-    Version:     1.2.4
+    Modified:    2017-11-22 23:21 by Christian Berndt
+    Version:     1.2.5
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -34,6 +34,7 @@
 <%@page import="ch.inofix.data.web.configuration.DataManagerConfiguration"%>
 <%@page import="ch.inofix.data.web.internal.constants.DataManagerWebKeys"%>
 <%@page import="ch.inofix.data.web.internal.search.EntriesChecker"%>
+<%@page import="ch.inofix.data.web.internal.search.MeasurementDisplayTerms"%>
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearch"%>
 <%@page import="ch.inofix.data.web.internal.search.MeasurementSearchTerms"%>
 
@@ -70,7 +71,15 @@
 <%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
 <%@page import="com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil"%>
 <%@page import="com.liferay.portal.kernel.repository.model.FileEntry"%>
+<%@page import="com.liferay.portal.kernel.search.facet.collector.FacetCollector"%>
+<%@page import="com.liferay.portal.kernel.search.facet.collector.TermCollector"%>
+<%@page import="com.liferay.portal.kernel.search.facet.Facet"%>
+<%@page import="com.liferay.portal.kernel.search.facet.MultiValueFacet"%>
 <%@page import="com.liferay.portal.kernel.search.Hits"%>
+<%@page import="com.liferay.portal.kernel.search.IndexerRegistryUtil"%>
+<%@page import="com.liferay.portal.kernel.search.Indexer"%>
+<%@page import="com.liferay.portal.kernel.search.SearchContextFactory"%>
+<%@page import="com.liferay.portal.kernel.search.SearchContext"%>
 <%@page import="com.liferay.portal.kernel.search.Sort"%>
 <%@page import="com.liferay.portal.kernel.security.auth.PrincipalException"%>
 <%@page import="com.liferay.portal.kernel.security.permission.ResourceActionsUtil"%>
@@ -80,6 +89,7 @@
 <%@page import="com.liferay.portal.kernel.service.TicketLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.UserServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.service.UserLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.util.comparator.UserLastNameComparator"%>
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.portal.kernel.util.CalendarFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Constants"%>
@@ -101,7 +111,9 @@
 <%@page import="com.liferay.trash.kernel.util.TrashUtil"%>
 
 <%@page import="java.text.DecimalFormatSymbols"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Calendar"%>
+<%@page import="java.util.Collections"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Iterator"%>
@@ -113,6 +125,7 @@
 <%@page import="javax.portlet.PortletURL"%>
 <%@page import="javax.portlet.PortletRequest"%>
 <%@page import="javax.portlet.ResourceURL"%>
+<%@page import="javax.portlet.WindowState"%>
 
 <%@page import="org.apache.commons.collections.IteratorUtils"%>
 
