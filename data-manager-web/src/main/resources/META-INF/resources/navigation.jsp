@@ -2,8 +2,8 @@
     navigation.jsp: Default navigation of Inofix' data-manager.
     
     Created:     2017-09-10 17:02 by Christian Berndt
-    Modified:    2017-11-04 00:11 by Christian Berndt
-    Version:     1.0.1
+    Modified:    2017-11-22 23:30 by Christian Berndt
+    Version:     1.0.2
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -37,6 +37,8 @@
             </div>
         </c:if> 
         --%>
+        <liferay-util:include page="/search_bar.jsp" servletContext="<%= application %>"/>      
+        
     </aui:form>
     
 </aui:nav-bar>
