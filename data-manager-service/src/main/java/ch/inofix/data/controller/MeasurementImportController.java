@@ -4,6 +4,8 @@ import static ch.inofix.data.internal.exportimport.util.ExportImportLifecycleCon
 import static ch.inofix.data.internal.exportimport.util.ExportImportLifecycleConstants.PROCESS_FLAG_MEASUREMENTS_IMPORT_IN_PROCESS;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,12 +39,12 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
+import ch.inofix.data.constants.DataManagerField;
 import ch.inofix.data.exception.FileFormatException;
 import ch.inofix.data.internal.exportimport.util.ExportImportThreadLocal;
 import ch.inofix.data.service.MeasurementLocalService;
@@ -51,8 +53,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-11-21 22:03
- * @version 1.1.2
+ * @modified 2017-12-02 17:37
+ * @version 1.1.3
  *
  */
 @Component(
@@ -159,68 +161,107 @@ public class MeasurementImportController extends BaseExportImportController impl
 
                 List<Node> values = channel.selectNodes("descendant::VT");
 
-                for (Node value : values) {
+                for (Node node : values) {
 
-                    Element valueElement = (Element) value;
-                    String timestamp = valueElement.attributeValue(timestampField);
-                    String val = valueElement.getText();
+                    Element valueElement = (Element) node;
+                    String timestampStr = valueElement.attributeValue(timestampField);
+                    Date timestamp = getDate(timestampStr);
+                    String value = valueElement.getText();
                     
-                    JSONObject jsonObject = createJSONObject(id, name, unit, timestamp, val);
+                    JSONObject jsonObject = JSONFactoryUtil.createJSONObject(); 
+                    jsonObject.put(DataManagerField.ID, id);
+                    jsonObject.put(DataManagerField.NAME, name);
+                    jsonObject.put(DataManagerField.TIMESTAMP, timestampStr);
+                    jsonObject.put(DataManagerField.UNIT, unit);
+                    jsonObject.put(DataManagerField.VALUE, value);
 
-                    int status = addMeasurement(serviceContext, userId, jsonObject);
+                    if (Validator.isNotNull(value)) {
 
-                    if (status == IGNORED) {
-                        numIgnored++;
-                    }
+                        int status = addMeasurement(serviceContext, userId,
+                                jsonObject, id, name, timestamp, unit, value);
 
-                    if (status == IMPORTED) {
-                        numImported++;
-                    }
+                        if (status == IGNORED) {
+                            numIgnored++;
+                        }
 
-                    if (numProcessed % 100 == 0 && numProcessed > 0) {
+                        if (status == IMPORTED) {
+                            numImported++;
+                        }
 
-                        float completed = ((Integer) numProcessed).floatValue() / numValues * 100;
+                        if (numProcessed % 100 == 0 && numProcessed > 0) {
 
-                        _log.info("Processed " + numProcessed + " of " + numValues + " measurements in "
-                                + stopWatch.getTime() + " ms (" + completed + "%).");
+                            float completed = ((Integer) numProcessed)
+                                    .floatValue() / numValues * 100;
+
+                            _log.info("Processed " + numProcessed + " of "
+                                    + numValues + " measurements in "
+                                    + stopWatch.getTime() + " ms ("
+                                    + completed + "%).");
+                        }
                     }
 
                     numProcessed++;
+
                 }
             }
 
-        } else if ("json".equals(extension)) {
+        } else if ("json".equalsIgnoreCase(extension)) {
 
-            _log.info("import json");
+            _log.info("process json");
 
-            String json = new String(FileUtil.getBytes(file));
-            JSONArray jsonArray = JSONFactoryUtil.createJSONArray(json);
+            try {
+                
+                _log.info("Charset.defaultCharset().toString() = " + Charset.defaultCharset().toString());
+                
+                String json = FileUtil.read(file);
+                
+                _log.info(json);
 
-            int numValues = jsonArray.length();
+                if (Validator.isNotNull(json)) {
 
-            for (int i = 0; i < jsonArray.length(); i++) {
+                    // Remove start and end quotes added by python's dump method
 
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    if (json.startsWith("'") && json.endsWith("'")) {
 
-                int status = addMeasurement(serviceContext, userId, jsonObject);
+                        json = json.substring(1, json.length() - 1);
 
-                if (status == IGNORED) {
-                    numIgnored++;
+                    }
+
+                    JSONArray jsonArray = JSONFactoryUtil.createJSONArray(json);
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+
+                        JSONObject inObject = jsonArray.getJSONObject(i);
+
+                        String id = inObject.getString(idField);
+                        String name = inObject.getString(nameField);
+                        Date timestamp = getDate(inObject.getString(timestampField));
+                        String unit = inObject.getString(DataManagerField.UNIT);
+                        String value = inObject.getString(DataManagerField.VALUE);
+
+                        if (Validator.isNotNull(value)) {
+
+                            int status = addMeasurement(serviceContext, userId, inObject, id, name, timestamp, unit,
+                                    value);
+
+                            if (status == IGNORED) {
+                                numIgnored++;
+                            }
+
+                            if (status == IMPORTED) {
+                                numImported++;
+                            }
+                        } else {
+                            numIgnored++;
+                        }
+
+                        numProcessed++;
+
+                    }
                 }
 
-                if (status == IMPORTED) {
-                    numImported++;
-                }
-
-                if (numProcessed % 100 == 0 && numProcessed > 0) {
-
-                    float completed = ((Integer) numProcessed).floatValue() / numValues * 100;
-
-                    _log.info("Processed " + numProcessed + " of " + numValues + " measurements in "
-                            + stopWatch.getTime() + " ms (" + completed + "%).");
-                }
-
-                numProcessed++;
+            } catch (IOException e) {
+                _log.error(e.getMessage());
             }
 
         } else {
@@ -277,21 +318,19 @@ public class MeasurementImportController extends BaseExportImportController impl
     protected void setPortletPreferencesLocalService(PortletPreferencesLocalService portletPreferencesLocalService) {
         _portletPreferencesLocalService = portletPreferencesLocalService;
     }
+    
+    private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject data, String id, String name,
+            Date timestamp, String unit, String value) throws Exception {
 
-    private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject jsonObject) throws Exception {
+        Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, null, timestamp,
+                null, null, null, true, 0, Integer.MAX_VALUE, null);
 
-        String id = jsonObject.getString("id");
-        String name = jsonObject.getString("name");
-        Date timestamp = getDate(jsonObject.getString("timestamp"));
-
-        Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, timestamp,
-                WorkflowConstants.STATUS_ANY, null, null, null, true, 0, Integer.MAX_VALUE, null);
-
-        _log.info("hits.getLength()  = " + hits.getLength());
+        _log.info("hits.getLength() = " + hits.getLength());
 
         if (hits.getLength() == 0) {
 
-            _measurementLocalService.addMeasurement(userId, jsonObject.toString(), id, name, timestamp, serviceContext);
+            _measurementLocalService.addMeasurement(userId, data.toString(), id, name, timestamp, unit, value,
+                    serviceContext);
 
             return IMPORTED;
 
@@ -300,6 +339,28 @@ public class MeasurementImportController extends BaseExportImportController impl
             return IGNORED;
         }
     }
+
+//    private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject jsonObject) throws Exception {
+//
+//        String id = jsonObject.getString("id");
+//        Date timestamp = getDate(jsonObject.getString("timestamp"));
+//
+//        Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, null, timestamp,
+//                null, null, null, true, 0, Integer.MAX_VALUE, null);
+//
+//        _log.info("hits.getLength()  = " + hits.getLength());
+//
+//        if (hits.getLength() == 0) {
+//
+//            _measurementLocalService.addMeasurement(userId, jsonObject.toString(), id, null, timestamp, unit, value, serviceContext);
+//
+//            return IMPORTED;
+//
+//        } else {
+//
+//            return IGNORED;
+//        }
+//    }
     
     private static JSONObject createJSONObject(String id, String name, String unit, String timestamp, String value) {
 

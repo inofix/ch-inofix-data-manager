@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import ch.inofix.data.constants.DataManagerField;
 import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.exception.MeasurementIdException;
 import ch.inofix.data.exception.MeasurementNameException;
@@ -44,8 +45,8 @@ import ch.inofix.data.service.MeasurementService;
  * 
  * @author Christian Berndt
  * @created 2017-11-01 23:30
- * @modified 2017-11-21 21:39
- * @version 1.0.3
+ * @modified 2017-12-02 16:58
+ * @version 1.0.4
  *
  */
 @Component(
@@ -183,6 +184,8 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
         String id = null;
         String name = null;
         Date timestamp = null;
+        String unit = null;
+        String value = null;
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
 
@@ -194,9 +197,10 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
 
                 String key = keys.next();
 
-                String value = actionRequest.getParameter(key);
+                // TODO: json fields must be prefixed with json-namespace
+                String val = actionRequest.getParameter(key);
 
-                dataObj.put(key, value);
+                dataObj.put(key, val);
 
             }
 
@@ -204,10 +208,12 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
 
         } else {
 
-            data = ParamUtil.getString(actionRequest, "data");
-            id = ParamUtil.getString(actionRequest, "id");
-            name = ParamUtil.getString(actionRequest, "name");
-            timestamp = ParamUtil.getDate(actionRequest, "timestamp", dateFormat);
+            data = ParamUtil.getString(actionRequest, DataManagerField.DATA);
+            id = ParamUtil.getString(actionRequest, DataManagerField.ID);
+            name = ParamUtil.getString(actionRequest, DataManagerField.NAME);
+            timestamp = ParamUtil.getDate(actionRequest, DataManagerField.TIMESTAMP, dateFormat);
+            unit = ParamUtil.getString(actionRequest, DataManagerField.UNIT);
+            value = ParamUtil.getString(actionRequest, DataManagerField.VALUE);
 
         }
 
@@ -219,13 +225,13 @@ public class EditMeasurementMVCActionCommand extends BaseMVCActionCommand {
 
             // Add measurement
 
-            measurement = _measurementService.addMeasurement(data, id, name, timestamp, serviceContext);
+            measurement = _measurementService.addMeasurement(data, id, name, timestamp, unit, value, serviceContext);
 
         } else {
 
             // Update measurement
 
-            measurement = _measurementService.updateMeasurement(measurementId, data, id, name, timestamp,
+            measurement = _measurementService.updateMeasurement(measurementId, data, id, name, timestamp, unit, value,
                     serviceContext);
         }
 

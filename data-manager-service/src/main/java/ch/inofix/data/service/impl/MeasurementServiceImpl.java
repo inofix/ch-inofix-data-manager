@@ -17,6 +17,7 @@ package ch.inofix.data.service.impl;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,8 +56,8 @@ import ch.inofix.data.service.permission.DataManagerPortletPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 00:32
- * @modified 2017-11-21 00:28
- * @version 1.0.6
+ * @modified 2017-12-02 16:52
+ * @version 1.0.8
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
@@ -69,13 +70,14 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
      * remote service.
      */
     @Override
-    public Measurement addMeasurement(String data, String id, String name, Date timestamp,
+    public Measurement addMeasurement(String data, String id, String name, Date timestamp, String unit, String value,
             ServiceContext serviceContext) throws PortalException {
 
         DataManagerPortletPermission.check(getPermissionChecker(), serviceContext.getScopeGroupId(),
                 MeasurementActionKeys.ADD_MEASUREMENT);
 
-        return measurementLocalService.addMeasurement(getUserId(), data, id, name, timestamp, serviceContext);
+        return measurementLocalService.addMeasurement(getUserId(), data, id, name, timestamp, unit, value,
+                serviceContext);
 
     }
 
@@ -155,13 +157,21 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
         return measurementLocalService.search(userId, groupId, keywords, start, end, sort);
     }
 
+    public Hits search(long userId, long groupId, String data, String id, String name, Date timestamp, Date from,
+            Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
+            throws PortalException {
+
+        return measurementLocalService.search(userId, groupId, data, id, name, timestamp, from, until, params,
+                andSearch, start, end, sort);
+    }
+
     @Override
-    public Measurement updateMeasurement(long measurementId, String data, String id, String name, Date timestamp,
+    public Measurement updateMeasurement(long measurementId, String data, String id, String name, Date timestamp, String unit, String value,
             ServiceContext serviceContext) throws PortalException {
 
         MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.UPDATE);
 
-        return measurementLocalService.updateMeasurement(measurementId, getUserId(), data, id, name, timestamp,
+        return measurementLocalService.updateMeasurement(measurementId, getUserId(), data, id, name, timestamp, unit, value,
                 serviceContext);
 
     }

@@ -1,5 +1,7 @@
 package ch.inofix.data.search;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +39,7 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import ch.inofix.data.constants.DataManagerField;
 import ch.inofix.data.model.Measurement;
 import ch.inofix.data.service.MeasurementLocalService;
 import ch.inofix.data.service.util.JSONSchemaUtil;
@@ -45,8 +48,8 @@ import ch.inofix.data.service.util.JSONSchemaUtil;
  *
  * @author Christian Berndt
  * @created 2017-09-27 10:52
- * @modified 2017-11-21
- * @version 1.1.7
+ * @modified 2017-12-02 17:49
+ * @version 1.1.8
  *
  */
 @Component(immediate = true, service = Indexer.class)
@@ -69,10 +72,10 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     @Override
     public void postProcessContextBooleanFilter(BooleanFilter contextBooleanFilter, SearchContext searchContext)
             throws Exception {
-        
+
         _log.info("postProcessContextBooleanFilter");
 
-        addStatus(contextBooleanFilter, searchContext);        
+        addStatus(contextBooleanFilter, searchContext);
 
         // id
 
@@ -93,28 +96,22 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
         // from- and until-date
 
-        // TODO
-        // Date fromDate =
-        // GetterUtil.getDate(searchContext.getAttribute("fromDate"),
-        // DateFormat.getDateInstance(), null);
-        // Date untilDate =
-        // GetterUtil.getDate(searchContext.getAttribute("untilDate"),
-        // DateFormat.getDateInstance(),
-        // null);
-        //
-        // long max = Long.MAX_VALUE;
-        // long min = Long.MIN_VALUE;
-        //
-        // if (fromDate != null) {
-        // min = fromDate.getTime();
-        // }
-        //
-        // if (untilDate != null) {
-        // max = untilDate.getTime();
-        // }
-        //
-        // contextBooleanFilter.addRangeTerm("fromDate_Number_sortable", min,
-        // max);
+        Date fromDate = GetterUtil.getDate(searchContext.getAttribute("fromDate"), DateFormat.getDateInstance(), null);
+        Date untilDate = GetterUtil.getDate(searchContext.getAttribute("untilDate"), DateFormat.getDateInstance(),
+                null);
+
+        long max = Long.MAX_VALUE;
+        long min = Long.MIN_VALUE;
+
+        if (fromDate != null) {
+            min = fromDate.getTime();
+        }
+
+        if (untilDate != null) {
+            max = untilDate.getTime();
+        }
+
+        contextBooleanFilter.addRangeTerm("timestamp_sortable", min, max);
 
     }
 
@@ -147,14 +144,17 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
         Document document = getBaseModelDocument(CLASS_NAME, measurement);
 
         document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
-        document.addTextSortable("data", measurement.getData());
-        document.addTextSortable("id", measurement.getId());
-        document.addTextSortable("name", measurement.getName());
+        document.addTextSortable(DataManagerField.DATA, measurement.getData());
+        document.addTextSortable(DataManagerField.ID, measurement.getId());
+        document.addTextSortable(DataManagerField.NAME, measurement.getName());
         document.addNumberSortable(Field.STATUS, WorkflowConstants.STATUS_APPROVED);
 
         if (measurement.getTimestamp() != null) {
-            document.addNumber("timestamp", measurement.getTimestamp().getTime());
+            document.addNumber(DataManagerField.TIMESTAMP, measurement.getTimestamp().getTime());
         }
+
+        document.addTextSortable(DataManagerField.UNIT, measurement.getUnit());
+        document.addTextSortable(DataManagerField.VALUE, measurement.getValue());
 
         PortletPreferences portletPreferences = getPreferences(measurement.getGroupId());
         String json = portletPreferences.getValue("jsonSchema", "{}");
