@@ -18,5 +18,7 @@
 		<field name="id" type="String" />
 		<field name="name" type="String" />
 		<field name="timestamp" type="Date" />
+		<field name="value" type="String" />
+		<field name="unit" type="String" />
 	</model>
 </model-hints>

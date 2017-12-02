@@ -11,8 +11,8 @@ import com.liferay.portal.kernel.util.Validator;
  *
  * @author Christian Berndt
  * @created 2017-09-27 11:47
- * @modified 2017-09-27 11:47
- * @version 1.0.0
+ * @modified 2017-11-27 23:56
+ * @version 1.0.1
  *
  */
 public class MeasurementDisplayTerms extends DisplayTerms {
@@ -21,9 +21,11 @@ public class MeasurementDisplayTerms extends DisplayTerms {
     public static final String DATA = "data";
     public static final String FROM = "from";
     public static final String GROUP_ID = "groupId";
-    public static final String MODIFIED_DATE = "modifiedDate";
-    public static final String STATUS = "status";
+    public static final String ID = "id";
     public static final String MEASUREMENT_ID = "measurementId";
+    public static final String MODIFIED_DATE = "modifiedDate";
+    public static final String NAME = "name";
+    public static final String STATUS = "status";
     public static final String UNTIL = "until";
     public static final String USER_NAME = "userName";
 
@@ -35,13 +37,15 @@ public class MeasurementDisplayTerms extends DisplayTerms {
         data = ParamUtil.getString(portletRequest, DATA);
         from = ParamUtil.getLong(portletRequest, FROM);
         groupId = ParamUtil.getLong(portletRequest, GROUP_ID);
+        id = ParamUtil.getString(portletRequest, ID);
+        measurementId = ParamUtil.getLong(portletRequest, MEASUREMENT_ID);
         modifiedDate = ParamUtil.getString(portletRequest, MODIFIED_DATE);
+        name = ParamUtil.getString(portletRequest, NAME);
         String statusString = ParamUtil.getString(portletRequest, STATUS);
 
         if (Validator.isNotNull(statusString)) {
             status = GetterUtil.getInteger(statusString);
         }
-        measurementId = ParamUtil.getLong(portletRequest, MEASUREMENT_ID);
         until = ParamUtil.getLong(portletRequest, UNTIL);
         userName = ParamUtil.getString(portletRequest, USER_NAME);
     }
@@ -77,6 +81,22 @@ public class MeasurementDisplayTerms extends DisplayTerms {
     public void setGroupId(long groupId) {
         this.groupId = groupId;
     }
+    
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public long getMeasurementId() {
+        return measurementId;
+    }
+
+    public void setMeasurementId(long measurementId) {
+        this.measurementId = measurementId;
+    }
 
     public String getModifiedDate() {
         return modifiedDate;
@@ -85,6 +105,14 @@ public class MeasurementDisplayTerms extends DisplayTerms {
     public void setModifiedDate(String modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public int getStatus() {
         return status;
@@ -92,14 +120,6 @@ public class MeasurementDisplayTerms extends DisplayTerms {
 
     public void setStatus(int status) {
         this.status = status;
-    }
-
-    public long getMeasurementId() {
-        return measurementId;
-    }
-
-    public void setMeasurementId(long measurementId) {
-        this.measurementId = measurementId;
     }
 
     public long getUntil() {
@@ -122,9 +142,11 @@ public class MeasurementDisplayTerms extends DisplayTerms {
     protected String data;
     protected long from;
     protected long groupId;
-    protected String modifiedDate;
-    protected int status;
+    protected String id;
     protected long measurementId;
+    protected String modifiedDate;
+    protected String name;
+    protected int status;
     protected long until;
     protected String userName;
 
