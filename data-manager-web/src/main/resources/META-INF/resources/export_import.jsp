@@ -2,8 +2,8 @@
     export_import.jsp: default view of the export-import panel
     
     Created:    2017-11-01 19:01 by Christian Berndt
-    Modified:   2017-11-02 16:25 by Christian Berndt
-    Version:    1.0.1
+    Modified:   2017-12-03 19:07 by Christian Berndt
+    Version:    1.0.2
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -53,6 +53,16 @@
                 />
                 
                 <%
+                    portletURL.setParameter("tabs2", "manage");
+                %>
+
+                <aui:nav-item
+                    href="<%= portletURL.toString() %>"
+                    label="manage"
+                    selected='<%= tabs2.equals("manage") %>'
+                />
+                
+                <%
                     portletURL.setParameter("tabs2", "delete");
                 %>
                 <aui:nav-item
@@ -73,6 +83,9 @@
                 </c:when>
                 <c:when test='<%= tabs2.equals("import") %>'>
                     <liferay-util:include page="/import/view.jsp" servletContext="<%= application %>" />
+                </c:when>
+                <c:when test='<%= tabs2.equals("manage") %>'>
+                    <liferay-util:include page="/import/manage.jsp" servletContext="<%= application %>" />
                 </c:when>
                 <c:when test='<%= tabs2.equals("delete") %>'>                
                     <liferay-util:include page="/delete_measurements.jsp" servletContext="<%= application %>"/>

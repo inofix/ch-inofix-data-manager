@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import ch.inofix.data.background.task.MeasurementExportBackgroundTaskExecutor;
 import ch.inofix.data.background.task.MeasurementImportBackgroundTaskExecutor;
+import ch.inofix.data.constants.DataManagerField;
 import ch.inofix.data.exception.MeasurementIdException;
 import ch.inofix.data.exception.MeasurementNameException;
 import ch.inofix.data.exception.MeasurementTimestampException;
@@ -69,8 +70,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-12-02 00:40
- * @version 1.1.8
+ * @modified 2017-12-03 19:03
+ * @version 1.1.9
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -341,9 +342,15 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
             throws PortalException {
 
         _log.info("search()");
+        
+        _log.info("from = " + from);
+        _log.info("until = " + until);
+        
+        _log.info("sort = " + sort);
 
         if (sort == null) {
-            sort = new Sort("timestamp_sortable", true);
+            sort = new Sort(DataManagerField.TIMESTAMP, true);
+//            sort = new Sort("timestamp_sortable", true);
         }
 
         Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class.getName());
@@ -415,7 +422,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     protected SearchContext buildSearchContext(long userId, long groupId, String data, String id, String name,
-            Date timestamp, Date from, Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start,
+            Date timestamp, Date fromDate, Date untilDate, LinkedHashMap<String, Object> params, boolean andSearch, int start,
             int end, Sort sort) throws PortalException {
 
         SearchContext searchContext = new SearchContext();
@@ -427,18 +434,26 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         if (Validator.isNotNull(data)) {
             searchContext.setAttribute("data", data);
         }
+        
         if (Validator.isNotNull(id)) {
             searchContext.setAttribute("id", id);
         }
+        
         if (Validator.isNotNull(name)) {
             searchContext.setAttribute("name", name);
         }
+        
         if (Validator.isNotNull(timestamp)) {
             searchContext.setAttribute("timestamp", timestamp.getTime());
         }
 
-        searchContext.setAttribute("from", from);
-        searchContext.setAttribute("until", until);
+        if (Validator.isNotNull(fromDate)) {
+            searchContext.setAttribute("fromDate", fromDate);
+        }
+
+        if (Validator.isNotNull(untilDate)) {
+            searchContext.setAttribute("untilDate", untilDate);
+        }
 
         searchContext.setAttribute("paginationType", "more");
 

@@ -2,17 +2,17 @@
     import/view.jsp: default view of the measurements import
     
     Created:    2017-11-01 18:58 by Christian Berndt
-    Modified:   2017-11-19 22:53 by Christian Berndt
-    Version:    1.0.2
+    Modified:   2017-12-03 17:31 by Christian Berndt
+    Version:    1.0.3
 --%>
 
 <%@ include file="/init.jsp" %>
 
 <%
     long backgroundTaskId = ParamUtil.getLong(request, "backgroundTaskId");
-    Calendar calendar = CalendarFactoryUtil.getCalendar(timeZone, locale);
+    Calendar cal = CalendarFactoryUtil.getCalendar(timeZone, locale);
 
-    int timeZoneOffset = timeZone.getOffset(calendar.getTimeInMillis());
+    int timeZoneOffset = timeZone.getOffset(cal.getTimeInMillis());
 %>
 
 <%

@@ -2,12 +2,26 @@
  * main.scss: css specific to the data-manager-portlet.
  *
  * Created:     2017-10-12 16:17 by Christian Berndt
- * Modified:    2017-11-19 22:49 by Christian Berndt
- * Version:     1.0.2
+ * Modified:    2017-12-01 19:52 by Christian Berndt
+ * Version:     1.0.3
  * 
  */
 @import "bourbon";
 @import "mixins";
+
+.btn-primary {
+    
+    > a {
+    
+        color: white; 
+        
+        &:focus, 
+        &:hover {
+            color: white;
+            text-decoration: none;
+        }
+    }
+}
 
 .container {
     

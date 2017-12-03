@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-11-22 23:21 by Christian Berndt
-    Version:     1.2.5
+    Modified:    2017-12-03 16:04 by Christian Berndt
+    Version:     1.2.6
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -136,8 +136,10 @@
 <portlet:defineObjects />
 
 <%
+    Calendar calendar = Calendar.getInstance();
     String[] columns = portletPreferences.getValue("columns", "id,name,timestamp,modified-date,user-name").split(StringPool.COMMA);
     String dataURL = portletPreferences.getValue("dataURL", "");
+    long from = 0;
     String idField = portletPreferences.getValue("idField", "id");
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
     String markupView = portletPreferences.getValue("markupView", "lexicon");
@@ -148,7 +150,7 @@
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
     String tabs2 = ParamUtil.getString(request, "tabs2", "import");
     String timestampField = portletPreferences.getValue("timestampField", "timestamp");
-    long until = ParamUtil.getLong(request, "until", now.getTime());
+    long until = 0;
     long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0"));
     String userName = portletPreferences.getValue("userName", "");
 
@@ -163,8 +165,10 @@
         jsonSchema = portletPreferences.getValue("jsonSchema", dataManagerConfiguration.jsonSchema());
         markupView = portletPreferences.getValue("markupView", dataManagerConfiguration.markupView());
         nameField = portletPreferences.getValue("nameField", dataManagerConfiguration.nameField());
-        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed",String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
-        timestampField = portletPreferences.getValue("timestampField", dataManagerConfiguration.timestampField());
+        showSearchSpeed = GetterUtil.getBoolean(portletPreferences.getValue("showSearchSpeed",
+                String.valueOf(dataManagerConfiguration.showSearchSpeeed())));
+        timestampField = portletPreferences.getValue("timestampField",
+                dataManagerConfiguration.timestampField());
         userId = GetterUtil.getLong(portletPreferences.getValue("userId", dataManagerConfiguration.userId()));
         userName = portletPreferences.getValue("userName", dataManagerConfiguration.userName());
 
@@ -184,6 +188,39 @@
 
     List<String> fields = JSONSchemaUtil.getFields(jsonSchemaObj);
     String[] requiredFields = JSONSchemaUtil.getRequiredFields(jsonSchemaObj);
+
+    // from - until
+
+    long oneDay = 1000 * 60 * 60 * 24;
+    long oneWeek = oneDay * 7;
+
+    calendar.setTimeInMillis(now.getTime() - oneWeek);
+
+    int fromDateDay = ParamUtil.getInteger(request, "fromDateDay", calendar.get(Calendar.DAY_OF_MONTH));
+    int fromDateMonth = ParamUtil.getInteger(request, "fromDateMonth", calendar.get(Calendar.MONTH));
+    int fromDateYear = ParamUtil.getInteger(request, "fromDateYear", calendar.get(Calendar.YEAR));
+
+    if (from == 0) {
+        from = PortalUtil.getDate(fromDateMonth, fromDateDay, fromDateYear).getTime();
+    } else {
+        calendar.setTimeInMillis(from);
+        fromDateDay = calendar.get(Calendar.DAY_OF_MONTH);
+        fromDateMonth = calendar.get(Calendar.MONTH);
+        fromDateYear = calendar.get(Calendar.YEAR);
+    }
+    
+    int untilDateDay = ParamUtil.getInteger(request, "untilDateDay", calendar.get(Calendar.DAY_OF_MONTH));
+    int untilDateMonth = ParamUtil.getInteger(request, "untilDateMonth", calendar.get(Calendar.MONTH));
+    int untilDateYear = ParamUtil.getInteger(request, "untilDateYear", calendar.get(Calendar.YEAR));
+
+    if (until == 0) {
+        until = PortalUtil.getDate(untilDateMonth, untilDateDay, untilDateYear).getTime();
+    } else {
+        calendar.setTimeInMillis(until);
+        untilDateDay = calendar.get(Calendar.DAY_OF_MONTH);
+        untilDateMonth = calendar.get(Calendar.MONTH);
+        untilDateYear = calendar.get(Calendar.YEAR);
+    }
 %>
 
 <%!

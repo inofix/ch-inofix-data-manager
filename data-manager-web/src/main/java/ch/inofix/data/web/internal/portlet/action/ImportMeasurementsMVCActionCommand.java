@@ -1,7 +1,10 @@
 package ch.inofix.data.web.internal.portlet.action;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.io.FileUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -60,8 +64,8 @@ import ch.inofix.data.service.MeasurementService;
  * 
  * @author Christian Berndt
  * @created 2017-11-01 17:20
- * @modified 2017-11-19 22:58
- * @version 1.0.2
+ * @modified 2017-12-02 17:53
+ * @version 1.0.3
  *
  */
 @Component(
@@ -242,6 +246,14 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
                 importData(actionRequest, ExportImportHelper.TEMP_FOLDER_NAME);
 
                 sendRedirect(actionRequest, actionResponse, redirect);
+            
+            } else if (cmd.equals("importDataFromURL")) {
+                
+                _log.info("importDataFromURL");
+
+                importDataFromURL(actionRequest, ExportImportHelper.TEMP_FOLDER_NAME);
+
+                sendRedirect(actionRequest, actionResponse, redirect);
 
             }
         } catch (Exception e) {
@@ -337,6 +349,49 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
                         ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT, importLayoutSettingsMap);
 
         _measurementService.importMeasurementsInBackground(exportImportConfiguration, inputStream, extension);
+
+    }
+    
+    protected void importDataFromURL(ActionRequest actionRequest,  String folderName) throws Exception {
+
+        _log.info("importDataFromURL()");
+        
+        String dataURL = ParamUtil.getString(actionRequest, "dataURL");
+        
+        _log.info("dataURL = " + dataURL);
+        
+        String extension = dataURL.substring(dataURL.lastIndexOf(".") + 1,
+                dataURL.length());
+
+        File file = FileUtil.createTempFile(extension);        
+        
+        ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+        
+        URL url = new URL(dataURL);
+        
+        String fileName = url.getFile();
+        
+        _log.info("fileName = " + fileName);
+
+        FileUtils.copyURLToFile(url, file);
+                
+        _log.info("extension = " + extension);
+        
+        InputStream inputStream = null;
+
+        try {
+            
+            inputStream = new FileInputStream(file);
+            
+//            inputStream = _dlFileEntryLocalService.getFileAsStream(fileEntry.getFileEntryId(), fileEntry.getVersion(),
+//                    false);
+
+            importData(actionRequest, fileName, inputStream);
+
+            deleteTempFileEntry(themeDisplay.getScopeGroupId(), folderName);
+        } finally {
+            StreamUtil.cleanUp(inputStream);
+        }
 
     }
 
