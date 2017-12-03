@@ -2,8 +2,8 @@
     view.jsp: Default view of Inofix' data-manager.
     
     Created:     2017-09-10 16:37 by Christian Berndt
-    Modified:    2017-11-20 01:14 by Christian Berndt
-    Version:     1.0.4
+    Modified:    2017-12-03 17:01 by Christian Berndt
+    Version:     1.0.5
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -32,16 +32,40 @@
     
     MeasurementSearchTerms searchTerms = (MeasurementSearchTerms) searchContainer.getSearchTerms();
     
+    boolean ignoreFromDate = ParamUtil.getBoolean(request, "ignoreFromDate", true);
+
+    Date fromDate = null;
+
+    if (!ignoreFromDate) {
+
+        fromDateDay = ParamUtil.getInteger(request, "fromDateDay");
+        fromDateMonth = ParamUtil.getInteger(request, "fromDateMonth");
+        fromDateYear = ParamUtil.getInteger(request, "fromDateYear");
+        fromDate = PortalUtil.getDate(fromDateMonth, fromDateDay, fromDateYear);
+    }
+    
+    boolean ignoreUntilDate = ParamUtil.getBoolean(request, "ignoreUntilDate", true);
+    
+    Date untilDate = null;
+
+    if (!ignoreUntilDate) {
+
+        untilDateDay = ParamUtil.getInteger(request, "untilDateDay");
+        untilDateMonth = ParamUtil.getInteger(request, "untilDateMonth");
+        untilDateYear = ParamUtil.getInteger(request, "untilDateYear");
+        untilDate = PortalUtil.getDate(untilDateMonth, untilDateDay, untilDateYear);
+    }
+    
     Hits hits = null;
 
     if (searchTerms.isAdvancedSearch()) {
-        
-        // TODO: add advanced search
-        hits = MeasurementServiceUtil.search(themeDisplay.getUserId(), scopeGroupId, keywords,
+
+        hits = MeasurementServiceUtil.search(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), null,
+                searchTerms.getId(), null, null, fromDate, untilDate, null, searchTerms.isAdvancedSearch(),
                 searchContainer.getStart(), searchContainer.getEnd(), sort);
-        
+
     } else {
-        
+
         hits = MeasurementServiceUtil.search(themeDisplay.getUserId(), scopeGroupId, keywords,
                 searchContainer.getStart(), searchContainer.getEnd(), sort);
     }
@@ -61,7 +85,7 @@
 %>
 
 <liferay-util:include page="/navigation.jsp"
-    servletContext="<%=application%>"/>    
+    servletContext="<%=application%>"/>
     
 <c:choose>
     <c:when test="<%= "export-import".equals(tabs1) %>">
