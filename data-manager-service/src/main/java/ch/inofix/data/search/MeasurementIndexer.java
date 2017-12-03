@@ -48,8 +48,8 @@ import ch.inofix.data.service.util.JSONSchemaUtil;
  *
  * @author Christian Berndt
  * @created 2017-09-27 10:52
- * @modified 2017-12-02 17:49
- * @version 1.1.8
+ * @modified 2017-12-03 19:02
+ * @version 1.1.9
  *
  */
 @Component(immediate = true, service = Indexer.class)
@@ -73,8 +73,6 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     public void postProcessContextBooleanFilter(BooleanFilter contextBooleanFilter, SearchContext searchContext)
             throws Exception {
 
-        _log.info("postProcessContextBooleanFilter");
-
         addStatus(contextBooleanFilter, searchContext);
 
         // id
@@ -97,21 +95,20 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
         // from- and until-date
 
         Date fromDate = GetterUtil.getDate(searchContext.getAttribute("fromDate"), DateFormat.getDateInstance(), null);
-        Date untilDate = GetterUtil.getDate(searchContext.getAttribute("untilDate"), DateFormat.getDateInstance(),
-                null);
+        Date untilDate = GetterUtil.getDate(searchContext.getAttribute("untilDate"), DateFormat.getDateInstance(), null);
 
         long max = Long.MAX_VALUE;
         long min = Long.MIN_VALUE;
-
+        
         if (fromDate != null) {
             min = fromDate.getTime();
         }
-
+        
         if (untilDate != null) {
             max = untilDate.getTime();
         }
 
-        contextBooleanFilter.addRangeTerm("timestamp_sortable", min, max);
+        contextBooleanFilter.addRangeTerm("timestamp_Number_sortable", min, max);
 
     }
 
@@ -141,45 +138,53 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     @Override
     protected Document doGetDocument(Measurement measurement) throws Exception {
 
-        Document document = getBaseModelDocument(CLASS_NAME, measurement);
+        _log.info("doGetDocument()");
+        
+        _log.info(measurement.getTimestamp());
 
-        document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
-        document.addTextSortable(DataManagerField.DATA, measurement.getData());
-        document.addTextSortable(DataManagerField.ID, measurement.getId());
-        document.addTextSortable(DataManagerField.NAME, measurement.getName());
-        document.addNumberSortable(Field.STATUS, WorkflowConstants.STATUS_APPROVED);
+        try {
 
-        if (measurement.getTimestamp() != null) {
-            document.addNumber(DataManagerField.TIMESTAMP, measurement.getTimestamp().getTime());
-        }
+            Document document = getBaseModelDocument(CLASS_NAME, measurement);
 
-        document.addTextSortable(DataManagerField.UNIT, measurement.getUnit());
-        document.addTextSortable(DataManagerField.VALUE, measurement.getValue());
+            document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
+            document.addText(DataManagerField.DATA, measurement.getData());
+            document.addTextSortable(DataManagerField.ID, measurement.getId());
+            document.addTextSortable(DataManagerField.NAME, measurement.getName());
+            document.addNumberSortable(Field.STATUS, WorkflowConstants.STATUS_APPROVED);
+            document.addDateSortable(DataManagerField.TIMESTAMP, measurement.getTimestamp());
+            document.addTextSortable(DataManagerField.UNIT, measurement.getUnit());
+            document.addTextSortable(DataManagerField.VALUE, measurement.getValue());
 
-        PortletPreferences portletPreferences = getPreferences(measurement.getGroupId());
-        String json = portletPreferences.getValue("jsonSchema", "{}");
-        JSONObject jsonSchema = JSONFactoryUtil.createJSONObject(json);
-        List<String> schemaFields = JSONSchemaUtil.getFields(jsonSchema);
+            PortletPreferences portletPreferences = getPreferences(measurement.getGroupId());
+            String json = portletPreferences.getValue("jsonSchema", "{}");
+            JSONObject jsonSchema = JSONFactoryUtil.createJSONObject(json);
+            List<String> schemaFields = JSONSchemaUtil.getFields(jsonSchema);
 
-        String data = measurement.getData();
-        JSONObject jsonObject = JSONFactoryUtil.createJSONObject(data);
+            String data = measurement.getData();
+            JSONObject jsonObject = JSONFactoryUtil.createJSONObject(data);
 
-        // Index JSON data according to schema
+            // Index JSON data according to schema
 
-        for (String schemaField : schemaFields) {
+            for (String schemaField : schemaFields) {
 
-            if (jsonObject != null) {
+                if (jsonObject != null) {
 
-                String value = jsonObject.getString(schemaField);
+                    String value = jsonObject.getString(schemaField);
 
-                if (Validator.isNotNull(value)) {
-                    document.addTextSortable("json_" + schemaField, value);
+                    if (Validator.isNotNull(value)) {
+                        document.addTextSortable("json_" + schemaField, value);
 
+                    }
                 }
             }
-        }
+                       
+            _log.info("document = " + document);
 
-        return document;
+            return document;
+        } catch (Exception e) {
+            _log.error(e);
+            throw new Exception(e);
+        }
 
     }
 
@@ -233,6 +238,8 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     }
 
     protected void reindexMeasurements(long companyId) throws PortalException {
+        
+        _log.info("reIndexMeasurements()");
 
         final IndexableActionableDynamicQuery indexableActionableDynamicQuery = _measurementLocalService
                 .getIndexableActionableDynamicQuery();
