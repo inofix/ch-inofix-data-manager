@@ -2,8 +2,8 @@
     export_import.jsp: default view of the export-import panel
     
     Created:    2017-11-01 19:01 by Christian Berndt
-    Modified:   2017-12-03 19:07 by Christian Berndt
-    Version:    1.0.2
+    Modified:   2017-12-11 22:32 by Christian Berndt
+    Version:    1.0.3
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -34,13 +34,11 @@
                     portletURL.setParameter("tabs2", "export");
                 %>
 
-                <%-- 
                 <aui:nav-item
                     href="<%= portletURL.toString() %>"
                     label="export"
                     selected='<%= tabs2.equals("export") %>'
                 />
-                --%>
 
                 <%
                     portletURL.setParameter("tabs2", "import");

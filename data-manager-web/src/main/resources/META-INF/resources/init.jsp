@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-12-03 16:04 by Christian Berndt
-    Version:     1.2.6
+    Modified:    2017-12-11 22:33 by Christian Berndt
+    Version:     1.2.7
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -148,7 +148,7 @@
     String password = portletPreferences.getValue("password", "");
     boolean showSearchSpeed = false;
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
-    String tabs2 = ParamUtil.getString(request, "tabs2", "import");
+    String tabs2 = ParamUtil.getString(request, "tabs2", "latest");
     String timestampField = portletPreferences.getValue("timestampField", "timestamp");
     long until = 0;
     long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0"));
