@@ -2,8 +2,8 @@
     navigation.jsp: Default navigation of Inofix' data-manager.
     
     Created:     2017-09-10 17:02 by Christian Berndt
-    Modified:    2017-11-22 23:30 by Christian Berndt
-    Version:     1.0.2
+    Modified:    2017-12-11 22:26 by Christian Berndt
+    Version:     1.0.3
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -14,6 +14,7 @@
     
     PortletURL exportImportURL = renderResponse.createRenderURL();
     exportImportURL.setParameter("tabs1", "export-import"); 
+    exportImportURL.setParameter("tabs2", "export");
     
     long formDateTime = ParamUtil.getLong(request, "formDate");
 %>
