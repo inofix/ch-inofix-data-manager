@@ -22,13 +22,13 @@
     <aui:nav cssClass="navbar-nav">
 
         <%
-            portletURL.setParameter("tabs2", "latest");
+            portletURL.setParameter("tabs2", "channels");
         %>
 
         <aui:nav-item
             href="<%= portletURL.toString() %>"
-            label="latest"
-            selected='<%= tabs2.equals("latest") %>'
+            label="channels"
+            selected='<%= tabs2.equals("channels") %>'
         />
 
         <%
@@ -49,6 +49,6 @@
         <liferay-util:include page="/measurement_list.jsp" servletContext="<%= application %>"/>
     </c:when>
     <c:otherwise>
-        <liferay-util:include page="/latest_measurements.jsp" servletContext="<%= application %>"/>
+        <liferay-util:include page="/channels.jsp" servletContext="<%= application %>"/>
     </c:otherwise>
 </c:choose>
