@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-12-11 22:33 by Christian Berndt
-    Version:     1.2.7
+    Modified:    2017-12-12 16:41 by Christian Berndt
+    Version:     1.2.8
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -18,6 +18,7 @@
 
 <%@page import="ch.inofix.data.background.task.MeasurementExportBackgroundTaskExecutor"%>
 <%@page import="ch.inofix.data.background.task.MeasurementImportBackgroundTaskExecutor"%>
+<%@page import="ch.inofix.data.constants.DataManagerField"%>
 <%@page import="ch.inofix.data.constants.MeasurementActionKeys"%>
 <%@page import="ch.inofix.data.constants.PortletKeys"%>
 <%@page import="ch.inofix.data.exception.FileFormatException"%>
@@ -75,6 +76,7 @@
 <%@page import="com.liferay.portal.kernel.search.facet.collector.TermCollector"%>
 <%@page import="com.liferay.portal.kernel.search.facet.Facet"%>
 <%@page import="com.liferay.portal.kernel.search.facet.MultiValueFacet"%>
+<%@page import="com.liferay.portal.kernel.search.Document"%>
 <%@page import="com.liferay.portal.kernel.search.Hits"%>
 <%@page import="com.liferay.portal.kernel.search.IndexerRegistryUtil"%>
 <%@page import="com.liferay.portal.kernel.search.Indexer"%>
@@ -93,6 +95,7 @@
 <%@page import="com.liferay.portal.kernel.util.ArrayUtil"%>
 <%@page import="com.liferay.portal.kernel.util.CalendarFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.util.Constants"%>
+<%@page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
 <%@page import="com.liferay.portal.kernel.util.HtmlUtil"%>
 <%@page import="com.liferay.portal.kernel.util.HttpUtil"%>
@@ -110,7 +113,10 @@
 <%@page import="com.liferay.portal.kernel.util.WebKeys"%>
 <%@page import="com.liferay.trash.kernel.util.TrashUtil"%>
 
+<%@page import="java.text.DateFormat"%>
 <%@page import="java.text.DecimalFormatSymbols"%>
+<%@page import="java.text.Format"%>
+
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="java.util.Collections"%>
@@ -120,6 +126,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Objects"%>
+
 <%@page import="java.io.Serializable"%>
 
 <%@page import="javax.portlet.PortletURL"%>
@@ -148,7 +155,7 @@
     String password = portletPreferences.getValue("password", "");
     boolean showSearchSpeed = false;
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
-    String tabs2 = ParamUtil.getString(request, "tabs2", "latest");
+    String tabs2 = ParamUtil.getString(request, "tabs2", "channels");
     String timestampField = portletPreferences.getValue("timestampField", "timestamp");
     long until = 0;
     long userId = GetterUtil.getLong(portletPreferences.getValue("userId", "0"));
