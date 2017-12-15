@@ -64,8 +64,8 @@ import ch.inofix.data.service.MeasurementService;
  * 
  * @author Christian Berndt
  * @created 2017-11-01 17:20
- * @modified 2017-12-02 17:53
- * @version 1.0.3
+ * @modified 2017-12-15 23:44
+ * @version 1.0.4
  *
  */
 @Component(
@@ -352,43 +352,32 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
 
     }
     
-    protected void importDataFromURL(ActionRequest actionRequest,  String folderName) throws Exception {
+    protected void importDataFromURL(ActionRequest actionRequest, String folderName) throws Exception {
 
-        _log.info("importDataFromURL()");
-        
         String dataURL = ParamUtil.getString(actionRequest, "dataURL");
-        
-        _log.info("dataURL = " + dataURL);
-        
-        String extension = dataURL.substring(dataURL.lastIndexOf(".") + 1,
-                dataURL.length());
 
-        File file = FileUtil.createTempFile(extension);        
-        
+        String extension = dataURL.substring(dataURL.lastIndexOf(".") + 1, dataURL.length());
+
+        File file = FileUtil.createTempFile(extension);
+
         ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-        
+
         URL url = new URL(dataURL);
-        
+
         String fileName = url.getFile();
-        
-        _log.info("fileName = " + fileName);
 
         FileUtils.copyURLToFile(url, file);
-                
-        _log.info("extension = " + extension);
-        
+
         InputStream inputStream = null;
 
         try {
-            
+
             inputStream = new FileInputStream(file);
-            
-//            inputStream = _dlFileEntryLocalService.getFileAsStream(fileEntry.getFileEntryId(), fileEntry.getVersion(),
-//                    false);
 
             importData(actionRequest, fileName, inputStream);
 
             deleteTempFileEntry(themeDisplay.getScopeGroupId(), folderName);
+
         } finally {
             StreamUtil.cleanUp(inputStream);
         }
