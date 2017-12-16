@@ -14,6 +14,11 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 
@@ -24,8 +29,8 @@ import ch.inofix.data.service.MeasurementLocalServiceUtil;
 /**
  * @author Christian Berndt
  * @created 2017-09-01 22:00
- * @modified 2017-11-09 20:47
- * @version 1.0.2
+ * @modified 2017-12-16 19:41
+ * @version 1.0.4
  */
 public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBackgroundTaskExecutor {
 
@@ -53,27 +58,32 @@ public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBac
 
     @Override
     public BackgroundTaskResult execute(BackgroundTask backgroundTask) throws Exception {
-        
-        _log.info("execute()");
 
         ExportImportConfiguration exportImportConfiguration = getExportImportConfiguration(backgroundTask);
+
+        long userId = exportImportConfiguration.getUserId();
 
         List<FileEntry> attachmentsFileEntries = backgroundTask.getAttachmentsFileEntries();
 
         File file = null;
 
         for (FileEntry attachmentsFileEntry : attachmentsFileEntries) {
+
             try {
-                
+
                 String extension = attachmentsFileEntry.getExtension();
-                
-                _log.info("extension = " + extension);
-                
+
                 file = FileUtil.createTempFile(extension);
 
-                FileUtil.write(file, attachmentsFileEntry.getContentStream());
+                // Setup a permissionChecker for the user configured to own
+                // scheduled import.
 
-                _log.info(file.getAbsoluteFile());
+                PrincipalThreadLocal.setName(userId);
+                PermissionChecker permissionChecker = PermissionCheckerFactoryUtil
+                        .create(UserLocalServiceUtil.getUser(userId));
+                PermissionThreadLocal.setPermissionChecker(permissionChecker);
+
+                FileUtil.write(file, attachmentsFileEntry.getContentStream());
 
                 TransactionInvokerUtil.invoke(transactionConfig,
                         new MeasurementImportCallable(exportImportConfiguration, file));
@@ -116,5 +126,4 @@ public class MeasurementImportBackgroundTaskExecutor extends BaseExportImportBac
         private final File _file;
 
     }
-
 }
