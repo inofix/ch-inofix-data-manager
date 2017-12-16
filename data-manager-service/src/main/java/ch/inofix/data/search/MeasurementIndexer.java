@@ -48,8 +48,8 @@ import ch.inofix.data.service.util.JSONSchemaUtil;
  *
  * @author Christian Berndt
  * @created 2017-09-27 10:52
- * @modified 2017-12-03 19:02
- * @version 1.1.9
+ * @modified 2017-12-16 17:33
+ * @version 1.2.0
  *
  */
 @Component(immediate = true, service = Indexer.class)
@@ -77,19 +77,18 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
         // id
 
-        String id = (String) searchContext.getAttribute("id");
+        String id = (String) searchContext.getAttribute(DataManagerField.ID);
 
         if (Validator.isNotNull(id)) {
-
-            contextBooleanFilter.addRequiredTerm("id", id);
+            contextBooleanFilter.addRequiredTerm(DataManagerField.ID, id);
         }
 
         // timestamp
 
-        long timestamp = GetterUtil.getLong(searchContext.getAttribute("timestamp"));
+        long timestamp = GetterUtil.getLong(searchContext.getAttribute(DataManagerField.TIMESTAMP));
 
         if (timestamp > 0) {
-            contextBooleanFilter.addRequiredTerm("timestamp", timestamp);
+            contextBooleanFilter.addRequiredTerm("timestamp_Number_sortable", timestamp);
         }
 
         // from- and until-date
@@ -99,11 +98,11 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
 
         long max = Long.MAX_VALUE;
         long min = Long.MIN_VALUE;
-        
+
         if (fromDate != null) {
             min = fromDate.getTime();
         }
-        
+
         if (untilDate != null) {
             max = untilDate.getTime();
         }
@@ -115,9 +114,9 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     @Override
     public void postProcessSearchQuery(BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
             SearchContext searchContext) throws Exception {
-                
+        
         addSearchTerm(searchQuery, searchContext, "data", false);
-
+        
         LinkedHashMap<String, Object> params = (LinkedHashMap<String, Object>) searchContext.getAttribute("params");
 
         if (params != null) {
@@ -138,10 +137,6 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
     @Override
     protected Document doGetDocument(Measurement measurement) throws Exception {
 
-        _log.info("doGetDocument()");
-        
-        _log.info(measurement.getTimestamp());
-
         try {
 
             Document document = getBaseModelDocument(CLASS_NAME, measurement);
@@ -149,6 +144,7 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
             document.addDateSortable(Field.CREATE_DATE, measurement.getCreateDate());
             document.addText(DataManagerField.DATA, measurement.getData());
             document.addTextSortable(DataManagerField.ID, measurement.getId());
+            document.addNumberSortable("measurementId", measurement.getMeasurementId());
             document.addTextSortable(DataManagerField.NAME, measurement.getName());
             document.addNumberSortable(Field.STATUS, WorkflowConstants.STATUS_APPROVED);
             document.addDateSortable(DataManagerField.TIMESTAMP, measurement.getTimestamp());
@@ -177,15 +173,13 @@ public class MeasurementIndexer extends BaseIndexer<Measurement> {
                     }
                 }
             }
-                       
-            _log.info("document = " + document);
 
             return document;
+
         } catch (Exception e) {
             _log.error(e);
             throw new Exception(e);
         }
-
     }
 
     @Override

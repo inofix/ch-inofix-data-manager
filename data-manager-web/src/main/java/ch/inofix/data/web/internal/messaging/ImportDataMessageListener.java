@@ -1,8 +1,7 @@
 package ch.inofix.data.web.internal.messaging;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.Serializable;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
@@ -15,6 +14,9 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
+import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
@@ -30,6 +32,7 @@ import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
@@ -38,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.service.MeasurementLocalService;
+import ch.inofix.data.web.configuration.ExportImportConfigurationSettingsMapFactory;
 
 
 
@@ -45,8 +49,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  * 
  * @author Christian Berndt
  * @created 2017-12-14 21:03
- * @modified 2017-12-14 21:03
- * @version 1.0.0
+ * @modified 2017-12-16 19:40
+ * @version 1.0.1
  *
  */
 @Component(immediate = true, service = ImportDataMessageListener.class)
@@ -110,7 +114,9 @@ public class ImportDataMessageListener extends BaseMessageListener {
             String password = PrefsPropsUtil.getString(preferences, "password");
             String[] passwords = getPreferenceValues(password);
             
-//            String userId = PrefsPropsUtil.getString(preferences, "userId");
+            String userId = PrefsPropsUtil.getString(preferences, "userId");
+            String[] userIds = getPreferenceValues(userId);
+            
             String userName = PrefsPropsUtil.getString(preferences, "userName");
             String[] userNames = getPreferenceValues(userName);
 
@@ -149,15 +155,42 @@ public class ImportDataMessageListener extends BaseMessageListener {
                     parameterMap.put("idField", new String[] { idFields[i] });
                     parameterMap.put("nameField", new String[] { nameFields[i] });
                     parameterMap.put("timestampField", new String[] { timestampFields[i] });
+                    
+                    long importUserId = GetterUtil.getLong(userIds[i]);
+                    
+                    Map<String, Serializable> importMeasurementSettingsMap = ExportImportConfigurationSettingsMapFactory
+                            .buildImportMeasurementsSettingsMap(importUserId, groupId, parameterMap,
+                                    null, null);
+                    
+                    ExportImportConfiguration exportImportConfiguration = _exportImportConfigurationLocalService
+                            .addDraftExportImportConfiguration(importUserId,
+                                    ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT, importMeasurementSettingsMap);
 
-                    InputStream inputStream = new FileInputStream(file);
-
-//                    _measurementLocalService.importMeasurementsInBackground(0,exportImport
-
+                    _measurementLocalService.importMeasurementsInBackground(importUserId, exportImportConfiguration, file);
+                    
                 }
             }
         }
     }
+    
+    @Reference(unbind = "-")
+    protected void setExportImportConfigurationLocalService(
+            ExportImportConfigurationLocalService exportImportConfigurationLocalService) {
+
+        _exportImportConfigurationLocalService = exportImportConfigurationLocalService;
+    }
+
+    @Reference(unbind = "-")
+    protected void setMeasurementLocalService(MeasurementLocalService measurementLocalService) {
+        _measurementLocalService = measurementLocalService;
+    }
+
+    @Reference(unbind = "-")
+    protected void setSchedulerEngineHelper(SchedulerEngineHelper schedulerEngineHelper) {
+
+        _schedulerEngineHelper = schedulerEngineHelper;
+    }
+    
     
     private static String[] getPreferenceValues(String str) {
 
@@ -176,17 +209,7 @@ public class ImportDataMessageListener extends BaseMessageListener {
         return preferences;
     }
 
-    @Reference(unbind = "-")
-    protected void setMeasurementLocalService(MeasurementLocalService measurementLocalService) {
-        _measurementLocalService = measurementLocalService;
-    }
-
-    @Reference(unbind = "-")
-    protected void setSchedulerEngineHelper(SchedulerEngineHelper schedulerEngineHelper) {
-
-        _schedulerEngineHelper = schedulerEngineHelper;
-    }
-
+    private ExportImportConfigurationLocalService _exportImportConfigurationLocalService;
     private static final Log _log = LogFactoryUtil.getLog(ImportDataMessageListener.class.getName());
     private MeasurementLocalService _measurementLocalService;
 

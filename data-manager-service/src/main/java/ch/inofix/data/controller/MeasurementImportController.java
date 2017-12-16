@@ -53,8 +53,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-12-02 17:37
- * @version 1.1.3
+ * @modified 2017-12-16 19:46
+ * @version 1.1.4
  *
  */
 @Component(
@@ -131,8 +131,6 @@ public class MeasurementImportController extends BaseExportImportController impl
 
         String extension = FileUtil.getExtension(file.getName().toLowerCase());
 
-        _log.info("extension = " + extension);
-
         StopWatch stopWatch = new StopWatch();
 
         stopWatch.start();
@@ -143,6 +141,8 @@ public class MeasurementImportController extends BaseExportImportController impl
         int numIgnored = 0;
 
         if ("xml".equals(extension)) {
+            
+            _log.info("process xml");
 
             Document document = SAXReaderUtil.read(file);
 
@@ -167,7 +167,7 @@ public class MeasurementImportController extends BaseExportImportController impl
                     String timestampStr = valueElement.attributeValue(timestampField);
                     Date timestamp = getDate(timestampStr);
                     String value = valueElement.getText();
-                    
+                                        
                     JSONObject jsonObject = JSONFactoryUtil.createJSONObject(); 
                     jsonObject.put(DataManagerField.ID, id);
                     jsonObject.put(DataManagerField.NAME, name);
@@ -323,9 +323,7 @@ public class MeasurementImportController extends BaseExportImportController impl
             Date timestamp, String unit, String value) throws Exception {
 
         Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, null, timestamp,
-                null, null, null, true, 0, Integer.MAX_VALUE, null);
-
-        _log.info("hits.getLength() = " + hits.getLength());
+                null, null, null, true, 0, 1, null);
 
         if (hits.getLength() == 0) {
 
@@ -339,41 +337,6 @@ public class MeasurementImportController extends BaseExportImportController impl
             return IGNORED;
         }
     }
-
-//    private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject jsonObject) throws Exception {
-//
-//        String id = jsonObject.getString("id");
-//        Date timestamp = getDate(jsonObject.getString("timestamp"));
-//
-//        Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, null, timestamp,
-//                null, null, null, true, 0, Integer.MAX_VALUE, null);
-//
-//        _log.info("hits.getLength()  = " + hits.getLength());
-//
-//        if (hits.getLength() == 0) {
-//
-//            _measurementLocalService.addMeasurement(userId, jsonObject.toString(), id, null, timestamp, unit, value, serviceContext);
-//
-//            return IMPORTED;
-//
-//        } else {
-//
-//            return IGNORED;
-//        }
-//    }
-    
-    private static JSONObject createJSONObject(String id, String name, String unit, String timestamp, String value) {
-
-        JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-        jsonObject.put("id", id);
-        jsonObject.put("name", name);
-        jsonObject.put("unit", unit);
-        jsonObject.put("timestamp", timestamp);
-        jsonObject.put("value", value);
-
-        return jsonObject;
-
-    }
     
     private static Date getDate(String str) {
 
@@ -382,7 +345,7 @@ public class MeasurementImportController extends BaseExportImportController impl
         if (Validator.isNotNull(str)) {
 
             try {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 date = dateFormat.parse(str);
             } catch (ParseException e) {
                 _log.error(e.getMessage());

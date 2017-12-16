@@ -20,7 +20,6 @@ import org.osgi.service.component.annotations.Reference;
 import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
-import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
 import com.liferay.exportimport.kernel.exception.LARFileException;
 import com.liferay.exportimport.kernel.exception.LARFileSizeException;
 import com.liferay.exportimport.kernel.exception.LARTypeException;
@@ -59,6 +58,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.service.MeasurementService;
+import ch.inofix.data.web.configuration.ExportImportConfigurationSettingsMapFactory;
 
 /**
  * 
@@ -328,25 +328,24 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
     protected void importData(ActionRequest actionRequest, String fileName, InputStream inputStream) throws Exception {
 
         _log.info("importData()");
-                
-        String extension = FileUtil.getExtension(fileName); 
+
+        String extension = FileUtil.getExtension(fileName);
 
         _log.info("extension = " + extension);
-        
+
         ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
         long groupId = ParamUtil.getLong(actionRequest, "groupId");
-        boolean privateLayout = ParamUtil.getBoolean(actionRequest, "privateLayout");
-        
-        // TODO: remove dependency from ExportImportConfigurationSettingsMapFactory
 
-        Map<String, Serializable> importLayoutSettingsMap = ExportImportConfigurationSettingsMapFactory
-                .buildImportLayoutSettingsMap(themeDisplay.getUserId(), groupId, privateLayout, null,
-                        actionRequest.getParameterMap(), themeDisplay.getLocale(), themeDisplay.getTimeZone());
+        Map<String, Serializable> importMeasurementSettingsMap = ExportImportConfigurationSettingsMapFactory
+                .buildImportMeasurementsSettingsMap(themeDisplay.getUserId(), groupId, actionRequest.getParameterMap(),
+                        themeDisplay.getLocale(), themeDisplay.getTimeZone());
 
+        // TODO: reconsider addDraft...
+        // TODO: reconsider TYPE_IMPORT_LAYOUT
         ExportImportConfiguration exportImportConfiguration = _exportImportConfigurationLocalService
                 .addDraftExportImportConfiguration(themeDisplay.getUserId(),
-                        ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT, importLayoutSettingsMap);
+                        ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT, importMeasurementSettingsMap);
 
         _measurementService.importMeasurementsInBackground(exportImportConfiguration, inputStream, extension);
 
