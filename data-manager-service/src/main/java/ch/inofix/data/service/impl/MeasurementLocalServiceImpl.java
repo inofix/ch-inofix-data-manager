@@ -70,8 +70,8 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-12-03 19:03
- * @version 1.1.9
+ * @modified 2017-12-16 17:49
+ * @version 1.2.0
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
@@ -341,16 +341,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
             Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
             throws PortalException {
 
-        _log.info("search()");
-        
-        _log.info("from = " + from);
-        _log.info("until = " + until);
-        
-        _log.info("sort = " + sort);
-
         if (sort == null) {
             sort = new Sort(DataManagerField.TIMESTAMP, true);
-//            sort = new Sort("timestamp_sortable", true);
         }
 
         Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class.getName());
@@ -365,9 +357,6 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     @Override
     public void updateAsset(long userId, Measurement measurement, long[] assetCategoryIds, String[] assetTagNames,
             Double priority) throws PortalException {
-
-        _log.info("updateAsset");
-        _log.info("measurement.getName() = " + measurement.getName());
 
         // TODO
         boolean visible = true;
