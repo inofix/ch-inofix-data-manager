@@ -28,8 +28,8 @@ import ch.inofix.data.model.Measurement;
  *
  * @author Christian Berndt
  * @created 2017-09-27 11:57
- * @modified 2017-11-21 18:11
- * @version 1.0.2
+ * @modified 2017-12-16 19:32
+ * @version 1.0.3
  *
  */
 public class MeasurementSearch extends SearchContainer<Measurement> {
@@ -53,14 +53,12 @@ public class MeasurementSearch extends SearchContainer<Measurement> {
         headerNames.add("until");
 
         orderableHeaders.put("create-date", "createDate_Number_sortable");
-        orderableHeaders.put("data", "data_sortable");
-        orderableHeaders.put("id", "id_sortable");
-        orderableHeaders.put("measurement-id", "taskRecordId_Number_sortable");
+        orderableHeaders.put("id", "id_String_sortable");
+        orderableHeaders.put("measurement-id", "measurementId_Number_sortable");
         orderableHeaders.put("modified-date", "modified_sortable");
-        orderableHeaders.put("name", "name");
+        orderableHeaders.put("name", "name_String_sortable");
         orderableHeaders.put("status", "status_Number_sortable");
         orderableHeaders.put("timestamp", "timestamp_Number_sortable");
-        orderableHeaders.put("user-name", "userName_sortable");
     }
 
     public MeasurementSearch(PortletRequest portletRequest, PortletURL iteratorURL) {
