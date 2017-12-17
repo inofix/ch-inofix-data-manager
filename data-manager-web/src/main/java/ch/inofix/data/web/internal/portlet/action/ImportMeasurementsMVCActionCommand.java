@@ -67,8 +67,8 @@ import ch.inofix.data.web.configuration.ExportImportConfigurationSettingsMapFact
  * 
  * @author Christian Berndt
  * @created 2017-11-01 17:20
- * @modified 2017-12-16 01:15
- * @version 1.0.5
+ * @modified 2017-12-17 23:19
+ * @version 1.0.6
  *
  */
 @Component(
@@ -365,13 +365,16 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
         File file = FileUtil.createTempFile(extension);
 
         ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+        final String user = userName;
+        final String pw = password;
         
         if (Validator.isNotNull(password) && Validator.isNotNull(userName)) {
 
             Authenticator.setDefault(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(userName, password.toCharArray());
+                    return new PasswordAuthentication(user, pw.toCharArray());
                 }
             });
         }
