@@ -1,6 +1,11 @@
 allprojects {
+
     repositories {
         maven { url 'https://jitpack.io' }
+    }
+
+    plugins.withId("com.liferay.node") {
+        node.nodeVersion = "6.12.2"
     }
 }
 
