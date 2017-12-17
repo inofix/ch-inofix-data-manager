@@ -2,8 +2,8 @@
     manage.jsp: manually trigger imports from configured data-urls
     
     Created:    2017-12-01 19:36 by Christian Berndt
-    Modified:   2017-12-01 19:36 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2017-12-16 01:03 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -45,9 +45,17 @@
         
                     <aui:input name="dataURL" type="hidden"
                         value="<%=dataURL%>" />
+                    <aui:input name="password" type="hidden"
+                        value="<%=password%>" />                    
+                    <aui:input name="userName" type="hidden"
+                        value="<%=userName%>" />
                         
                     <aui:input name="dataURL" disabled="<%=true%>"
                         helpMessage="data-url-help" value="<%=dataURL%>" />
+                     <aui:input name="userName" disabled="<%=true%>"
+                        helpMessage="user-name-help" value="<%=userName%>" />
+                     <aui:input name="password" disabled="<%=true%>"
+                        helpMessage="password-help" type="password" value="<%=password%>" />
                 
                 </aui:fieldset>
                 
