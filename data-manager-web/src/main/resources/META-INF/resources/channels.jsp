@@ -2,8 +2,8 @@
     channels.jsp: channels panel of Inofix' data-manager.
     
     Created:     2017-12-03 19:21 by Christian Berndt
-    Modified:    2017-12-12 16:36 by Christian Berndt
-    Version:     1.0.1
+    Modified:    2017-12-17 14:41 by Christian Berndt
+    Version:     1.0.2
 --%>
 
 
@@ -40,7 +40,7 @@
         <%
             for (TermCollector termCollector : idTermCollectors) {
 
-                Sort sort = new Sort(DataManagerField.TIMESTAMP, true);
+                Sort sort = new Sort("timestamp_Number_sortable", true);
 
                 Hits hits = MeasurementServiceUtil.search(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
                         null, termCollector.getTerm(), null, null, null, null, null, true, 0, 1, sort);

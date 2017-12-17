@@ -88,8 +88,6 @@ public class ImportDataMessageListener extends BaseMessageListener {
         List<PortletPreferences> portletPreferencesList = PortletPreferencesLocalServiceUtil
                 .getPortletPreferences(ownerType, plid, portletId);
 
-        _log.info("portletPreferencesList.size() = " + portletPreferencesList.size());
-
         for (PortletPreferences portletPreferences : portletPreferencesList) {
 
             long groupId = portletPreferences.getOwnerId();

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.util.Map;
 
@@ -54,6 +56,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import ch.inofix.data.constants.PortletKeys;
@@ -64,8 +67,8 @@ import ch.inofix.data.web.configuration.ExportImportConfigurationSettingsMapFact
  * 
  * @author Christian Berndt
  * @created 2017-11-01 17:20
- * @modified 2017-12-15 23:44
- * @version 1.0.4
+ * @modified 2017-12-16 01:15
+ * @version 1.0.5
  *
  */
 @Component(
@@ -354,12 +357,24 @@ public class ImportMeasurementsMVCActionCommand extends BaseMVCActionCommand {
     protected void importDataFromURL(ActionRequest actionRequest, String folderName) throws Exception {
 
         String dataURL = ParamUtil.getString(actionRequest, "dataURL");
+        String password = ParamUtil.getString(actionRequest, "password");
+        String userName = ParamUtil.getString(actionRequest, "userName");
 
         String extension = dataURL.substring(dataURL.lastIndexOf(".") + 1, dataURL.length());
 
         File file = FileUtil.createTempFile(extension);
 
         ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+        
+        if (Validator.isNotNull(password) && Validator.isNotNull(userName)) {
+
+            Authenticator.setDefault(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(userName, password.toCharArray());
+                }
+            });
+        }
 
         URL url = new URL(dataURL);
 
