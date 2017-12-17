@@ -6,8 +6,5 @@
     "version": "1.0.0",
     "devDependencies": {
         "liferay-npm-bundler": "^1.2.3"
-    },
-    "scripts": {
-      "build": "[... && ] liferay-npm-bundler"
     }
 }
