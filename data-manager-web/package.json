@@ -2,9 +2,13 @@
     "dependencies": {
         "d3": "4"
     },
-    "name": "data-manager-web",
-    "version": "1.0.0",
+    "description": "JS dependencies of the Data Manager",
     "devDependencies": {
         "liferay-npm-bundler": "^1.2.3"
-    }
+    },
+    "name": "data-manager-web",
+    "scripts": {
+        "build": "liferay-npm-bundler"
+    },
+    "version": "1.0.0"
 }
