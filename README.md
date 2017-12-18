@@ -2,6 +2,22 @@
 
 Ingest, manage and store data from web-enabled sensors.
 
+## IMPORTANT NOTICE ##
+
+ch-inofix-data-manager development targets Liferay CE 7.0.4-ga5. 
+
+Make sure your liferay workspace environment is configured accordingly: 
+
+In $LIFERAY_WORKSPACE/gradle.properties set: 
+
+    liferay.workspace.bundle.url=https://cdn.lfrs.sl/releases.liferay.com/portal/7.0.4-ga5/liferay-ce-portal-tomcat-7.0-ga5-20171018150113838.zip
+
+In $LIFERAY_WORKSPACE/settings.gradle set: 
+
+    classpath group: "com.liferay", name: "com.liferay.gradle.plugins.workspace", version: "1.7.0"
+    
+(see the discussion at https://github.com/liferay/liferay-npm-build-tools/issues/56) 
+
 ## How To Build
 1. Install blade: `curl https://raw.githubusercontent.com/liferay/liferay-blade-cli/master/installers/local | sh`
 1. Create a liferay workspace: `WORKSPACE=my-workspace; blade init $WORKSPACE`
