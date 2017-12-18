@@ -8,7 +8,7 @@
     },
     "name": "data-manager-web",
     "scripts": {
-        "build": "liferay-npm-bundler"
+      "build": "[... && ] liferay-npm-bundler"
     },
     "version": "1.0.0"
 }
