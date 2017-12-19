@@ -1,11 +1,13 @@
 {
     "dependencies": {
-        "d3": "4"
+        "d3": "4.12.0",
+		"jquery": "3.2.1"
     },
-    "description": "JS dependencies of the Data Manager",
+    "description": "Data Manager Portlet",
     "devDependencies": {
         "liferay-npm-bundler": "^1.2.3"
     },
+	"main": "lib/index.es.js",
     "name": "data-manager-web",
     "scripts": {
       "build": "liferay-npm-bundler"

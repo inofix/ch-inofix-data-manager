@@ -30,9 +30,19 @@
             label="channels"
             selected='<%= tabs2.equals("channels") %>'
         />
+        
+        <%
+            portletURL.setParameter("tabs2", "graphs");
+        %>
+
+        <aui:nav-item
+            href="<%= portletURL.toString() %>"
+            label="graphs"
+            selected='<%= tabs2.equals("graphs") %>'
+        />
 
         <%
-            portletURL.setParameter("tabs2", "list");
+            portletURL.setParameter("tabs2", "graphs");
         %>
 
         <aui:nav-item
