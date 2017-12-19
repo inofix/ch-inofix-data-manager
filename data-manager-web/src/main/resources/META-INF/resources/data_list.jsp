@@ -1,5 +1,5 @@
 <%--
-    measurement_list.jsp: List view of Inofix' data-manager.
+    data_list.jsp: List view of Inofix' data-manager.
     
     Created:     2017-12-11 22:33 by Christian Berndt
     Modified:    2017-12-11 22:33 by Christian Berndt
