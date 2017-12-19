@@ -1,5 +1,5 @@
 <%--
-    channels.jsp: channels panel of Inofix' data-manager.
+    data_channels.jsp: channels panel of Inofix' data-manager.
     
     Created:     2017-12-03 19:21 by Christian Berndt
     Modified:    2017-12-17 14:41 by Christian Berndt
