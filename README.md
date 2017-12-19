@@ -14,7 +14,7 @@ In $LIFERAY_WORKSPACE/gradle.properties set:
 
 In $LIFERAY_WORKSPACE/settings.gradle set: 
 
-    classpath group: "com.liferay", name: "com.liferay.gradle.plugins.workspace", version: "1.7.0"
+    classpath group: "com.liferay", name: "com.liferay.gradle.plugins.workspace", version: "1.7.1"
     
 (see the discussion at https://github.com/liferay/liferay-npm-build-tools/issues/56) 
 
