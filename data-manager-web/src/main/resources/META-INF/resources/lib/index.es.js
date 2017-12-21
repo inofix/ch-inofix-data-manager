@@ -1,11 +1,25 @@
-import $ from 'jquery';
+import * as d3 from "d3";
 
-export default function(rootElementId) {
+export default function() {
     
-	var el = $(`#${rootElementId}`);
+ // DOM API
+ var clickMe = document.getElementById('click-me');
+ clickMe.onclick = function() {
+   if (this.style.backgroundColor) {
+     this.style.backgroundColor = '';
+   } else {
+     this.style.backgroundColor = 'red';
+   }
+ }
 
-	el.html('Hello from jQuery!');
-	el.click(() => {
-		alert('Ultra cool!');
-	});
+ // D3 Selection API. Note: it attaches the
+ // callbacks to each element in the selection
+ d3.selectAll('.hover-me')
+   .on('mouseover', function() {
+     this.style.backgroundColor = 'yellow';
+   })
+   .on('mouseleave', function() {
+     this.style.backgroundColor = '';
+   });
+
 }
