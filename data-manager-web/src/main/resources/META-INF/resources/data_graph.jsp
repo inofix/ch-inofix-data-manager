@@ -50,6 +50,13 @@
     
     <aui:a cssClass="pull-right" href="<%= getJSONURL %>" label="download-json" target="_blank"/>
     
+    <!-- Temporary workaround to obtain the library stylesheets -->
+    <link href="/o/data-manager-web/node_modules/billboard.js@1.1.1/dist/billboard.css" rel="stylesheet">
+    
+<!--      <svg width="960" height="500"></svg> -->
+    
+    
+    <%-- 
     <ol>
         <li>id = <%= id %></li>
         <li>interval = <%= interval %></li>
@@ -62,9 +69,15 @@
     <p class="hover-me">OK now hover over here!</p>
 
     <p class="hover-me">Hover here too!</p>
-
+    
+    --%>
+    
+    data_graph.jsp v.1
+    
+    <div id="<portlet:namespace />-BarChart"></div>
+    
     <aui:script require="data-manager-web@1.0.0">
-        dataManagerWeb100.default();
+        dataManagerWeb100.default('<%= getJSONURL %>', '<portlet:namespace/>');
     </aui:script>
 
 </div>
