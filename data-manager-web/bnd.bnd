@@ -8,3 +8,4 @@ Include-Resource: \
     @guava-23.2-jre.jar,\
     @handy-uri-templates-1.1.6.jar,\
     @org.everit.json.schema-1.6.0.jar
+Web-ContextPath: /data-manager-web

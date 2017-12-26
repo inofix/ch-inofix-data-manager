@@ -2,8 +2,8 @@
     data_graph.jsp:  d3 powered channel graph.
 
 	Created:	2017-12-19 00:06 by Christian Berndt
-    Modified: 	2017-12-25 17:57 by Christian Berndt
-    Version:  	1.0.3
+    Modified: 	2017-12-26 18:49 by Christian Berndt
+    Version:  	1.0.4
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -47,24 +47,18 @@
         <portlet:param name="redirect" value="<%=currentURL%>" />
         <portlet:param name="until" value="<%=String.valueOf(until)%>" />
     </portlet:resourceURL>
+        
+    <div class="clearfix" style="margin-bottom: 15px;">    
+        <aui:a cssClass="pull-right" href="<%= getJSONURL %>" label="download-json" target="_blank"/>
+    </div>
     
-    <aui:a cssClass="pull-right" href="<%= getJSONURL %>" label="download-json" target="_blank"/>
+    <!-- Temporary workaround to obtain the billboard.js library stylesheets -->
+    <link href="/o/data-manager-web/node_modules/billboard.js@1.1.1/dist/billboard.css" rel="stylesheet">
+        
+    <div id="<portlet:namespace />-JSONData"></div>
     
-    <ol>
-        <li>id = <%= id %></li>
-        <li>interval = <%= interval %></li>
-        <li>from = <%= from %></li>
-        <li>until = <%= until %></li>
-    </ol>
-
-    <p class="hover-me">Hover over me!</p>
-
-    <p class="hover-me">OK now hover over here!</p>
-
-    <p class="hover-me">Hover here too!</p>
-
     <aui:script require="data-manager-web@1.0.0">
-        dataManagerWeb100.default();
+        dataManagerWeb100.default('<%= getJSONURL %>', '<portlet:namespace/>');
     </aui:script>
 
 </div>

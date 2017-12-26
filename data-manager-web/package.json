@@ -1,8 +1,8 @@
 {
     "dependencies": {
-        "d3": "4.12.0"
+        "billboard.js": "1.1.1"
     },
-    "description": "Data Manager Portlet",
+    "description": "Data Manager Web",
     "devDependencies": {
         "babel-cli": "6.26.0",
         "babel-preset-es2015": "6.24.1",

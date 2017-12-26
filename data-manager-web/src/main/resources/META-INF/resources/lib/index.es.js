@@ -1,15 +1,26 @@
-import * as d3 from "d3";
+import { bb, d3 } from 'billboard.js/dist/billboard';
 
-export default function() {
-
-     // D3 Selection API. Note: it attaches the
-     // callbacks to each element in the selection
-     d3.selectAll('.hover-me')
-     .on('mouseover', function() {
-         this.style.backgroundColor = 'yellow';
-     })
-     .on('mouseleave', function() {
-         this.style.backgroundColor = '';
-     });
+export default function(dataURL, portletNamespace) {
+    
+//    console.log('dataURL = ' + dataURL);
+//    console.log('portletNamespace = ' + portletNamespace);
+    
+    var chart = bb.generate({
+        bindto: `#${portletNamespace}-JSONData`,
+        data: {
+            
+            url: dataURL,
+            mimeType: 'json',
+            keys: {
+                // x: 'name', // it's possible to specify 'x' when category axis
+                value: ['value']
+            }
+        },
+        axis: {
+            x: {
+                // type: 'category'
+            }
+        }
+    });
 
 }
