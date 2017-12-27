@@ -2,8 +2,8 @@
     data_graph.jsp:  d3 powered channel graph.
 
 	Created:	2017-12-19 00:06 by Christian Berndt
-    Modified: 	2017-12-26 18:49 by Christian Berndt
-    Version:  	1.0.4
+    Modified: 	2017-12-26 19:00 by Christian Berndt
+    Version:  	1.0.5
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -53,7 +53,7 @@
     </div>
     
     <!-- Temporary workaround to obtain the billboard.js library stylesheets -->
-    <link href="/o/data-manager-web/node_modules/billboard.js@1.1.1/dist/billboard.css" rel="stylesheet">
+    <link href="/o/data-manager-web/node_modules/billboard.js@1.2.0/dist/billboard.css" rel="stylesheet">
         
     <div id="<portlet:namespace />-JSONData"></div>
     
