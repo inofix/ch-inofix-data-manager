@@ -1,7 +1,7 @@
 import { bb, d3 } from 'billboard.js/dist/billboard';
 
 export default function(dataURL, portletNamespace) {
-    
+       
     var minDate = "2017-12-27T00:00:00";
     var name = "Wassertemperatur";
     var unit = "C°";
@@ -16,13 +16,6 @@ export default function(dataURL, portletNamespace) {
             keys: {
                 value: ['timestamp','value']
             },
-//            "labels": {
-//                "format": {
-//                    "value": function (x) {
-//                        return d3.format('$')(x)
-//                    }
-//                }
-//            },
             mimeType: 'json',
             "names": {
                 "value": name,
@@ -36,7 +29,7 @@ export default function(dataURL, portletNamespace) {
                 "min": minDate,
                 "type": "timeseries",
                 "tick": {
-                    "fit": true,
+                    "count": 4,
                     "format": "%Y-%m-%d"
                 }
             },
@@ -47,9 +40,12 @@ export default function(dataURL, portletNamespace) {
         },
         "tooltip": {
             "format": {
-                "title": function (d) { return '' + d; },
+                "title": function (timestamp) { 
+                    var format = d3.timeFormat("%Y-%m-%d %H:%M");
+                    return format(timestamp) 
+                },
                 "value": function (value, ratio, id) {
-                    var format = id === 'timestamp' ? d3.format('%Y-%m-%d') : d3.format('');
+                    var format = d3.format('');
                     return format(value);
                 }
             }
