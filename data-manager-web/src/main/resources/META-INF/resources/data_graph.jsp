@@ -2,8 +2,8 @@
     data_graph.jsp:  d3 powered channel graph.
 
 	Created:	2017-12-19 00:06 by Christian Berndt
-    Modified: 	2018-01-04 12:03 by Christian Berndt
-    Version:  	1.0.6
+    Modified: 	2018-01-04 14:54 by Christian Berndt
+    Version:  	1.0.7
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -60,7 +60,7 @@
     <div id="<portlet:namespace />-JSONData"></div>
     
     <aui:script require="data-manager-web@1.0.0">
-        dataManagerWeb100.default('<%= getJSONURL %>', '<portlet:namespace/>');
+        dataManagerWeb100.default('<%= getJSONURL %>', '<portlet:namespace/>', '<%= range %>');
     </aui:script>
 
 </div>
