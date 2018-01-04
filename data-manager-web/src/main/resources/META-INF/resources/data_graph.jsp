@@ -2,8 +2,8 @@
     data_graph.jsp:  d3 powered channel graph.
 
 	Created:	2017-12-19 00:06 by Christian Berndt
-    Modified: 	2017-12-26 19:00 by Christian Berndt
-    Version:  	1.0.5
+    Modified: 	2018-01-04 12:03 by Christian Berndt
+    Version:  	1.0.6
 --%>
 
 <%@ include file="/init.jsp"%>
@@ -43,10 +43,12 @@
         <portlet:param name="<%= Constants.CMD %>" value="getJSON" />
         <portlet:param name="id" value="<%=id%>" />
         <portlet:param name="from" value="<%=String.valueOf(from)%>" />
-        <portlet:param name="interval" value="<%=String.valueOf(interval)%>" />
+        <portlet:param name="range" value="<%=range%>" />
         <portlet:param name="redirect" value="<%=currentURL%>" />
         <portlet:param name="until" value="<%=String.valueOf(until)%>" />
     </portlet:resourceURL>
+    
+    range = <%= range %>
         
     <div class="clearfix" style="margin-bottom: 15px;">    
         <aui:a cssClass="pull-right" href="<%= getJSONURL %>" label="download-json" target="_blank"/>

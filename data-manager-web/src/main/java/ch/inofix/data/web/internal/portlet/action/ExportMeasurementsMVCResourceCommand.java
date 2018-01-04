@@ -38,8 +38,8 @@ import ch.inofix.data.web.internal.search.MeasurementSearch;
  * 
  * @author Christian Berndt
  * @created 2017-12-25 13:53
- * @modified 2017-11-02 19:19
- * @version 1.0.0
+ * @modified 2018-01-04 12:20
+ * @version 1.0.1
  *
  */
 @Component(
@@ -177,6 +177,7 @@ public class ExportMeasurementsMVCResourceCommand
 		String data = ParamUtil.getString(request, DataManagerField.DATA);
 		String id = ParamUtil.getString(request, DataManagerField.ID);
 		String name = ParamUtil.getString(request, DataManagerField.NAME);
+		String range = ParamUtil.getString(request, "range");
 
 		// TODO: retrieve the timestamp
 		Date timestamp = null;
@@ -190,7 +191,7 @@ public class ExportMeasurementsMVCResourceCommand
 		if (advancedSearch) {
 
 			hits = MeasurementServiceUtil.search(themeDisplay.getUserId(),
-			        themeDisplay.getScopeGroupId(), data, id, name, timestamp,
+			        themeDisplay.getScopeGroupId(), data, id, name, range, timestamp,
 			        fromDate, untilDate, null, andOperator, start, end, sort);
 
 		} else {

@@ -2,7 +2,7 @@ import { bb, d3 } from 'billboard.js/dist/billboard';
 
 export default function(dataURL, portletNamespace) {
        
-    var minDate = "2017-12-27T00:00:00";
+    var minDate = "2018-01-04T00:00:00";
     var name = "Wassertemperatur";
     var unit = "C°";
     

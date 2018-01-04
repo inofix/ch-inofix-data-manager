@@ -53,8 +53,8 @@ import ch.inofix.data.service.MeasurementLocalService;
  *
  * @author Christian Berndt
  * @created 2017-06-04 18:07
- * @modified 2017-12-16 19:46
- * @version 1.1.4
+ * @modified 2018-01-04 12:17
+ * @version 1.1.5
  *
  */
 @Component(
@@ -65,19 +65,23 @@ import ch.inofix.data.service.MeasurementLocalService;
         MeasurementImportController.class 
     }
 )
-public class MeasurementImportController extends BaseExportImportController implements ImportController {
+public class MeasurementImportController extends BaseExportImportController
+        implements ImportController {
 
     public MeasurementImportController() {
         initXStream();
     }
 
     @Override
-    public void importDataDeletions(ExportImportConfiguration exportImportConfiguration, File file) throws Exception {
+    public void importDataDeletions(
+            ExportImportConfiguration exportImportConfiguration, File file)
+            throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void importFile(ExportImportConfiguration exportImportConfiguration, File file) throws Exception {
+    public void importFile(ExportImportConfiguration exportImportConfiguration,
+            File file) throws Exception {
 
         PortletDataContext portletDataContext = null;
 
@@ -88,28 +92,34 @@ public class MeasurementImportController extends BaseExportImportController impl
             // Map<String, Serializable> settingsMap =
             // exportImportConfiguration.getSettingsMap();
 
-            doImportFile(file, exportImportConfiguration.getUserId(), exportImportConfiguration.getGroupId());
+            doImportFile(file, exportImportConfiguration.getUserId(),
+                    exportImportConfiguration.getGroupId());
             ExportImportThreadLocal.setMeasurementImportInProcess(false);
 
         } catch (Throwable t) {
             ExportImportThreadLocal.setMeasurementImportInProcess(false);
 
-            _exportImportLifecycleManager.fireExportImportLifecycleEvent(EVENT_MEASUREMENTS_IMPORT_FAILED,
-                    getProcessFlag(), PortletDataContextFactoryUtil.clonePortletDataContext(portletDataContext), t);
+            _exportImportLifecycleManager.fireExportImportLifecycleEvent(
+                    EVENT_MEASUREMENTS_IMPORT_FAILED, getProcessFlag(),
+                    PortletDataContextFactoryUtil
+                            .clonePortletDataContext(portletDataContext),
+                    t);
 
             throw t;
         }
     }
 
     @Override
-    public MissingReferences validateFile(ExportImportConfiguration exportImportConfiguration, File file)
+    public MissingReferences validateFile(
+            ExportImportConfiguration exportImportConfiguration, File file)
             throws Exception {
 
         throw new UnsupportedOperationException();
 
     }
 
-    protected void doImportFile(File file, long userId, long groupId) throws Exception {
+    protected void doImportFile(File file, long userId, long groupId)
+            throws Exception {
 
         _log.info("doImportFile");
 
@@ -126,7 +136,8 @@ public class MeasurementImportController extends BaseExportImportController impl
         if (portletPreferences != null) {
             idField = portletPreferences.getValue("idField", "id");
             nameField = portletPreferences.getValue("nameField", "name");
-            timestampField = portletPreferences.getValue("timestampField", "timestamp");
+            timestampField = portletPreferences.getValue("timestampField",
+                    "timestamp");
         }
 
         String extension = FileUtil.getExtension(file.getName().toLowerCase());
@@ -141,7 +152,7 @@ public class MeasurementImportController extends BaseExportImportController impl
         int numIgnored = 0;
 
         if ("xml".equals(extension)) {
-            
+
             _log.info("process xml");
 
             Document document = SAXReaderUtil.read(file);
@@ -164,11 +175,12 @@ public class MeasurementImportController extends BaseExportImportController impl
                 for (Node node : values) {
 
                     Element valueElement = (Element) node;
-                    String timestampStr = valueElement.attributeValue(timestampField);
+                    String timestampStr = valueElement
+                            .attributeValue(timestampField);
                     Date timestamp = getDate(timestampStr);
                     String value = valueElement.getText();
-                                        
-                    JSONObject jsonObject = JSONFactoryUtil.createJSONObject(); 
+
+                    JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
                     jsonObject.put(DataManagerField.ID, id);
                     jsonObject.put(DataManagerField.NAME, name);
                     jsonObject.put(DataManagerField.TIMESTAMP, timestampStr);
@@ -195,8 +207,8 @@ public class MeasurementImportController extends BaseExportImportController impl
 
                             _log.info("Processed " + numProcessed + " of "
                                     + numValues + " measurements in "
-                                    + stopWatch.getTime() + " ms ("
-                                    + completed + "%).");
+                                    + stopWatch.getTime() + " ms (" + completed
+                                    + "%).");
                         }
                     }
 
@@ -210,11 +222,12 @@ public class MeasurementImportController extends BaseExportImportController impl
             _log.info("process json");
 
             try {
-                
-                _log.info("Charset.defaultCharset().toString() = " + Charset.defaultCharset().toString());
-                
+
+                _log.info("Charset.defaultCharset().toString() = "
+                        + Charset.defaultCharset().toString());
+
                 String json = FileUtil.read(file);
-                
+
                 _log.info(json);
 
                 if (Validator.isNotNull(json)) {
@@ -235,14 +248,16 @@ public class MeasurementImportController extends BaseExportImportController impl
 
                         String id = inObject.getString(idField);
                         String name = inObject.getString(nameField);
-                        Date timestamp = getDate(inObject.getString(timestampField));
+                        Date timestamp = getDate(
+                                inObject.getString(timestampField));
                         String unit = inObject.getString(DataManagerField.UNIT);
-                        String value = inObject.getString(DataManagerField.VALUE);
+                        String value = inObject
+                                .getString(DataManagerField.VALUE);
 
                         if (Validator.isNotNull(value)) {
 
-                            int status = addMeasurement(serviceContext, userId, inObject, id, name, timestamp, unit,
-                                    value);
+                            int status = addMeasurement(serviceContext, userId,
+                                    inObject, id, name, timestamp, unit, value);
 
                             if (status == IGNORED) {
                                 numIgnored++;
@@ -269,14 +284,19 @@ public class MeasurementImportController extends BaseExportImportController impl
         }
 
         if (_log.isInfoEnabled()) {
-            _log.info("Importing measurements takes " + stopWatch.getTime() + " ms.");
-            _log.info("Added " + numAdded + " measurements as new, since they did not have a measurementId.");
-            _log.info("Ignored " + numIgnored + " measurements since they already exist in this instance.");
-            _log.info("Imported " + numImported + " measurements since they did not exist in this instance.");
+            _log.info("Importing measurements takes " + stopWatch.getTime()
+                    + " ms.");
+            _log.info("Added " + numAdded
+                    + " measurements as new, since they did not have a measurementId.");
+            _log.info("Ignored " + numIgnored
+                    + " measurements since they already exist in this instance.");
+            _log.info("Imported " + numImported
+                    + " measurements since they did not exist in this instance.");
         }
     }
-    
-    protected PortletPreferences getPortletPreferences(long groupId) throws PortalException {
+
+    protected PortletPreferences getPortletPreferences(long groupId)
+            throws PortalException {
 
         long ownerId = groupId;
         int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
@@ -286,9 +306,11 @@ public class MeasurementImportController extends BaseExportImportController impl
         try {
 
             com.liferay.portal.kernel.model.PortletPreferences portletPreferences = _portletPreferencesLocalService
-                    .getPortletPreferences(ownerId, ownerType, plid, ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
+                    .getPortletPreferences(ownerId, ownerType, plid,
+                            ch.inofix.data.constants.PortletKeys.DATA_MANAGER);
 
-            preferences = PortletPreferencesFactoryUtil.fromDefaultXML(portletPreferences.getPreferences());
+            preferences = PortletPreferencesFactoryUtil
+                    .fromDefaultXML(portletPreferences.getPreferences());
 
         } catch (NoSuchPortletPreferencesException e) {
             _log.warn(e.getMessage());
@@ -304,31 +326,36 @@ public class MeasurementImportController extends BaseExportImportController impl
     }
 
     @Reference(unbind = "-")
-    protected void setExportImportLifecycleManager(ExportImportLifecycleManager exportImportLifecycleManager) {
+    protected void setExportImportLifecycleManager(
+            ExportImportLifecycleManager exportImportLifecycleManager) {
 
         _exportImportLifecycleManager = exportImportLifecycleManager;
     }
 
     @Reference(unbind = "-")
-    protected void setMeasurementLocalService(MeasurementLocalService measurementLocalService) {
+    protected void setMeasurementLocalService(
+            MeasurementLocalService measurementLocalService) {
         this._measurementLocalService = measurementLocalService;
     }
-    
+
     @Reference(unbind = "-")
-    protected void setPortletPreferencesLocalService(PortletPreferencesLocalService portletPreferencesLocalService) {
+    protected void setPortletPreferencesLocalService(
+            PortletPreferencesLocalService portletPreferencesLocalService) {
         _portletPreferencesLocalService = portletPreferencesLocalService;
     }
-    
-    private int addMeasurement(ServiceContext serviceContext, long userId, JSONObject data, String id, String name,
-            Date timestamp, String unit, String value) throws Exception {
 
-        Hits hits = _measurementLocalService.search(userId, serviceContext.getScopeGroupId(), null, id, null, timestamp,
-                null, null, null, true, 0, 1, null);
+    private int addMeasurement(ServiceContext serviceContext, long userId,
+            JSONObject data, String id, String name, Date timestamp,
+            String unit, String value) throws Exception {
+
+        Hits hits = _measurementLocalService.search(userId,
+                serviceContext.getScopeGroupId(), null, id, null, null,
+                timestamp, null, null, null, true, 0, 1, null);
 
         if (hits.getLength() == 0) {
 
-            _measurementLocalService.addMeasurement(userId, data.toString(), id, name, timestamp, unit, value,
-                    serviceContext);
+            _measurementLocalService.addMeasurement(userId, data.toString(), id,
+                    name, timestamp, unit, value, serviceContext);
 
             return IMPORTED;
 
@@ -337,7 +364,7 @@ public class MeasurementImportController extends BaseExportImportController impl
             return IGNORED;
         }
     }
-    
+
     private static Date getDate(String str) {
 
         Date date = null;
@@ -345,7 +372,8 @@ public class MeasurementImportController extends BaseExportImportController impl
         if (Validator.isNotNull(str)) {
 
             try {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                DateFormat dateFormat = new SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss");
                 date = dateFormat.parse(str);
             } catch (ParseException e) {
                 _log.error(e.getMessage());
@@ -355,7 +383,7 @@ public class MeasurementImportController extends BaseExportImportController impl
         return date;
 
     }
-    
+
     private static int IGNORED = 0;
     private static int IMPORTED = 1;
 
@@ -363,6 +391,7 @@ public class MeasurementImportController extends BaseExportImportController impl
     private MeasurementLocalService _measurementLocalService;
     private PortletPreferencesLocalService _portletPreferencesLocalService;
 
-    private static final Log _log = LogFactoryUtil.getLog(MeasurementImportController.class.getName());
+    private static final Log _log = LogFactoryUtil
+            .getLog(MeasurementImportController.class.getName());
 
 }

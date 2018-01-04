@@ -56,8 +56,8 @@ import ch.inofix.data.service.permission.DataManagerPortletPermission;
  *
  * @author Christian Berndt
  * @created 2017-09-27 00:32
- * @modified 2017-12-02 16:52
- * @version 1.0.8
+ * @modified 2018-01-04 12:15
+ * @version 1.0.9
  * @see MeasurementServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementServiceUtil
  */
@@ -70,14 +70,16 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
      * remote service.
      */
     @Override
-    public Measurement addMeasurement(String data, String id, String name, Date timestamp, String unit, String value,
+    public Measurement addMeasurement(String data, String id, String name,
+            Date timestamp, String unit, String value,
             ServiceContext serviceContext) throws PortalException {
 
-        DataManagerPortletPermission.check(getPermissionChecker(), serviceContext.getScopeGroupId(),
+        DataManagerPortletPermission.check(getPermissionChecker(),
+                serviceContext.getScopeGroupId(),
                 MeasurementActionKeys.ADD_MEASUREMENT);
 
-        return measurementLocalService.addMeasurement(getUserId(), data, id, name, timestamp, unit, value,
-                serviceContext);
+        return measurementLocalService.addMeasurement(getUserId(), data, id,
+                name, timestamp, unit, value, serviceContext);
 
     }
 
@@ -89,7 +91,8 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
     }
 
     @Override
-    public void deleteBackgroundTask(long groupId, long backgroundTaskId) throws PortalException {
+    public void deleteBackgroundTask(long groupId, long backgroundTaskId)
+            throws PortalException {
 
         DataManagerPortletPermission.check(getPermissionChecker(), groupId,
                 MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
@@ -99,7 +102,8 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
     }
 
     @Override
-    public List<Measurement> deleteGroupMeasurements(long groupId) throws PortalException {
+    public List<Measurement> deleteGroupMeasurements(long groupId)
+            throws PortalException {
 
         _log.info("deleteGroupMeasurements()");
 
@@ -110,23 +114,28 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
     }
 
     @Override
-    public Measurement deleteMeasurement(long measurementId) throws PortalException {
+    public Measurement deleteMeasurement(long measurementId)
+            throws PortalException {
 
-        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.DELETE);
+        MeasurementPermission.check(getPermissionChecker(), measurementId,
+                MeasurementActionKeys.DELETE);
 
         return measurementLocalService.deleteMeasurement(measurementId);
 
     }
 
     @Override
-    public Measurement getMeasurement(long measurementId) throws PortalException {
+    public Measurement getMeasurement(long measurementId)
+            throws PortalException {
 
-        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.VIEW);
+        MeasurementPermission.check(getPermissionChecker(), measurementId,
+                MeasurementActionKeys.VIEW);
         return measurementLocalService.getMeasurement(measurementId);
     }
 
     @Override
-    public String[] getTempFileNames(long groupId, String folderName) throws PortalException {
+    public String[] getTempFileNames(long groupId, String folderName)
+            throws PortalException {
 
         DataManagerPortletPermission.check(getPermissionChecker(), groupId,
                 MeasurementActionKeys.EXPORT_IMPORT_MEASUREMENTS);
@@ -136,45 +145,54 @@ public class MeasurementServiceImpl extends MeasurementServiceBaseImpl {
     }
 
     @Override
-    public long importMeasurementsInBackground(ExportImportConfiguration exportImportConfiguration,
+    public long importMeasurementsInBackground(
+            ExportImportConfiguration exportImportConfiguration,
             InputStream inputStream, String extension) throws PortalException {
 
-        Map<String, Serializable> settingsMap = exportImportConfiguration.getSettingsMap();
+        Map<String, Serializable> settingsMap = exportImportConfiguration
+                .getSettingsMap();
 
         long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
 
-        DataManagerPortletPermission.check(getPermissionChecker(), targetGroupId,
-                MeasurementActionKeys.IMPORT_MEASUREMENTS);
+        DataManagerPortletPermission.check(getPermissionChecker(),
+                targetGroupId, MeasurementActionKeys.IMPORT_MEASUREMENTS);
 
-        return measurementLocalService.importMeasurementsInBackground(getUserId(), exportImportConfiguration,
-                inputStream, extension);
+        return measurementLocalService.importMeasurementsInBackground(
+                getUserId(), exportImportConfiguration, inputStream, extension);
     }
 
     @Override
-    public Hits search(long userId, long groupId, String keywords, int start, int end, Sort sort)
-            throws PortalException {
+    public Hits search(long userId, long groupId, String keywords, int start,
+            int end, Sort sort) throws PortalException {
 
-        return measurementLocalService.search(userId, groupId, keywords, start, end, sort);
+        return measurementLocalService.search(userId, groupId, keywords, start,
+                end, sort);
     }
 
-    public Hits search(long userId, long groupId, String data, String id, String name, Date timestamp, Date from,
-            Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
-            throws PortalException {
+    public Hits search(long userId, long groupId, String data, String id,
+            String name, String range, Date timestamp, Date from, Date until,
+            LinkedHashMap<String, Object> params, boolean andSearch, int start,
+            int end, Sort sort) throws PortalException {
 
-        return measurementLocalService.search(userId, groupId, data, id, name, timestamp, from, until, params,
-                andSearch, start, end, sort);
+        return measurementLocalService.search(userId, groupId, data, id, name,
+                range, timestamp, from, until, params, andSearch, start, end,
+                sort);
     }
 
     @Override
-    public Measurement updateMeasurement(long measurementId, String data, String id, String name, Date timestamp, String unit, String value,
+    public Measurement updateMeasurement(long measurementId, String data,
+            String id, String name, Date timestamp, String unit, String value,
             ServiceContext serviceContext) throws PortalException {
 
-        MeasurementPermission.check(getPermissionChecker(), measurementId, MeasurementActionKeys.UPDATE);
+        MeasurementPermission.check(getPermissionChecker(), measurementId,
+                MeasurementActionKeys.UPDATE);
 
-        return measurementLocalService.updateMeasurement(measurementId, getUserId(), data, id, name, timestamp, unit, value,
+        return measurementLocalService.updateMeasurement(measurementId,
+                getUserId(), data, id, name, timestamp, unit, value,
                 serviceContext);
 
     }
-    
-    private static Log _log = LogFactoryUtil.getLog(MeasurementServiceImpl.class.getName()); 
+
+    private static Log _log = LogFactoryUtil
+            .getLog(MeasurementServiceImpl.class.getName());
 }

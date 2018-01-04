@@ -2,8 +2,8 @@
     data_channels.jsp: channels panel of Inofix' data-manager.
     
     Created:     2017-12-03 19:21 by Christian Berndt
-    Modified:    2017-12-17 14:41 by Christian Berndt
-    Version:     1.0.2
+    Modified:    2018-01-04 12:26 by Christian Berndt
+    Version:     1.0.3
 --%>
 
 
@@ -46,7 +46,7 @@
                 Hits hits = MeasurementServiceUtil.search(
                         themeDisplay.getUserId(),
                         themeDisplay.getScopeGroupId(), null,
-                        termCollector.getTerm(), null, null, null, null,
+                        termCollector.getTerm(), null, null, null, null, null,
                         null, true, 0, 1, sort);
 
                 if (hits.getLength() > 0) {

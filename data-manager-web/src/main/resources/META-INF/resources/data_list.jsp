@@ -2,8 +2,8 @@
     data_list.jsp: List view of Inofix' data-manager.
     
     Created:     2017-12-11 22:33 by Christian Berndt
-    Modified:    2017-12-11 22:33 by Christian Berndt
-    Version:     1.0.0
+    Modified:    2018-01-04 12:24 by Christian Berndt
+    Version:     1.0.1
 --%>
 
 <%@ include file="/init.jsp" %>
@@ -61,7 +61,7 @@
     if (searchTerms.isAdvancedSearch()) {
 
         hits = MeasurementServiceUtil.search(themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), null,
-                searchTerms.getId(), null, null, fromDate, untilDate, null, searchTerms.isAdvancedSearch(),
+                searchTerms.getId(), null, null, null, fromDate, untilDate, null, searchTerms.isAdvancedSearch(),
                 searchContainer.getStart(), searchContainer.getEnd(), sort);
 
     } else {
