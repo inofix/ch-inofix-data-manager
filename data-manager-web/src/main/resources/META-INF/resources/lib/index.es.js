@@ -1,11 +1,31 @@
+/**
+ *
+ * @author Christian Berndt
+ * @created 2017-12-19 12:31
+ * @modified 2018-01-04 15:09
+ * @version 1.0.1
+ *
+ */
+
 import { bb, d3 } from 'billboard.js/dist/billboard';
 
-export default function(dataURL, portletNamespace) {
+export default function(dataURL, portletNamespace, range) {
        
-    var minDate = "2018-01-04T00:00:00";
+    var minDate = new Date(now - 1000 * 60 * 60 * 24 * 7);      // 1 week
+    var now = new Date().getTime(); 
     var name = "Wassertemperatur";
     var unit = "C°";
     
+    if ("day" === range) {
+        minDate = new Date(now - 1000 * 60 * 60 * 24);          // 1 day
+    } else if ("week" === range) {
+        minDate = new Date(now - 1000 * 60 * 60 * 24 * 7);      // 1 week        
+    } else if ("month" === range) {
+        minDate = new Date(now - 1000 * 60 * 60 * 24 * 30);     // 1 month        
+    } else if ("year" === range) {
+        minDate = new Date(now - 1000 * 60 * 60 * 24 * 365);    // 1 week        
+    }
+        
     var chart = bb.generate({
         bindto: `#${portletNamespace}-JSONData`,
         data: {
