@@ -70,12 +70,13 @@ import ch.inofix.data.service.base.MeasurementLocalServiceBaseImpl;
  *
  * @author Christian Berndt
  * @created 2017-03-08 19:46
- * @modified 2017-12-16 17:49
- * @version 1.2.0
+ * @modified 2018-01-04 12:15
+ * @version 1.2.1
  * @see MeasurementLocalServiceBaseImpl
  * @see ch.inofix.data.service.MeasurementLocalServiceUtil
  */
-public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl {
+public class MeasurementLocalServiceImpl
+        extends MeasurementLocalServiceBaseImpl {
     /*
      * NOTE FOR DEVELOPERS:
      *
@@ -86,8 +87,9 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
     @Indexable(type = IndexableType.REINDEX)
     @Override
-    public Measurement addMeasurement(long userId, String data, String id, String name, Date timestamp,
-            String unit, String value, ServiceContext serviceContext) throws PortalException {
+    public Measurement addMeasurement(long userId, String data, String id,
+            String name, Date timestamp, String unit, String value,
+            ServiceContext serviceContext) throws PortalException {
 
         // Measurement
 
@@ -123,7 +125,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         // Asset
 
-        updateAsset(userId, measurement, serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames(),
+        updateAsset(userId, measurement, serviceContext.getAssetCategoryIds(),
+                serviceContext.getAssetTagNames(),
                 serviceContext.getAssetPriority());
 
         return measurement;
@@ -131,9 +134,11 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public List<Measurement> deleteGroupMeasurements(long groupId) throws PortalException {
+    public List<Measurement> deleteGroupMeasurements(long groupId)
+            throws PortalException {
 
-        List<Measurement> measurements = measurementPersistence.findByGroupId(groupId);
+        List<Measurement> measurements = measurementPersistence
+                .findByGroupId(groupId);
 
         for (Measurement measurement : measurements) {
             deleteMeasurement(measurement);
@@ -146,7 +151,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     @Indexable(type = IndexableType.DELETE)
     @Override
     @SystemEvent(type = SystemEventConstants.TYPE_DELETE)
-    public Measurement deleteMeasurement(Measurement measurement) throws PortalException {
+    public Measurement deleteMeasurement(Measurement measurement)
+            throws PortalException {
 
         // Measurement
 
@@ -154,28 +160,34 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         // Resources
 
-        resourceLocalService.deleteResource(measurement.getCompanyId(), Measurement.class.getName(),
-                ResourceConstants.SCOPE_INDIVIDUAL, measurement.getMeasurementId());
+        resourceLocalService.deleteResource(measurement.getCompanyId(),
+                Measurement.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL,
+                measurement.getMeasurementId());
 
         return measurement;
     }
 
     @Override
-    public Measurement deleteMeasurement(long measurementId) throws PortalException {
+    public Measurement deleteMeasurement(long measurementId)
+            throws PortalException {
 
-        Measurement measurement = measurementPersistence.findByPrimaryKey(measurementId);
+        Measurement measurement = measurementPersistence
+                .findByPrimaryKey(measurementId);
 
         return measurementLocalService.deleteMeasurement(measurement);
     }
 
     @Override
-    public File exportMeasurementsAsFile(ExportImportConfiguration exportImportConfiguration) throws PortalException {
+    public File exportMeasurementsAsFile(
+            ExportImportConfiguration exportImportConfiguration)
+            throws PortalException {
 
         try {
             ExportController measurementExportController = ExportImportControllerRegistryUtil
                     .getExportController(Measurement.class.getName());
 
-            return measurementExportController.export(exportImportConfiguration);
+            return measurementExportController
+                    .export(exportImportConfiguration);
 
         } catch (PortalException pe) {
             _log.error(pe);
@@ -187,7 +199,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public long exportMeasurementsAsFileInBackground(long userId, ExportImportConfiguration exportImportConfiguration)
+    public long exportMeasurementsAsFileInBackground(long userId,
+            ExportImportConfiguration exportImportConfiguration)
             throws PortalException {
 
         // TODO: The export may have different file types / extensions:
@@ -202,17 +215,22 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         Map<String, Serializable> taskContextMap = new HashMap<>();
 
-        taskContextMap.put("exportImportConfigurationId", exportImportConfiguration.getExportImportConfigurationId());
+        taskContextMap.put("exportImportConfigurationId",
+                exportImportConfiguration.getExportImportConfigurationId());
 
-        BackgroundTask backgroundTask = BackgroundTaskManagerUtil.addBackgroundTask(userId,
-                exportImportConfiguration.getGroupId(), exportImportConfiguration.getName(),
-                MeasurementExportBackgroundTaskExecutor.class.getName(), taskContextMap, new ServiceContext());
+        BackgroundTask backgroundTask = BackgroundTaskManagerUtil
+                .addBackgroundTask(userId,
+                        exportImportConfiguration.getGroupId(),
+                        exportImportConfiguration.getName(),
+                        MeasurementExportBackgroundTaskExecutor.class.getName(),
+                        taskContextMap, new ServiceContext());
 
         return backgroundTask.getBackgroundTaskId();
     }
 
     @Override
-    public void importMeasurements(ExportImportConfiguration exportImportConfiguration, File file)
+    public void importMeasurements(
+            ExportImportConfiguration exportImportConfiguration, File file)
             throws PortalException {
 
         _log.info("importMeasurements()");
@@ -223,9 +241,11 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
             ImportController measurementImportController = ExportImportControllerRegistryUtil
                     .getImportController(Measurement.class.getName());
 
-            measurementImportController.importFile(exportImportConfiguration, file);
+            measurementImportController.importFile(exportImportConfiguration,
+                    file);
 
-            _log.info("measurementImportController = " + measurementImportController);
+            _log.info("measurementImportController = "
+                    + measurementImportController);
 
         } catch (PortalException pe) {
             Throwable cause = pe.getCause();
@@ -243,8 +263,9 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public void importMeasurements(ExportImportConfiguration exportImportConfiguration, InputStream inputStream)
-            throws PortalException {
+    public void importMeasurements(
+            ExportImportConfiguration exportImportConfiguration,
+            InputStream inputStream) throws PortalException {
 
         _log.info("importMeasurements()");
 
@@ -267,18 +288,23 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public long importMeasurementsInBackground(long userId, ExportImportConfiguration exportImportConfiguration,
-            File file) throws PortalException {
+    public long importMeasurementsInBackground(long userId,
+            ExportImportConfiguration exportImportConfiguration, File file)
+            throws PortalException {
 
         _log.info("importMeasurementsInBackground()");
 
         Map<String, Serializable> taskContextMap = new HashMap<>();
 
-        taskContextMap.put("exportImportConfigurationId", exportImportConfiguration.getExportImportConfigurationId());
+        taskContextMap.put("exportImportConfigurationId",
+                exportImportConfiguration.getExportImportConfigurationId());
 
-        BackgroundTask backgroundTask = BackgroundTaskManagerUtil.addBackgroundTask(userId,
-                exportImportConfiguration.getGroupId(), exportImportConfiguration.getName(),
-                MeasurementImportBackgroundTaskExecutor.class.getName(), taskContextMap, new ServiceContext());
+        BackgroundTask backgroundTask = BackgroundTaskManagerUtil
+                .addBackgroundTask(userId,
+                        exportImportConfiguration.getGroupId(),
+                        exportImportConfiguration.getName(),
+                        MeasurementImportBackgroundTaskExecutor.class.getName(),
+                        taskContextMap, new ServiceContext());
 
         backgroundTask.addAttachment(userId, file.getName(), file);
 
@@ -286,7 +312,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public long importMeasurementsInBackground(long userId, ExportImportConfiguration exportImportConfiguration,
+    public long importMeasurementsInBackground(long userId,
+            ExportImportConfiguration exportImportConfiguration,
             InputStream inputStream, String extension) throws PortalException {
 
         _log.info("importMeasurementsInBackground()");
@@ -299,7 +326,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
             FileUtil.write(file, inputStream);
 
-            return importMeasurementsInBackground(userId, exportImportConfiguration, file);
+            return importMeasurementsInBackground(userId,
+                    exportImportConfiguration, file);
 
         } catch (IOException ioe) {
             throw new SystemException(ioe);
@@ -309,8 +337,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
     }
 
     @Override
-    public Hits search(long userId, long groupId, String keywords, int start, int end, Sort sort)
-            throws PortalException {
+    public Hits search(long userId, long groupId, String keywords, int start,
+            int end, Sort sort) throws PortalException {
 
         if (sort == null) {
             sort = new Sort(Field.MODIFIED_DATE, true);
@@ -332,31 +360,36 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
             andOperator = true;
         }
 
-        return search(userId, groupId, data, id, name, null, null, null, null, andOperator, start, end, sort);
+        return search(userId, groupId, data, id, name, null, null, null, null,
+                null, andOperator, start, end, sort);
 
     }
 
     @Override
-    public Hits search(long userId, long groupId, String data, String id, String name, Date timestamp, Date from,
-            Date until, LinkedHashMap<String, Object> params, boolean andSearch, int start, int end, Sort sort)
-            throws PortalException {
+    public Hits search(long userId, long groupId, String data, String id,
+            String name, String range, Date timestamp, Date from, Date until,
+            LinkedHashMap<String, Object> params, boolean andSearch, int start,
+            int end, Sort sort) throws PortalException {
 
         if (sort == null) {
             sort = new Sort(DataManagerField.TIMESTAMP, true);
         }
 
-        Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class.getName());
+        Indexer<Measurement> indexer = IndexerRegistryUtil
+                .getIndexer(Measurement.class.getName());
 
-        SearchContext searchContext = buildSearchContext(userId, groupId, data, id, name, timestamp, from, until,
-                params, andSearch, start, end, sort);
+        SearchContext searchContext = buildSearchContext(userId, groupId, data,
+                id, name, range, timestamp, from, until, params, andSearch,
+                start, end, sort);
 
         return indexer.search(searchContext);
 
     }
 
     @Override
-    public void updateAsset(long userId, Measurement measurement, long[] assetCategoryIds, String[] assetTagNames,
-            Double priority) throws PortalException {
+    public void updateAsset(long userId, Measurement measurement,
+            long[] assetCategoryIds, String[] assetTagNames, Double priority)
+            throws PortalException {
 
         // TODO
         boolean visible = true;
@@ -368,25 +401,31 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         Date publishDate = null;
 
-        String summary = HtmlUtil.extractText(StringUtil.shorten(measurement.getData(), 500));
+        String summary = HtmlUtil
+                .extractText(StringUtil.shorten(measurement.getData(), 500));
 
         String className = Measurement.class.getName();
         long classPK = measurement.getMeasurementId();
 
-        assetEntryLocalService.updateEntry(userId, measurement.getGroupId(), measurement.getCreateDate(),
-                measurement.getModifiedDate(), className, classPK, measurement.getUuid(), 0, assetCategoryIds,
-                assetTagNames, true, visible, null, null, publishDate, null, ContentTypes.TEXT_HTML,
-                measurement.getName(), measurement.getName(), summary, null, null, 0, 0, priority);
+        assetEntryLocalService.updateEntry(userId, measurement.getGroupId(),
+                measurement.getCreateDate(), measurement.getModifiedDate(),
+                className, classPK, measurement.getUuid(), 0, assetCategoryIds,
+                assetTagNames, true, visible, null, null, publishDate, null,
+                ContentTypes.TEXT_HTML, measurement.getName(),
+                measurement.getName(), summary, null, null, 0, 0, priority);
     }
 
     @Indexable(type = IndexableType.REINDEX)
     @Override
-    public Measurement updateMeasurement(long measurementId, long userId, String data, String id, String name,
-            Date timestamp, String unit, String value, ServiceContext serviceContext) throws PortalException {
+    public Measurement updateMeasurement(long measurementId, long userId,
+            String data, String id, String name, Date timestamp, String unit,
+            String value, ServiceContext serviceContext)
+            throws PortalException {
 
         // Measurement
 
-        Measurement measurement = measurementPersistence.findByPrimaryKey(measurementId);
+        Measurement measurement = measurementPersistence
+                .findByPrimaryKey(measurementId);
 
         validate(id, name, timestamp, value);
 
@@ -403,16 +442,19 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
 
         // Asset
 
-        updateAsset(userId, measurement, serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames(),
+        updateAsset(userId, measurement, serviceContext.getAssetCategoryIds(),
+                serviceContext.getAssetTagNames(),
                 serviceContext.getAssetPriority());
 
         return measurement;
 
     }
 
-    protected SearchContext buildSearchContext(long userId, long groupId, String data, String id, String name,
-            Date timestamp, Date fromDate, Date untilDate, LinkedHashMap<String, Object> params, boolean andSearch, int start,
-            int end, Sort sort) throws PortalException {
+    protected SearchContext buildSearchContext(long userId, long groupId,
+            String data, String id, String name, String range, Date timestamp,
+            Date fromDate, Date untilDate, LinkedHashMap<String, Object> params,
+            boolean andSearch, int start, int end, Sort sort)
+            throws PortalException {
 
         SearchContext searchContext = new SearchContext();
 
@@ -423,15 +465,19 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         if (Validator.isNotNull(data)) {
             searchContext.setAttribute("data", data);
         }
-        
+
         if (Validator.isNotNull(id)) {
             searchContext.setAttribute("id", id);
         }
-        
+
         if (Validator.isNotNull(name)) {
             searchContext.setAttribute("name", name);
         }
-        
+
+        if (Validator.isNotNull(range)) {
+            searchContext.setAttribute("range", range);
+        }
+
         if (Validator.isNotNull(timestamp)) {
             searchContext.setAttribute("timestamp", timestamp.getTime());
         }
@@ -485,8 +531,8 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         return searchContext;
     }
 
-    protected void validate(String id, String name, Date timestamp, String value)
-            throws PortalException {
+    protected void validate(String id, String name, Date timestamp,
+            String value) throws PortalException {
 
         if (Validator.isNull(id)) {
             throw new MeasurementIdException();
@@ -505,6 +551,7 @@ public class MeasurementLocalServiceImpl extends MeasurementLocalServiceBaseImpl
         }
     }
 
-    private static final Log _log = LogFactoryUtil.getLog(MeasurementLocalServiceImpl.class.getName());
+    private static final Log _log = LogFactoryUtil
+            .getLog(MeasurementLocalServiceImpl.class.getName());
 
 }

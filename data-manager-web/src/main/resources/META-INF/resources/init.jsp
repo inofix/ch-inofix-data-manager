@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2017-12-25 14:03 by Christian Berndt
-    Version:     1.2.9
+    Modified:    2018-01-04 12:04 by Christian Berndt
+    Version:     1.3.0
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -148,12 +148,12 @@
     String dataURL = portletPreferences.getValue("dataURL", "");
     long from = 0;
     String idField = portletPreferences.getValue("idField", "id");
-    int interval = GetterUtil.getInteger(portletPreferences.getValue("interval", "0"), 1000 * 60 * 60); 
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
     String markupView = portletPreferences.getValue("markupView", "lexicon");
     String nameField = portletPreferences.getValue("nameField", "name");
     Date now = new Date();
     String password = portletPreferences.getValue("password", "");
+    String range = ParamUtil.getString(request, "range", "week");
     boolean showSearchSpeed = false;
     String tabs1 = ParamUtil.getString(request, "tabs1", "data");
     String tabs2 = ParamUtil.getString(request, "tabs2", "channels");
