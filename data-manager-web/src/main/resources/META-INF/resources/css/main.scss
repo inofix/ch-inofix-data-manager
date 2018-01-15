@@ -2,8 +2,8 @@
  * main.scss: css specific to the data-manager-portlet.
  *
  * Created:     2017-10-12 16:17 by Christian Berndt
- * Modified:    2017-12-19 16:30 by Christian Berndt
- * Version:     1.0.5
+ * Modified:    2018-01-15 20:16 by Christian Berndt
+ * Version:     1.0.6
  * 
  */
 @import "bourbon";
@@ -119,5 +119,9 @@
             font-weight: 600; 
             padding: 15px;
         }
-    }  
+    }
+
+    .graph-wrapper {
+        padding: 15px;
+    }
 }

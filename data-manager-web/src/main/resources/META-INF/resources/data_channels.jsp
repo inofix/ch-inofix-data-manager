@@ -2,8 +2,8 @@
     data_channels.jsp: channels panel of Inofix' data-manager.
     
     Created:     2017-12-03 19:21 by Christian Berndt
-    Modified:    2018-01-04 12:26 by Christian Berndt
-    Version:     1.0.3
+    Modified:    2018-01-15 23:48 by Christian Berndt
+    Version:     1.0.4
 --%>
 
 
@@ -13,27 +13,8 @@
     Format dateFormat = FastDateFormatFactoryUtil.getDateTime(
             DateFormat.MEDIUM, DateFormat.MEDIUM, locale, timeZone);
 
-    // The list of availabe channels
-    
-    SearchContext searchContext = SearchContextFactory.getInstance(request);
-
-    Facet idFacet = new MultiValueFacet(searchContext);
-    idFacet.setFieldName(DataManagerField.ID);
-
-    searchContext.addFacet(idFacet);
-
-    // Remove facet attributes from context, since we need the field's index here
-
-    searchContext.setAttribute(DataManagerField.ID, null);
-    searchContext.setAttribute("from", 0);
-    searchContext.setAttribute("until", 0);
-
-    Indexer<Measurement> indexer = IndexerRegistryUtil.getIndexer(Measurement.class);
-    indexer.search(searchContext);
-
-    FacetCollector idFacetCollector = idFacet.getFacetCollector();
-    List<TermCollector> idTermCollectors = idFacetCollector.getTermCollectors();
-
+    List<TermCollector> idTermCollectors = (List<TermCollector>) request
+            .getAttribute("data.jsp-idTermCollectors");
 %>
 
 <div class="container-fluid-1280">

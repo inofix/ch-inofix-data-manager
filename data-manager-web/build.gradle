@@ -19,4 +19,3 @@ dependencies {
     compileOnly project(":modules:ch-inofix-data-manager:data-manager-api")
     compileOnly project(":modules:ch-inofix-data-manager:data-manager-service")
 }
-

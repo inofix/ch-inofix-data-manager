@@ -2,8 +2,8 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2018-01-04 12:04 by Christian Berndt
-    Version:     1.3.0
+    Modified:    2018-01-15 16:31 by Christian Berndt
+    Version:     1.3.1
 --%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -46,6 +46,7 @@
 <%@page import="com.liferay.exportimport.kernel.exception.LARFileSizeException"%>
 <%@page import="com.liferay.exportimport.kernel.exception.LARTypeException"%>
 <%@page import="com.liferay.exportimport.kernel.lar.ManifestSummary"%>
+<%@page import="com.liferay.frontend.taglib.servlet.taglib.ManagementBarFilterItem"%>
 <%@page import="com.liferay.portal.kernel.backgroundtask.BackgroundTask"%>
 <%@page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants"%>
 <%@page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil"%>
@@ -147,6 +148,7 @@
     String[] columns = portletPreferences.getValue("columns", "id,name,timestamp,modified-date,user-name").split(StringPool.COMMA);
     String dataURL = portletPreferences.getValue("dataURL", "");
     long from = 0;
+    String id = ParamUtil.getString(request, "id");
     String idField = portletPreferences.getValue("idField", "id");
     String jsonSchema = portletPreferences.getValue("jsonSchema", "");
     String markupView = portletPreferences.getValue("markupView", "lexicon");
