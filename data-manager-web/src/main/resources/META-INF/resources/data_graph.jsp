@@ -1,66 +1,54 @@
 <%--
-    data_graph.jsp:  d3 powered channel graph.
+    data_graph.jsp: billboard / d3 powered channel graph.
 
 	Created:	2017-12-19 00:06 by Christian Berndt
-    Modified: 	2018-01-04 14:54 by Christian Berndt
-    Version:  	1.0.7
+    Modified: 	2018-01-15 18:03 by Christian Berndt
+    Version:  	1.0.8
 --%>
 
 <%@ include file="/init.jsp"%>
 
 <%
-	String id = ParamUtil.getString(request, "id");
-
-	SearchContext searchContext = SearchContextFactory
-	        .getInstance(request);
-
-	Facet idFacet = new MultiValueFacet(searchContext);
-	idFacet.setFieldName(DataManagerField.ID);
+    List<TermCollector> idTermCollectors = (List<TermCollector>) request
+            .getAttribute("data.jsp-idTermCollectors");
     
-    searchContext.addFacet(idFacet);
-
-	Indexer<Measurement> indexer = IndexerRegistryUtil
-	        .getIndexer(Measurement.class);
-	indexer.search(searchContext);
-
-	FacetCollector idFacetCollector = idFacet.getFacetCollector();
-	List<TermCollector> idTermCollectors = idFacetCollector
-	        .getTermCollectors();
-
     // Set default id
     
-	if (Validator.isNull(id)) {
-		if (idTermCollectors.size() > 0) {
-			id = idTermCollectors.get(0).getTerm();
-		}
-	}
+    if (Validator.isNull(id)) {
+        if (idTermCollectors.size() > 0) {
+            id = idTermCollectors.get(0).getTerm();
+        }
+    }
 %>
 
-<div class="container-fluid-1280">   
+<%-- id = <%= id %> <br/> --%>
+<%-- from = <%= from %> <br/> --%>
+<%-- range = <%= range %> <br/> --%>
+<%-- until = <%= until %> <br/>      --%>
 
-    <portlet:resourceURL id="exportMeasurements" var="getJSONURL">
-        <portlet:param name="advancedSearch" value="true" />
-        <portlet:param name="<%= Constants.CMD %>" value="getJSON" />
-        <portlet:param name="id" value="<%=id%>" />
-        <portlet:param name="from" value="<%=String.valueOf(from)%>" />
-        <portlet:param name="range" value="<%=range%>" />
-        <portlet:param name="redirect" value="<%=currentURL%>" />
-        <portlet:param name="until" value="<%=String.valueOf(until)%>" />
-    </portlet:resourceURL>
-    
-    range = <%= range %>
-        
-    <div class="clearfix" style="margin-bottom: 15px;">    
-        <aui:a cssClass="pull-right" href="<%= getJSONURL %>" label="download-json" target="_blank"/>
-    </div>
-    
-    <!-- Temporary workaround to obtain the billboard.js library stylesheets -->
-    <link href="/o/data-manager-web/node_modules/billboard.js@1.2.0/dist/billboard.css" rel="stylesheet">
-        
+<portlet:resourceURL id="exportMeasurements" var="getJSONURL">
+    <portlet:param name="advancedSearch" value="true" />
+    <portlet:param name="<%=Constants.CMD%>" value="getJSON" />
+    <portlet:param name="id" value="<%=id%>" />
+    <portlet:param name="from" value="<%=String.valueOf(from)%>" />
+    <portlet:param name="range" value="<%=range%>" />
+    <portlet:param name="redirect" value="<%=currentURL%>" />
+    <portlet:param name="until" value="<%=String.valueOf(until)%>" />
+</portlet:resourceURL>
+
+<liferay-util:include page="/data_toolbar.jsp" servletContext="<%= application %>">
+    <liferay-util:param name="id" value="<%= id %>"/>
+    <liferay-util:param name="jsonURL" value="<%= getJSONURL.toString() %>"/>
+</liferay-util:include>
+
+  
+<!-- Temporary workaround to obtain the billboard.js library stylesheets -->
+<link href="/o/data-manager-web/node_modules/billboard.js@1.2.0/dist/billboard.css" rel="stylesheet">
+ 
+<div class="graph-wrapper">  
     <div id="<portlet:namespace />-JSONData"></div>
-    
-    <aui:script require="data-manager-web@1.0.0">
-        dataManagerWeb100.default('<%= getJSONURL %>', '<portlet:namespace/>', '<%= range %>');
-    </aui:script>
-
 </div>
+
+<aui:script require="data-manager-web@1.0.0">
+    dataManagerWeb100.default('<%= getJSONURL %>', '<portlet:namespace/>', '<%= range %>');
+</aui:script>
