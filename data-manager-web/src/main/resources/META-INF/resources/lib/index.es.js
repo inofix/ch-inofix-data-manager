@@ -2,19 +2,21 @@
  *
  * @author Christian Berndt
  * @created 2017-12-19 12:31
- * @modified 2018-01-04 15:09
- * @version 1.0.1
+ * @modified 2018-01-16 13:16
+ * @version 1.0.2
  *
  */
 
 import { bb, d3 } from 'billboard.js/dist/billboard';
 
-export default function(dataURL, portletNamespace, range) {
+export default function(dataURL, parameters) {
        
     var minDate = new Date(now - 1000 * 60 * 60 * 24 * 7);      // 1 week
     var now = new Date().getTime(); 
-    var name = "Wassertemperatur";
-    var unit = "C°";
+    var name = parameters.name;
+    var portletNamespace = parameters.namespace;
+    var range = parameters.range;
+    var unit = parameters.unit; 
     
     if ("day" === range) {
         minDate = new Date(now - 1000 * 60 * 60 * 24);          // 1 day
