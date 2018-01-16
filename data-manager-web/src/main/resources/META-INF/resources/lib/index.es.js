@@ -11,21 +11,32 @@ import { bb, d3 } from 'billboard.js/dist/billboard';
 
 export default function(dataURL, parameters) {
        
+    var chartType = parameters.chart;
     var minDate = new Date(now - 1000 * 60 * 60 * 24 * 7);      // 1 week
     var now = new Date().getTime(); 
     var name = parameters.name;
     var portletNamespace = parameters.namespace;
     var range = parameters.range;
+    var tickCount = 7;
+    var tickFormat = "%Y-%m-%d";
     var unit = parameters.unit; 
     
     if ("day" === range) {
         minDate = new Date(now - 1000 * 60 * 60 * 24);          // 1 day
+        tickCount = 12;
+        tickFormat = "%H:%M";
     } else if ("week" === range) {
         minDate = new Date(now - 1000 * 60 * 60 * 24 * 7);      // 1 week        
+        tickCount = 7;
+        tickFormat = "%Y-%m-%d";
     } else if ("month" === range) {
         minDate = new Date(now - 1000 * 60 * 60 * 24 * 30);     // 1 month        
+        tickCount = 4;
+        tickFormat = "%Y-%m-%d";
     } else if ("year" === range) {
         minDate = new Date(now - 1000 * 60 * 60 * 24 * 365);    // 1 week        
+        tickCount = 12;
+        tickFormat = "%m-%d";
     }
         
     var chart = bb.generate({
@@ -42,29 +53,30 @@ export default function(dataURL, parameters) {
             "names": {
                 "value": name,
             },
-            "type": "area"
-//            "type": "area-step"
-//            "type": "bar"
+            "type": chartType
         },
         axis: {
             "x": {
                 "min": minDate,
                 "type": "timeseries",
                 "tick": {
-                    "count": 4,
-                    "format": "%Y-%m-%d"
+                    "fit": false,
+                    "count": tickCount,
+                    "format": tickFormat
                 }
             },
             "y": {
-                "label": unit,
-                "position": "outer-middle"
+                "label": {
+                    "text": unit,
+                    "position": "outer-middle"
+                }
             }
         },
         "tooltip": {
             "format": {
                 "title": function (timestamp) { 
                     var format = d3.timeFormat("%Y-%m-%d %H:%M");
-                    return format(timestamp) 
+                    return format(timestamp); 
                 },
                 "value": function (value, ratio, id) {
                     var format = d3.format('');

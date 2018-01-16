@@ -2,13 +2,15 @@
     data_graph.jsp: billboard / d3 powered channel graph.
 
 	Created:	2017-12-19 00:06 by Christian Berndt
-    Modified: 	2018-01-16 13:09 by Christian Berndt
-    Version:  	1.0.9
+    Modified: 	2018-01-16 16:39 by Christian Berndt
+    Version:  	1.1.0
 --%>
 
 <%@ include file="/init.jsp"%>
 
 <%
+    String chart = ParamUtil.getString(request, "chart", "area");
+
     List<TermCollector> idTermCollectors = (List<TermCollector>) request
             .getAttribute("data.jsp-idTermCollectors");
     
@@ -75,6 +77,7 @@
     <aui:script require="data-manager-web@1.0.0">
     
         var parameters = {
+                "chart" : '<%= chart %>',
                 "name" : '<%= measurement.getName() %>',
                 "namespace" : '<portlet:namespace/>',
                 "range" : '<%= range %>',

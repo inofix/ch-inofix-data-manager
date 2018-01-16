@@ -2,40 +2,51 @@
     data_toolbar.jsp: The data-toolbar of the data-manager portlet
 
     Created:    2018-01-15 16:23 by Christian Berndt
-    Modified:   2018-01-15 16:23 by Christian Berndt
-    Version:    1.0.0
+    Modified:   2018-01-15 14:40 by Christian Berndt
+    Version:    1.0.1
 --%>
 
 <%@ include file="/init.jsp"%>
 
-<%        
-    String jsonURL = request.getParameter("jsonURL"); 
+<%
+    String chart = ParamUtil.getString(request, "chart", "area");
+    String jsonURL = request.getParameter("jsonURL");
 
     PortletURL portletURL = liferayPortletResponse.createRenderURL();
     portletURL.setParameters(renderRequest.getParameterMap());
-    
+
+    String[] types = { "area", "area-step", "area-spline", "bar",
+            "bubble",
+            // "donut", "gauge",    // available but not applicable
+            "line",
+            // "pie",               // available but not applicable
+            "scatter", "spline", "step" };
+    List<ManagementBarFilterItem> chartFilterItems = new ArrayList<ManagementBarFilterItem>();
+
+    for (String type : types) {
+        portletURL.setParameter("chart", type);
+        portletURL.setParameter("range", range);
+        chartFilterItems.add(new ManagementBarFilterItem(type,
+                portletURL.toString()));
+    }
+
+    String[] ranges = { "day", "week", "month", "year" };
     List<ManagementBarFilterItem> rangeFilterItems = new ArrayList<ManagementBarFilterItem>();
-    
-    portletURL.setParameter("range", "day");
-    rangeFilterItems.add(new ManagementBarFilterItem("day", portletURL.toString()));
-    
-    portletURL.setParameter("range", "week");
-    rangeFilterItems.add(new ManagementBarFilterItem("week", portletURL.toString()));
-    
-    portletURL.setParameter("range", "month");
-    rangeFilterItems.add(new ManagementBarFilterItem("month", portletURL.toString()));
-    
-    portletURL.setParameter("range", "year");
-    rangeFilterItems.add(new ManagementBarFilterItem("year", portletURL.toString()));
-    
-    
+
+    for (String chartRange : ranges) {
+        portletURL.setParameter("chart", chart);
+        portletURL.setParameter("range", chartRange);
+        rangeFilterItems.add(new ManagementBarFilterItem(chartRange,
+                portletURL.toString()));
+    }
+
     List<ManagementBarFilterItem> channelFilterItems = new ArrayList<ManagementBarFilterItem>();
 
     List<TermCollector> idTermCollectors = (List<TermCollector>) request
             .getAttribute("data.jsp-idTermCollectors");
-    
+
     for (TermCollector termCollector : idTermCollectors) {
-        
+
         Sort sort = new Sort("timestamp_Number_sortable", true);
 
         Hits hits = MeasurementServiceUtil.search(
@@ -49,16 +60,18 @@
             List<Measurement> measurements = MeasurementUtil
                     .getMeasurements(hits);
             Measurement measurement = measurements.get(0);
-            
-            String label = measurement.getId() + StringPool.SPACE + measurement.getName();
-        
+
+            String label = measurement.getId() + StringPool.SPACE
+                    + measurement.getName();
+
+            portletURL.setParameter("chart", chart);
             portletURL.setParameter("id", measurement.getId());
             portletURL.setParameter("range", range);
-            channelFilterItems.add(new ManagementBarFilterItem(measurement.getId(), label, portletURL.toString()));
-            
-        }       
-    }
+            channelFilterItems.add(new ManagementBarFilterItem(
+                    measurement.getId(), label, portletURL.toString()));
 
+        }
+    }
 %>
 
 <liferay-frontend:management-bar>
@@ -70,6 +83,9 @@
              
          <liferay-frontend:management-bar-filter label="channel" value="<%= id %>" 
              managementBarFilterItems="<%= channelFilterItems %>"/>
+             
+         <liferay-frontend:management-bar-filter label="chart" value="<%= chart %>" 
+             managementBarFilterItems="<%= chartFilterItems %>"/>
         
     </liferay-frontend:management-bar-filters>
 
