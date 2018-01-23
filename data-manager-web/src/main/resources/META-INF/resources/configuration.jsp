@@ -2,13 +2,17 @@
     configuration.jsp: configuration of the data-manager portlet.
     
     Created:    2017-09-14 17:33 by Christian Berndt
-    Modified:   2017-11-21 20:41 by Christian Berndt
+    Modified:   2018-01-22 23:41 by Stefan Lübbers
     Version:    1.0.7
 --%>
 
 <%@ include file="/init.jsp"%>
 
 <%
+    //String[] columns = new String[0];
+    PortletURL portletURL = renderResponse.createRenderURL();
+    MeasurementSearch searchContainer = new MeasurementSearch(liferayPortletRequest, portletURL);
+    List<String> headerList = searchContainer.getHeaderNames();
     List<User> users = UserServiceUtil.getGroupUsers(scopeGroupId);
 %>
 
@@ -104,8 +108,33 @@
                 id="displaySettingsPanel" markupView="<%=markupView%>"
                 persistState="<%=true%>" title="display-settings">
 
-                <aui:input name="preferences--columns--"
-                    helpMessage="columns-help" value="<%= StringUtil.merge(columns) %>" />
+                <aui:fieldset collapsible="<%=true%>" label="show-columns">
+	            <%
+	                Set<String> availableColumns = SetUtil.fromList(headerList);
+	                // Left list
+	                List leftList = new ArrayList();
+	                for (String column : columns) {
+	                    leftList.add(new KeyValuePair(column, LanguageUtil.get(request, column)));
+	                }
+	                // Right list
+	                List rightList = new ArrayList();
+	                Arrays.sort(columns);
+	                for (String column : availableColumns) {
+	                    if (Arrays.binarySearch(columns, column) < 0) {
+	                        rightList.add(new KeyValuePair(column, LanguageUtil.get(request, column)));
+	                    }
+	                }
+	                rightList = ListUtil.sort(rightList, new KeyValuePairComparator(false, true));
+	            %>
+    
+                <liferay-ui:input-move-boxes
+                    leftBoxName="currentColumns"
+                    leftList="<%=leftList%>"
+                    leftReorder="<%=Boolean.TRUE.toString()%>"
+                    leftTitle="current"
+                    rightBoxName="availableColumns"
+                    rightList="<%=rightList%>" rightTitle="available" />
+            </aui:fieldset>
 
             </liferay-ui:panel>
 
@@ -122,6 +151,8 @@
         var Util = Liferay.Util;
 
         var form = AUI.$(document.<portlet:namespace />fm);
+        
+        form.fm('columns').val(Util.listSelect(form.fm('currentColumns')));
 
         submitForm(form);
     }

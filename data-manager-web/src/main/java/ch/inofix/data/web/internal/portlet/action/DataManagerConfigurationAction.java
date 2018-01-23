@@ -2,6 +2,8 @@ package ch.inofix.data.web.internal.portlet.action;
 
 import java.util.Map;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +17,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
+import com.liferay.portal.kernel.util.ParamUtil;
+
 import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.web.configuration.DataManagerConfiguration;
 
@@ -32,6 +36,21 @@ import ch.inofix.data.web.configuration.DataManagerConfiguration;
     service = ConfigurationAction.class
 )
 public class DataManagerConfigurationAction extends DefaultConfigurationAction {
+	
+	@Override
+    public String getJspPath(HttpServletRequest httpServletRequest) {
+        return "/configuration.jsp";
+    }
+	@Override
+    public void processAction(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse)
+            throws Exception {
+
+        String columns = ParamUtil.getString(actionRequest, "columns");
+        
+        setPreference(actionRequest, "columns", columns.split(","));
+        
+        super.processAction(portletConfig, actionRequest, actionResponse);
+    }
 
     @Override
     public void include(PortletConfig portletConfig, HttpServletRequest httpServletRequest,
