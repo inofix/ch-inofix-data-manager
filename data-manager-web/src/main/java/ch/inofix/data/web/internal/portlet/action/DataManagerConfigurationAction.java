@@ -23,9 +23,9 @@ import ch.inofix.data.constants.PortletKeys;
 import ch.inofix.data.web.configuration.DataManagerConfiguration;
 
 /**
- * @author Christian Berndt
+ * @author Christian Berndt, Stefan Lübbers
  * @created 2017-09-14 17:28
- * @modified 2017-10-25 22:44
+ * @modified 2018-01-23 01:13
  * @version 1.0.1
  */
 @Component(
@@ -36,15 +36,11 @@ import ch.inofix.data.web.configuration.DataManagerConfiguration;
     service = ConfigurationAction.class
 )
 public class DataManagerConfigurationAction extends DefaultConfigurationAction {
-	
-	@Override
-    public String getJspPath(HttpServletRequest httpServletRequest) {
-        return "/configuration.jsp";
-    }
-	@Override
+
+    @Override
     public void processAction(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse)
             throws Exception {
-
+        
         String columns = ParamUtil.getString(actionRequest, "columns");
         
         setPreference(actionRequest, "columns", columns.split(","));
