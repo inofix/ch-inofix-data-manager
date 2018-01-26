@@ -107,6 +107,8 @@
             <liferay-ui:panel collapsible="<%=true%>" extended="<%= true %>"
                 id="displaySettingsPanel" markupView="<%=markupView%>"
                 persistState="<%=true%>" title="display-settings">
+                
+                <aui:input name="columns" type="hidden"/>
 
                 <aui:fieldset collapsible="<%=true%>" label="show-columns">
 	            <%
