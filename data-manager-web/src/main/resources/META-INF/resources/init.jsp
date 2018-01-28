@@ -2,7 +2,7 @@
     init.jsp: Common imports and initialization code.
 
     Created:     2017-09-10 16:39 by Christian Berndt
-    Modified:    2018-01-15 16:31 by Christian Berndt
+    Modified:    2018-01-23 01:13 by Stefan Lübbers
     Version:     1.3.1
 --%>
 
@@ -100,11 +100,15 @@
 <%@page import="com.liferay.portal.kernel.util.GetterUtil"%>
 <%@page import="com.liferay.portal.kernel.util.HtmlUtil"%>
 <%@page import="com.liferay.portal.kernel.util.HttpUtil"%>
+<%@page import="com.liferay.portal.kernel.util.KeyValuePair"%>
+<%@page import="com.liferay.portal.kernel.util.KeyValuePairComparator"%>
+<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
 <%@page import="com.liferay.portal.kernel.util.ParamUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portal.kernel.util.PropsKeys"%>
 <%@page import="com.liferay.portal.kernel.util.PortalUtil"%>
+<%@page import="com.liferay.portal.kernel.util.SetUtil"%>
 <%@page import="com.liferay.portal.kernel.util.StringBundler"%>
 <%@page import="com.liferay.portal.kernel.util.StringPool"%>
 <%@page import="com.liferay.portal.kernel.util.StringUtil"%>
@@ -118,6 +122,7 @@
 <%@page import="java.text.DecimalFormatSymbols"%>
 <%@page import="java.text.Format"%>
 
+<%@page import="java.util.Arrays"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="java.util.Collections"%>
@@ -127,6 +132,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Objects"%>
+<%@page import="java.util.Set"%>
 
 <%@page import="java.io.Serializable"%>
 
@@ -145,7 +151,7 @@
 
 <%
     Calendar calendar = Calendar.getInstance();
-    String[] columns = portletPreferences.getValue("columns", "id,name,timestamp,modified-date,user-name").split(StringPool.COMMA);
+    String[] columns = portletPreferences.getValues("columns", "id,name,timestamp,modified-date,user-name".split(StringPool.COMMA));
     String dataURL = portletPreferences.getValue("dataURL", "");
     long from = 0;
     String id = ParamUtil.getString(request, "id");
@@ -168,7 +174,6 @@
             .getAttribute(DataManagerConfiguration.class.getName());
 
     if (Validator.isNotNull(dataManagerConfiguration)) {
-
         columns = portletPreferences.getValues("columns", dataManagerConfiguration.columns());
         dataURL = portletPreferences.getValue("dataURL", dataManagerConfiguration.dataURL());
         idField = portletPreferences.getValue("idField", dataManagerConfiguration.idField());

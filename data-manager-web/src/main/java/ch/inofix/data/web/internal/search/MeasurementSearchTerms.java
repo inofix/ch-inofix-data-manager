@@ -21,10 +21,9 @@ public class MeasurementSearchTerms extends MeasurementDisplayTerms {
         super(portletRequest);
 
         data = DAOParamUtil.getString(portletRequest, DATA);
-        from = DAOParamUtil.getLong(portletRequest, FROM);
         groupId = DAOParamUtil.getLong(portletRequest, GROUP_ID);
         status = DAOParamUtil.getInteger(portletRequest, STATUS);
-        until = DAOParamUtil.getLong(portletRequest, UNTIL);
+        unit = DAOParamUtil.getLong(portletRequest, UNIT);
 
     }
 }

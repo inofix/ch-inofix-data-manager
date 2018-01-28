@@ -42,7 +42,6 @@ public class MeasurementSearch extends SearchContainer<Measurement> {
     static {
         headerNames.add("create-date");
         headerNames.add("data");
-        headerNames.add("from");
         headerNames.add("id");
         headerNames.add("measurement-id");
         headerNames.add("modified-date");
@@ -50,7 +49,7 @@ public class MeasurementSearch extends SearchContainer<Measurement> {
         headerNames.add("status");
         headerNames.add("timestamp");
         headerNames.add("user-name");
-        headerNames.add("until");
+        headerNames.add("unit");
 
         orderableHeaders.put("create-date", "createDate_Number_sortable");
         orderableHeaders.put("id", "id_String_sortable");
@@ -90,8 +89,7 @@ public class MeasurementSearch extends SearchContainer<Measurement> {
         iteratorURL.setParameter(MeasurementDisplayTerms.STATUS, String.valueOf(displayTerms.getStatus()));
         iteratorURL.setParameter(MeasurementDisplayTerms.USER_NAME, displayTerms.getUserName());
         iteratorURL.setParameter(MeasurementDisplayTerms.MODIFIED_DATE, displayTerms.getModifiedDate());
-        iteratorURL.setParameter(MeasurementDisplayTerms.FROM, String.valueOf(displayTerms.getFrom()));
-        iteratorURL.setParameter(MeasurementDisplayTerms.UNTIL, String.valueOf(displayTerms.getUntil()));
+        iteratorURL.setParameter(MeasurementDisplayTerms.UNIT, String.valueOf(displayTerms.getUnit()));
 
         try {
             PortalPreferences preferences = PortletPreferencesFactoryUtil.getPortalPreferences(portletRequest);
